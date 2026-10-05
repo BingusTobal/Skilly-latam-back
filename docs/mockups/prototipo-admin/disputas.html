@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Disputas</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --amber:#b8860b;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --amber-bg:#fbeecb;
+    --red-bg:#fbdcdc;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.alert{background:var(--red-bg);}
+  .kpi.alert b{color:var(--red);}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .section-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .section-title h2{font-size:15px;margin:0;}
+  .section-title .tag{font-size:11px;color:#888;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  td{padding:10px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+
+  .status{font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:bold;}
+  .status.open{color:var(--red);background:var(--red-bg);}
+  .status.review{color:var(--navy);background:var(--blue-bg);}
+  .status.resolved{color:var(--green);background:var(--green-bg);}
+
+  .link-btn{font-size:11.5px;border:1px solid #000;padding:5px 12px;background:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html" class="active">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Disputas</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi alert"><b>2</b><span>Disputas abiertas</span></div>
+      <div class="kpi"><b>1</b><span>En revisión</span></div>
+      <div class="kpi ok"><b>11</b><span>Resueltas este mes</span></div>
+      <div class="kpi"><b>$1.350.000</b><span>Monto retenido en disputa</span></div>
+    </div>
+
+    <div class="section-title">
+      <h2>Casos</h2>
+      <span class="tag">3 requieren acción</span>
+    </div>
+
+    <table>
+      <tr>
+        <th>Servicio</th><th>Organización</th><th>Profesional</th><th>Motivo</th><th>Monto retenido</th><th>Estado</th><th></th>
+      </tr>
+      <tr>
+        <td>Rediseño UX/UI de landing</td><td>Estudio Norte</td><td>María José Delgado</td>
+        <td>Entrega incompleta</td><td>$650.000</td>
+        <td><span class="status open">Abierta</span></td><td><button class="link-btn">Revisar</button></td>
+      </tr>
+      <tr>
+        <td>Auditoría financiera PYME</td><td>Constructora Alba</td><td>Andrés Muñoz</td>
+        <td>No cumple el alcance acordado</td><td>$400.000</td>
+        <td><span class="status open">Abierta</span></td><td><button class="link-btn">Revisar</button></td>
+      </tr>
+      <tr>
+        <td>Estrategia de marketing digital</td><td>Comercial Rojas</td><td>Camila Rojas</td>
+        <td>Retraso en la entrega</td><td>$350.000</td>
+        <td><span class="status review">En revisión</span></td><td><button class="link-btn">Revisar</button></td>
+      </tr>
+      <tr>
+        <td>Taller de bienestar laboral</td><td>Grupo Iturra</td><td>Tomás Iturra</td>
+        <td>Falta de comunicación</td><td>$150.000</td>
+        <td><span class="status resolved">Resuelta — a favor del profesional</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

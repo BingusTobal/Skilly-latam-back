@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Mis servicios</title>
+<style>
+  :root{ --navy:#1a3a5c; --red:#c62828; --green:#2e7d32; --amber:#b8860b;
+    --blue-bg:#cfe8f3; --green-bg:#dcf0d8; --amber-bg:#fbeecb; --gray-line:#d0d0d0; --ink:#1a1a1a; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:820px;background:#fff;border:1px solid #000;padding:22px 28px 32px;}
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:20px;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:14px;}
+  .logo svg{width:20px;height:20px;}
+  .navlinks{display:flex;gap:24px;font-size:13px;align-items:center;}
+  .navlinks a{color:#000;text-decoration:none;}
+  .navlinks a.active{font-weight:bold;text-decoration:underline;}
+  .navlinks .me{color:#666;font-size:12px;}
+
+  .head-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  h1{font-size:20px;margin:0;}
+  .btn-new{background:#000;color:#fff;border:1px solid #000;padding:10px 18px;font-size:13px;cursor:pointer;text-decoration:none;}
+
+  .card{border:1px solid var(--gray-line);padding:16px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .card .name{font-size:14px;font-weight:bold;margin-bottom:4px;}
+  .card .meta{font-size:11.5px;color:#777;}
+  .status{font-size:10.5px;padding:4px 10px;border-radius:2px;font-weight:bold;}
+  .status.active{background:var(--green-bg);color:var(--green);}
+  .status.review{background:var(--amber-bg);color:var(--amber);}
+  .price{font-size:15px;font-weight:bold;color:var(--red);}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="topnav">
+    <div class="logo"><svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg> Skilly Latam</div>
+    <div class="navlinks">
+      <a href="mis-servicios.html" class="active">Mis servicios</a>
+      <a href="mis-solicitudes.html">Mis solicitudes</a>
+      <a href="#">Help</a>
+      <span class="me">Juan Pérez</span>
+    </div>
+  </div>
+
+  <div class="head-row">
+    <h1>Mis servicios</h1>
+    <a class="btn-new" href="publicar-servicio.html">+ Publicar nuevo servicio</a>
+  </div>
+
+  <div class="card">
+    <div>
+      <div class="name">Sitio web corporativo en 15 días</div>
+      <div class="meta">Desarrollo software · 14 servicios completados</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="price">$700.000</div>
+      <span class="status active">Activo</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>
+      <div class="name">Soporte técnico mensual</div>
+      <div class="meta">Desarrollo software · enviado hace 2 días</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="price">$200.000</div>
+      <span class="status review">En revisión</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

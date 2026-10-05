@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Confirmar entrega</title>
+<style>
+  :root{
+    --red:#c62828;
+    --green:#2e7d32;
+    --navy:#1a3a5c;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:640px;background:#fff;border:1px solid #000;padding:22px 26px 30px;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:16px;}
+  .logo svg{width:22px;height:22px;}
+  .navlinks{display:flex;gap:34px;font-size:14px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  .back-row{font-size:13px;margin-bottom:6px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .crumb{font-size:12px;color:#777;margin-bottom:18px;}
+
+  .status-banner{
+    display:flex;align-items:center;gap:10px;
+    background:var(--gray-bg);border:1px solid var(--green);color:var(--green);
+    padding:11px 14px;margin-bottom:20px;font-size:13px;font-weight:bold;
+  }
+  .status-banner .sub{display:block;font-weight:normal;color:#555;font-size:11px;margin-top:2px;}
+
+  h1.title{font-size:19px;margin:0 0 16px;}
+
+  .card{border:1px solid #000;padding:14px 16px;margin-bottom:18px;}
+  .card h3{font-size:13px;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--gray-line);}
+  .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;color:#333;}
+  .row span:first-child{color:#777;}
+
+  .quote-box{
+    border-left:3px solid var(--gray-line);padding:8px 12px;margin-top:10px;
+    font-size:12px;color:#444;font-style:italic;background:var(--gray-bg);
+  }
+  .quote-box .who{display:block;font-size:10.5px;color:#888;font-style:normal;margin-top:6px;}
+
+  .amount-box{
+    border:1px solid #000;padding:16px;text-align:center;margin-bottom:18px;background:var(--gray-bg);
+  }
+  .amount-box .label{font-size:11px;color:#666;margin-bottom:4px;}
+  .amount-box .amount{font-size:24px;font-weight:bold;color:var(--red);}
+  .amount-box .state{font-size:10.5px;color:#888;margin-top:4px;}
+  .amount-box .state b{color:var(--navy);}
+
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12px;color:#444;margin-bottom:6px;}
+  .textarea-box{border:1px solid #999;min-height:60px;padding:9px 10px;font-size:12px;color:#999;background:#fff;}
+  .field-note{font-size:10.5px;color:#888;margin-top:5px;}
+
+  .actions{display:flex;gap:12px;margin-bottom:6px;}
+  .btn{flex:1;text-align:center;font-size:14px;padding:12px 0;border:1px solid #000;cursor:pointer;}
+  .btn-confirm{background:#000;color:#fff;}
+  .btn-report{background:#fff;color:var(--red);border-color:var(--red);}
+
+  .footnote{font-size:10.5px;color:#888;margin-top:10px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="back-row"><a href="mis-reservas.html">&larr; Volver a mis reservas</a></div>
+  <div class="crumb">Mis servicios &gt; Sitio web corporativo en 15 días &gt; Confirmar entrega</div>
+
+  <div class="status-banner">
+    <span>✓</span>
+    <span>
+      Juan Pérez marcó este servicio como entregado
+      <span class="sub">19 de septiembre 2026</span>
+    </span>
+  </div>
+
+  <h1 class="title">Confirmar entrega del servicio</h1>
+
+  <div class="card">
+    <h3>Detalle del servicio</h3>
+    <div class="row"><span>Servicio</span><span>Sitio web corporativo en 15 días</span></div>
+    <div class="row"><span>Profesional</span><span>Juan Pérez</span></div>
+    <div class="row"><span>Fecha de inicio</span><span>4 sep 2026</span></div>
+    <div class="row"><span>Fecha de entrega</span><span>19 sep 2026</span></div>
+    <div class="row"><span>Modalidad</span><span>Remoto</span></div>
+
+    <div class="quote-box">
+      "Sitio publicado en produccion-albaconstructora.cl. Código fuente entregado en el repositorio compartido. Quedo atento a cualquier ajuste."
+      <span class="who">— Nota de entrega de Juan Pérez</span>
+    </div>
+  </div>
+
+  <div class="amount-box">
+    <div class="label">Monto retenido para este servicio</div>
+    <div class="amount">$700.000</div>
+    <div class="state">Estado actual: <b>Retenido en la plataforma</b></div>
+  </div>
+
+  <div class="field">
+    <label>Comentario sobre el servicio recibido (opcional)</label>
+    <div class="textarea-box">Ej: Cumplió el alcance a tiempo, buena comunicación durante todo el proyecto…</div>
+    <p class="field-note">Este comentario podrá mostrarse en el perfil de Juan Pérez, sin calificación por estrellas ni puntaje.</p>
+  </div>
+
+  <div class="actions">
+    <div class="btn btn-confirm">Confirmar entrega y liberar pago</div>
+    <div class="btn btn-report">Reportar un problema</div>
+  </div>
+
+  <p class="footnote">Al confirmar, Skilly libera el pago retenido a Juan Pérez, emite su boleta de honorarios y genera la factura correspondiente a tu organización. Si reportas un problema, el pago permanece retenido mientras Skilly revisa el caso.</p>
+
+</div>
+</body>
+</html>

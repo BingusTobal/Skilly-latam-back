@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Resumen</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --amber:#b8860b;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --amber-bg:#fbeecb;
+    --red-bg:#fbdcdc;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.warn{background:var(--amber-bg);}
+  .kpi.warn b{color:var(--amber);}
+  .kpi.alert{background:var(--red-bg);}
+  .kpi.alert b{color:var(--red);}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .row{display:flex;gap:20px;}
+  .panel{flex:1;border:1px solid var(--gray-line);padding:16px 18px;}
+  .panel h2{font-size:14px;margin:0 0 14px;}
+
+  /* bar chart */
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:11.5px;}
+  .bar-row .label{width:120px;flex-shrink:0;color:#444;}
+  .bar-track{flex:1;background:#eee;height:14px;position:relative;}
+  .bar-fill{height:100%;background:var(--navy);}
+  .bar-row .val{width:34px;text-align:right;color:#666;flex-shrink:0;}
+
+  /* activity feed */
+  .activity{list-style:none;margin:0;padding:0;}
+  .activity li{
+    display:flex;gap:10px;font-size:12px;padding:9px 0;border-bottom:1px solid #f0f0f0;
+  }
+  .activity li:last-child{border-bottom:none;}
+  .activity .dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+  .activity .dot.ok{background:var(--green);}
+  .activity .dot.warn{background:var(--amber);}
+  .activity .dot.alert{background:var(--red);}
+  .activity .txt b{display:block;}
+  .activity .txt span{color:#888;font-size:10.5px;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html" class="active">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Resumen general</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi warn"><b>8</b><span>Postulaciones pendientes</span></div>
+      <div class="kpi ok"><b>34</b><span>Servicios activos</span></div>
+      <div class="kpi alert"><b>2</b><span>Disputas abiertas</span></div>
+      <div class="kpi"><b>$1.240.000</b><span>Comisión este mes</span></div>
+      <div class="kpi"><b>58</b><span>Organizaciones activas</span></div>
+    </div>
+
+    <div class="row">
+      <div class="panel">
+        <h2>Servicios activos por categoría</h2>
+        <div class="bar-row"><span class="label">Salud y Bienestar</span><div class="bar-track"><div class="bar-fill" style="width:85%;"></div></div><span class="val">12</span></div>
+        <div class="bar-row"><span class="label">Desarrollo software</span><div class="bar-track"><div class="bar-fill" style="width:65%;"></div></div><span class="val">9</span></div>
+        <div class="bar-row"><span class="label">Diseño gráfico</span><div class="bar-track"><div class="bar-fill" style="width:45%;"></div></div><span class="val">6</span></div>
+        <div class="bar-row"><span class="label">Marketing</span><div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div><span class="val">4</span></div>
+        <div class="bar-row"><span class="label">Finanzas</span><div class="bar-track"><div class="bar-fill" style="width:22%;"></div></div><span class="val">3</span></div>
+      </div>
+
+      <div class="panel">
+        <h2>Actividad reciente</h2>
+        <ul class="activity">
+          <li><span class="dot ok"></span><div class="txt"><b>Juan Pérez aceptó una solicitud</b><span>Sitio web corporativo en 15 días · hace 40 min</span></div></li>
+          <li><span class="dot warn"></span><div class="txt"><b>Nueva postulación recibida</b><span>Tomás Iturra · Salud y Bienestar · hace 2 h</span></div></li>
+          <li><span class="dot alert"></span><div class="txt"><b>Disputa abierta</b><span>Rediseño UX/UI de landing · hace 3 h</span></div></li>
+          <li><span class="dot ok"></span><div class="txt"><b>Entrega confirmada</b><span>Auditoría financiera PYME · hace 5 h</span></div></li>
+          <li><span class="dot warn"></span><div class="txt"><b>Solicitud vencida sin respuesta</b><span>Taller de bienestar laboral · hace 6 h</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

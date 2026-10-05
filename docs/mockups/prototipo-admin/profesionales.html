@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Profesionales</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --amber:#b8860b;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --amber-bg:#fbeecb;
+    --red-bg:#fbdcdc;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:22px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+  .kpi.alert{background:var(--red-bg);}
+  .kpi.alert b{color:var(--red);}
+
+  .search-row{display:flex;margin-bottom:18px;border:1px solid #000;max-width:340px;}
+  .search-row input{flex:1;border:none;padding:9px 11px;font-size:12.5px;color:#888;}
+  .search-row button{border:none;border-left:1px solid #000;background:#000;color:#fff;padding:0 16px;font-size:12.5px;cursor:pointer;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  td{padding:10px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;}
+
+  .cat-chip{font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;color:#333;}
+  .cat-chip.blue{background:var(--blue-bg);}
+  .cat-chip.green{background:var(--green-bg);}
+  .cat-chip.amber{background:var(--amber-bg);}
+  .cat-chip.red{background:#f4dfc4;}
+  .cat-chip.pink{background:#f6dbe6;}
+
+  .status{font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:bold;}
+  .status.active{color:var(--green);background:var(--green-bg);}
+  .status.watch{color:var(--red);background:var(--red-bg);}
+
+  .link-btn{font-size:11.5px;border:1px solid #000;padding:5px 12px;background:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html" class="active">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Profesionales</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ok"><b>112</b><span>Profesionales activos</span></div>
+      <div class="kpi"><b>5</b><span>Aprobados este mes</span></div>
+      <div class="kpi"><b>Salud y Bienestar</b><span>Categoría con más profesionales</span></div>
+      <div class="kpi alert"><b>1</b><span>Con disputa abierta</span></div>
+    </div>
+
+    <div class="search-row">
+      <input type="text" placeholder="Buscar por nombre o categoría…">
+      <button>Buscar</button>
+    </div>
+
+    <table>
+      <tr>
+        <th>Nombre</th><th>Categoría</th><th>Aprobado</th><th>Servicios completados</th><th>Estado</th><th></th>
+      </tr>
+      <tr>
+        <td>Juan Pérez</td><td><span class="cat-chip blue">Desarrollo software</span></td><td>29 ago 2026</td>
+        <td class="num">14</td>
+        <td><span class="status active">Activo</span></td><td><button class="link-btn">Ver perfil</button></td>
+      </tr>
+      <tr>
+        <td>María José Delgado</td><td><span class="cat-chip pink">Diseño gráfico</span></td><td>30 ago 2026</td>
+        <td class="num">9</td>
+        <td><span class="status active">Activo</span></td><td><button class="link-btn">Ver perfil</button></td>
+      </tr>
+      <tr>
+        <td>Andrés Muñoz</td><td><span class="cat-chip green">Finanzas</span></td><td>2 sep 2026</td>
+        <td class="num">6</td>
+        <td><span class="status watch">1 disputa abierta</span></td><td><button class="link-btn">Ver perfil</button></td>
+      </tr>
+      <tr>
+        <td>Camila Rojas</td><td><span class="cat-chip amber">Marketing</span></td><td>3 sep 2026</td>
+        <td class="num">4</td>
+        <td><span class="status active">Activo</span></td><td><button class="link-btn">Ver perfil</button></td>
+      </tr>
+      <tr>
+        <td>Tomás Iturra</td><td><span class="cat-chip red">Salud y Bienestar</span></td><td>4 sep 2026</td>
+        <td class="num">21</td>
+        <td><span class="status active">Activo</span></td><td><button class="link-btn">Ver perfil</button></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

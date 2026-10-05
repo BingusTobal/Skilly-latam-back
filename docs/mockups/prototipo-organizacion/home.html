@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Inicio</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --orange-bg:#fbe3c0;
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:960px;background:#fff;border:1px solid #000;}
+
+  .topnav{
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid #eee;padding:16px 30px;
+  }
+  .logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:14px;}
+  .logo svg{width:20px;height:20px;}
+  .navlinks{display:flex;gap:26px;font-size:13px;align-items:center;}
+  .navlinks a{color:#000;text-decoration:none;}
+  .navlinks .cta{border:1px solid #000;padding:6px 14px;}
+
+  /* HERO */
+  .hero{
+    background:var(--navy);color:#fff;padding:50px 30px 40px;text-align:center;
+  }
+  .hero h1{font-size:28px;margin:0 0 10px;}
+  .hero p{font-size:14px;color:#cfe0ee;margin:0 0 26px;}
+  .search-bar{
+    max-width:520px;margin:0 auto;display:flex;background:#fff;border:1px solid #000;
+  }
+  .search-bar input{
+    flex:1;border:none;padding:13px 14px;font-size:13px;color:#888;
+  }
+  .search-bar button{
+    border:none;border-left:1px solid #000;background:#000;color:#fff;padding:0 22px;font-size:13px;cursor:pointer;
+  }
+  .stats-row{display:flex;justify-content:center;gap:40px;margin-top:28px;font-size:12px;color:#cfe0ee;}
+  .stats-row b{display:block;font-size:18px;color:#fff;}
+
+  /* SECTIONS */
+  .section{padding:34px 30px;border-bottom:1px solid #eee;}
+  .section h2{font-size:17px;margin:0 0 4px;}
+  .section .sub{font-size:12px;color:#777;margin:0 0 20px;}
+
+  /* CATEGORY TILES */
+  .cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .cat-tile{border:1px solid var(--gray-line);padding:18px 8px;text-align:center;}
+  .cat-tile .ic{font-size:28px;margin-bottom:8px;}
+  .cat-tile .name{font-size:12px;font-weight:bold;}
+  .cat-tile .count{font-size:10.5px;color:#888;}
+  .cat-tile.blue{background:var(--blue);}
+  .cat-tile.green{background:var(--green-bg);}
+  .cat-tile.orange{background:var(--orange-bg);}
+
+  /* FEATURED SERVICES */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .fcard{border:1px solid #ccc;}
+  .fcard .icon-box{height:100px;display:flex;align-items:center;justify-content:center;font-size:34px;}
+  .fcard .body{background:var(--gray-bg);padding:9px 11px 11px;}
+  .fcard .cat-tag{font-size:10px;color:#666;}
+  .fcard .name{font-size:12px;font-weight:bold;margin:2px 0 6px;min-height:30px;}
+  .fcard .foot{display:flex;justify-content:space-between;align-items:baseline;}
+  .fcard .price{color:var(--red);font-weight:bold;font-size:13px;}
+  .fcard .dur{font-size:10px;color:#777;}
+
+  /* HOW IT WORKS */
+  .steps{display:flex;gap:16px;}
+  .step{flex:1;text-align:center;}
+  .step .num{
+    width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;
+    margin:0 auto 10px;
+  }
+  .step .stitle{font-size:12.5px;font-weight:bold;margin-bottom:4px;}
+  .step .sdesc{font-size:11px;color:#666;line-height:1.4;}
+
+  /* TESTIMONIALS */
+  .testimonials{display:flex;gap:18px;}
+  .tcard{flex:1;border:1px solid var(--gray-line);background:var(--gray-bg);padding:14px 16px;font-size:12px;color:#444;font-style:italic;}
+  .tcard .who{display:block;font-size:10.5px;color:#888;font-style:normal;margin-top:8px;}
+
+  /* FOOTER CTA */
+  .footer-cta{padding:30px;text-align:center;}
+  .footer-cta .btn{
+    display:inline-block;border:1px solid #000;background:#000;color:#fff;
+    padding:12px 30px;font-size:13px;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+      Skilly Latam
+    </div>
+    <div class="navlinks">
+      <a href="catalogo.html">Servicios</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="help.html">Help</a>
+      <a href="login-registro.html">Iniciar sesión</a>
+      <a href="mis-reservas.html" class="cta">Mis reservas</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Encuentra el servicio que tu organización necesita</h1>
+    <p>Talento independiente validado, listo para trabajar contigo por proyecto</p>
+    <div class="search-bar">
+      <input type="text" placeholder="Ej: diseño UX, desarrollo web, auditoría financiera…">
+      <a href="catalogo.html" style="border:none;border-left:1px solid #000;background:#000;color:#fff;padding:0 22px;font-size:13px;cursor:pointer;text-decoration:none;display:flex;align-items:center;">Buscar</a>
+    </div>
+    <div class="stats-row">
+      <div><b>296</b>servicios publicados</div>
+      <div><b>5</b>categorías</div>
+      <div><b>34</b>servicios en curso hoy</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Explora por categoría</h2>
+    <p class="sub">Cada categoría agrupa distintos servicios de precio fijo</p>
+    <div class="cat-grid">
+      <a style="text-decoration:none;color:inherit;" href="catalogo.html"><div class="cat-tile blue"><div class="ic">💻</div><div class="name">Desarrollo software</div><div class="count">66 servicios</div></div></a>
+      <a style="text-decoration:none;color:inherit;" href="catalogo.html"><div class="cat-tile green"><div class="ic">🎨</div><div class="name">Diseño gráfico</div><div class="count">47 servicios</div></div></a>
+      <a style="text-decoration:none;color:inherit;" href="catalogo.html"><div class="cat-tile orange"><div class="ic">📊</div><div class="name">Finanzas</div><div class="count">29 servicios</div></div></a>
+      <a style="text-decoration:none;color:inherit;" href="catalogo.html"><div class="cat-tile blue"><div class="ic">📣</div><div class="name">Marketing</div><div class="count">42 servicios</div></div></a>
+      <a style="text-decoration:none;color:inherit;" href="catalogo.html"><div class="cat-tile green"><div class="ic">🌿</div><div class="name">Salud y Bienestar</div><div class="count">112 servicios</div></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Servicios destacados</h2>
+    <p class="sub">Los más solicitados esta semana</p>
+    <div class="feat-grid">
+      <a style="text-decoration:none;color:inherit;" href="detalle-servicio.html"><div class="fcard">
+        <div class="icon-box" style="background:var(--blue);">💻</div>
+        <div class="body">
+          <div class="cat-tag">Desarrollo software</div>
+          <div class="name">Sitio web corporativo en 15 días</div>
+          <div class="foot"><span class="price">$700.000</span><span class="dur">15 días</span></div>
+        </div>
+      </div></a>
+      <a style="text-decoration:none;color:inherit;" href="detalle-servicio.html"><div class="fcard">
+        <div class="icon-box" style="background:var(--green-bg);">🎨</div>
+        <div class="body">
+          <div class="cat-tag">Diseño gráfico</div>
+          <div class="name">Rediseño UX/UI de landing</div>
+          <div class="foot"><span class="price">$650.000</span><span class="dur">2–3 semanas</span></div>
+        </div>
+      </div></a>
+      <a style="text-decoration:none;color:inherit;" href="detalle-servicio.html"><div class="fcard">
+        <div class="icon-box" style="background:var(--orange-bg);">🌿</div>
+        <div class="body">
+          <div class="cat-tag">Salud y Bienestar</div>
+          <div class="name">Taller de bienestar laboral</div>
+          <div class="foot"><span class="price">$150.000</span><span class="dur">1 h</span></div>
+        </div>
+      </div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Cómo funciona</h2>
+    <p class="sub">De la búsqueda a la entrega, en tres pasos</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="stitle">Explora y agenda</div>
+        <div class="sdesc">Elige un servicio, la fecha y el profesional que prefieras (o deja que Skilly asigne uno)</div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="stitle">El profesional acepta</div>
+        <div class="sdesc">Tu pago queda solo autorizado hasta que el profesional confirma dentro del plazo</div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="stitle">Confirmas la entrega</div>
+        <div class="sdesc">Revisas el resultado y el pago retenido se libera al profesional</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lo que dicen las organizaciones</h2>
+    <div class="testimonials">
+      <div class="tcard">
+        "Cumplió el alcance a tiempo, buena comunicación durante todo el proyecto."
+        <span class="who">— Constructora Alba</span>
+      </div>
+      <div class="tcard">
+        "Buen nivel técnico, lo recontrataríamos para el siguiente sprint."
+        <span class="who">— Estudio Norte</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-cta">
+    <a class="btn" href="catalogo.html" style="text-decoration:none;">Explorar todo el catálogo</a>
+  </div>
+
+</div>
+</body>
+</html>

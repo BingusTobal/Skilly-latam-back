@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Historial de reservas</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --red:#c62828; --green:#2e7d32; --amber:#b8860b;
+    --blue-bg:#cfe8f3; --green-bg:#dcf0d8; --amber-bg:#fbeecb; --red-bg:#fbdcdc;
+    --gray-line:#d0d0d0; --gray-bg:#f5f5f5; --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .back-row{font-size:13px;margin-bottom:14px;}
+  .back-row a{color:#333;text-decoration:none;}
+
+  .org-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+  .org-head h1{font-size:19px;margin:0 0 4px;}
+  .org-head .meta{font-size:12px;color:#666;}
+  .status-badge{font-size:10.5px;padding:4px 10px;border-radius:2px;background:var(--green-bg);color:var(--green);font-weight:bold;height:fit-content;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .section-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .section-title h2{font-size:15px;margin:0;}
+
+  .filter-row{display:flex;gap:8px;margin-bottom:14px;}
+  .filter-chip{font-size:11px;border:1px solid #999;padding:5px 12px;background:#fff;cursor:pointer;}
+  .filter-chip.active{background:#000;color:#fff;border-color:#000;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  td{padding:10px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;}
+
+  .status{font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:bold;}
+  .status.done{color:var(--green);background:var(--green-bg);}
+  .status.progress{color:var(--navy);background:var(--blue-bg);}
+  .status.pending{color:#8a6300;background:var(--amber-bg);}
+  .status.dispute{color:var(--red);background:var(--red-bg);}
+
+  .link-btn{font-size:11.5px;border:1px solid #000;padding:5px 12px;background:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo"><svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg></div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html" class="active">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="back-row"><a href="organizaciones.html">&larr; Volver a Organizaciones</a></div>
+
+    <div class="org-head">
+      <div>
+        <h1>Constructora Alba SpA</h1>
+        <div class="meta">RUT 76.541.230-K · Contacto: Marcela Ibáñez · Cliente desde 28 ago 2026</div>
+      </div>
+      <span class="status-badge">Activa</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ok"><b>5</b><span>Servicios contratados</span></div>
+      <div class="kpi"><b>$2.150.000</b><span>Gasto total acumulado</span></div>
+      <div class="kpi"><b>1</b><span>Disputa histórica</span></div>
+      <div class="kpi"><b>19 sep 2026</b><span>Última reserva</span></div>
+    </div>
+
+    <div class="section-title">
+      <h2>Historial de reservas</h2>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-chip active">Todas</div>
+      <div class="filter-chip">Pendientes</div>
+      <div class="filter-chip">En curso</div>
+      <div class="filter-chip">Finalizadas</div>
+      <div class="filter-chip">Con disputa</div>
+    </div>
+
+    <table>
+      <tr>
+        <th>Servicio</th><th>Profesional</th><th>Fecha reserva</th><th>Monto</th><th>Estado</th><th></th>
+      </tr>
+      <tr>
+        <td>Sitio web corporativo en 15 días</td><td>Juan Pérez</td><td>4 sep 2026</td>
+        <td class="num">$700.000</td>
+        <td><span class="status done">Finalizada</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+      <tr>
+        <td>Evaluación psicolaboral</td><td>Tomás Iturra</td><td>28 ago 2026</td>
+        <td class="num">$80.000</td>
+        <td><span class="status done">Finalizada</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+      <tr>
+        <td>Auditoría financiera PYME</td><td>Andrés Muñoz</td><td>30 ago 2026</td>
+        <td class="num">$400.000</td>
+        <td><span class="status dispute">Con disputa</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+      <tr>
+        <td>Taller de bienestar laboral</td><td>Tomás Iturra</td><td>15 sep 2026</td>
+        <td class="num">$150.000</td>
+        <td><span class="status progress">En curso</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+      <tr>
+        <td>Identidad visual básica</td><td>María José Delgado</td><td>20 sep 2026</td>
+        <td class="num">$300.000</td>
+        <td><span class="status pending">Pendiente de aceptación</span></td><td><button class="link-btn">Ver</button></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

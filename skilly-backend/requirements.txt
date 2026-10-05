@@ -1,0 +1,41 @@
+# Skilly Latam — Dependencias backend
+# Ticket 0.1 | Fuente de verdad del stack: AGENTS.md
+# Versiones fijadas a lo realmente instalado y verificado en Python 3.14.7
+
+# --- Framework ---
+Django==5.2.7
+djangorestframework==3.18.1
+djangorestframework-simplejwt==5.5.1
+
+# --- Base de datos (MariaDB) ---
+mysqlclient==2.3.0
+
+# --- Seguridad y CORS ---
+django-cors-headers==4.9.0
+
+# --- Archivos S3 (ticket 0.7) ---
+django-storages==1.14.6
+boto3==1.43.108
+
+# --- Correo transaccional SES (ticket 0.8) ---
+django-anymail==15.2
+
+# --- Documentacion de API ---
+drf-spectacular==0.30.0
+
+# --- Tareas en segundo plano (Celery, Sprint 3 ticket 3.13) ---
+celery==5.6.3
+redis==8.1.0
+
+# --- Produccion ---
+gunicorn==26.2.0
+whitenoise==6.12.0
+python-dotenv==1.2.4
+
+# --- Testing (ticket 0.16) ---
+pytest==9.1.1
+pytest-django==4.14.0
+pytest-cov==7.1.0
+factory-boy==3.3.3
+
+# Dependencias transitivas resueltas por pip freeze (ver requirements.lock.txt)

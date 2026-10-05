@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Perfil de talento</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --blue-dark:#8fb9cf;
+    --skin:#e0b58c;
+    --hair:#5a3a29;
+    --shirt:#d99a3c;
+    --star:#1a3a5c;
+    --red:#c62828;
+    --gray-line:#d0d0d0;
+    --gray-bg:#eeeeee;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#f2f2f2;
+    font-family: Arial, Helvetica, sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:24px 12px;
+  }
+  .frame{
+    width:100%;
+    max-width:760px;
+    background:#fff;
+    border:1px solid #000;
+    padding:22px 26px 30px;
+  }
+  /* top nav */
+  .topnav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #eee;
+    padding-bottom:14px;
+    margin-bottom:16px;
+  }
+  .logo{display:flex;align-items:center;gap:8px;}
+  .logo svg{width:22px;height:22px;}
+  .navlinks{display:flex;gap:34px;font-size:14px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  /* back + breadcrumb */
+  .back-row{font-size:13px;margin-bottom:6px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .crumb{font-size:12px;color:#777;margin-bottom:16px;}
+
+  /* stepper */
+  .stepper{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:11px;
+    color:#999;
+    border:1px solid var(--gray-line);
+    background:#fafafa;
+    padding:8px 12px;
+    margin-bottom:22px;
+  }
+  .stepper .step{white-space:nowrap;}
+  .stepper .step.current{color:#000;font-weight:bold;text-decoration:underline;}
+  .stepper .sep{color:#bbb;}
+
+  /* layout */
+  .layout{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+  }
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+  }
+  .main{
+    flex:1;
+    min-width:0;
+  }
+
+  /* profile card */
+  .avatar-box{
+    position:relative;
+    background:var(--blue);
+    border:1px solid #000;
+    height:210px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .avatar-box .star{
+    position:absolute;
+    top:8px;
+    right:8px;
+    font-size:18px;
+    color:var(--star);
+  }
+  .info-block{
+    border:1px solid #000;
+    border-top:none;
+    padding:12px 14px 16px;
+  }
+  .name{font-size:17px;font-weight:bold;margin:0 0 2px;}
+  .role{font-size:13px;color:#444;margin:0 0 10px;}
+  .price{font-size:20px;font-weight:bold;color:var(--red);margin:8px 0 4px;}
+  .price small{font-size:11px;color:#777;font-weight:normal;}
+  .avail-tag{
+    display:inline-block;
+    font-size:11px;
+    border:1px solid #2e7d32;
+    color:#2e7d32;
+    padding:2px 8px;
+    margin-bottom:14px;
+  }
+  .btn{
+    display:block;
+    width:100%;
+    text-align:center;
+    font-size:13px;
+    padding:9px 0;
+    border:1px solid #000;
+    margin-bottom:8px;
+    cursor:pointer;
+    background:#fff;
+  }
+  .btn-primary{background:#000;color:#fff;}
+
+  hr.thin{border:none;border-top:1px solid var(--gray-line);margin:16px 0;}
+
+  /* main sections */
+  .section{margin-bottom:20px;}
+  .section h3{
+    font-size:14px;
+    margin:0 0 8px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--gray-line);
+  }
+  .section p{font-size:13px;line-height:1.5;color:#333;margin:0;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    font-size:12px;
+    border:1px solid #999;
+    padding:4px 10px;
+  }
+
+  .cert-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px;}
+  .cert-ok{color:#2e7d32;font-weight:bold;}
+  .cert-lock{color:#999;}
+  .cert-note{font-size:11px;color:#888;margin-left:22px;}
+
+  .metrics{display:flex;gap:10px;}
+  .metric{
+    flex:1;
+    border:1px solid var(--gray-line);
+    background:#fafafa;
+    text-align:center;
+    padding:12px 6px;
+  }
+  .metric b{display:block;font-size:15px;}
+  .metric span{font-size:11px;color:#666;}
+
+  .review{
+    display:flex;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+  }
+  .review:last-child{border-bottom:none;}
+  .rev-avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--gray-bg);border:1px solid #ccc;
+    flex-shrink:0;
+  }
+  .rev-body{font-size:12px;}
+  .rev-name{font-weight:bold;font-size:13px;}
+  .rev-valid{font-size:10px;color:#2e7d32;border:1px solid #2e7d32;padding:1px 5px;margin-left:6px;}
+  .rev-text{color:#444;margin-top:3px;}
+
+  .person{width:90px;height:90px;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="back-row"><a href="detalle-servicio.html">&larr; Volver al servicio</a></div>
+  <div class="crumb">Talento Disponible &gt; Desarrollo software &gt; Juan Pérez</div>
+
+  <div class="stepper">
+    <span class="step">Buscar</span><span class="sep">›</span>
+    <span class="step">Comparar</span><span class="sep">›</span>
+    <span class="step current">Seleccionar</span><span class="sep">›</span>
+    <span class="step">Agendar</span><span class="sep">›</span>
+    <span class="step">Contratar</span><span class="sep">›</span>
+    <span class="step">Evaluar</span><span class="sep">›</span>
+    <span class="step">Recontratar</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="avatar-box">
+        <span class="star">&#9733;</span>
+        <svg class="person" viewBox="0 0 100 100">
+          <circle cx="50" cy="34" r="18" fill="#e0b58c"/>
+          <path d="M32 34 Q30 14 50 14 Q70 14 68 34" fill="#5a3a29"/>
+          <path d="M20 100 Q20 62 50 62 Q80 62 80 100 Z" fill="#d99a3c"/>
+        </svg>
+      </div>
+      <div class="info-block">
+        <p class="name">Juan Pérez</p>
+        <p class="role">Desarrollador Web</p>
+        <div class="price">$149 <small>/ proyecto</small></div>
+        <div class="avail-tag">Disponibilidad: Inmediata</div>
+
+        <a class="btn btn-primary" style="display:block;text-decoration:none;" href="programa-servicio.html">Agendar</a>
+        <div class="btn">Contactar</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <div class="section">
+        <h3>Sobre mí</h3>
+        <p>Desarrollador web full-stack con experiencia en proyectos de e-commerce y aplicaciones a medida. Disponible para colaborar de forma remota, por proyecto puntual o como apoyo temporal a equipos existentes.</p>
+      </div>
+
+      <div class="section">
+        <h3>Habilidades</h3>
+        <div class="chips">
+          <div class="chip">React</div>
+          <div class="chip">Node.js</div>
+          <div class="chip">Python</div>
+          <div class="chip">SQL</div>
+          <div class="chip">UX básico</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Certificaciones</h3>
+        <div class="cert-row"><span class="cert-ok">✓</span> LinkedIn verificado</div>
+        <div class="cert-row"><span class="cert-lock">🔒</span> Otros certificados (privados)</div>
+        <div class="cert-note">Se comparten con la organización solo tras la selección</div>
+      </div>
+
+      <div class="section">
+        <h3>Métricas</h3>
+        <div class="metrics">
+          <div class="metric"><b>48</b><span>servicios completados</span></div>
+          <div class="metric"><b>95%</b><span>tasa de recontratación</span></div>
+          <div class="metric"><b>&lt; 2h</b><span>tiempo de respuesta</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Comentarios de organizaciones</h3>
+
+        <div class="review">
+          <div class="rev-avatar"></div>
+          <div class="rev-body">
+            <span class="rev-name">Constructora Alba</span>
+            <span class="rev-valid">Comentario validado</span>
+            <div class="rev-text">Cumplió el alcance a tiempo, buena comunicación durante todo el proyecto.</div>
+          </div>
+        </div>
+
+        <div class="review">
+          <div class="rev-avatar"></div>
+          <div class="rev-body">
+            <span class="rev-name">Estudio Norte</span>
+            <span class="rev-valid">Comentario validado</span>
+            <div class="rev-text">Buen nivel técnico, lo recontrataríamos para el siguiente sprint.</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

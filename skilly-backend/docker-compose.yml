@@ -1,0 +1,52 @@
+# Skilly Latam — Servicios de desarrollo (ticket 0.3, 0.16)
+# Uso: docker compose up -d
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: skilly-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-skilly}
+      MARIADB_USER: ${DB_USER:-skilly}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-skilly_dev_password}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_dev_password}
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --sql-mode=STRICT_TRANS_TABLES
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - skilly
+
+  redis:
+    image: redis:7-alpine
+    container_name: skilly-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - skilly
+
+volumes:
+  mariadb_data:
+  redis_data:
+
+networks:
+  skilly:
+    driver: bridge

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Panel de administración</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --amber:#b8860b;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --amber-bg:#fbeecb;
+    --red-bg:#fbdcdc;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  /* SIDEBAR */
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side .logo svg polygon{stroke:#fff;}
+  .side nav a{
+    display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;
+  }
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  /* MAIN */
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.warn{background:var(--amber-bg);}
+  .kpi.warn b{color:var(--amber);}
+  .kpi.alert{background:var(--red-bg);}
+  .kpi.alert b{color:var(--red);}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .section-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .section-title h2{font-size:15px;margin:0;}
+  .section-title .tag{font-size:11px;color:#888;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{
+    text-align:left;font-size:11px;color:#777;font-weight:normal;
+    border-bottom:1px solid var(--gray-line);padding:8px 10px;
+  }
+  td{padding:10px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+
+  .cat-chip{
+    font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;color:#333;
+  }
+  .cat-chip.blue{background:var(--blue-bg);}
+  .cat-chip.green{background:var(--green-bg);}
+  .cat-chip.amber{background:var(--amber-bg);}
+  .cat-chip.red{background:#f4dfc4;}
+  .cat-chip.pink{background:#f6dbe6;}
+
+  .status{
+    font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:bold;
+  }
+  .status.pending{color:#8a6300;background:var(--amber-bg);}
+  .status.review{color:var(--navy);background:var(--blue-bg);}
+
+  .link-btn{
+    font-size:11.5px;border:1px solid #000;padding:5px 12px;background:#fff;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html" class="active">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Postulaciones de profesionales</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi warn"><b>8</b><span>Postulaciones pendientes</span></div>
+      <div class="kpi ok"><b>34</b><span>Servicios activos</span></div>
+      <div class="kpi alert"><b>2</b><span>Disputas abiertas</span></div>
+      <div class="kpi"><b>$1.240.000</b><span>Comisión recaudada este mes</span></div>
+    </div>
+
+    <div class="section-title">
+      <h2>Solicitudes para ser profesional</h2>
+      <span class="tag">8 pendientes de revisión</span>
+    </div>
+
+    <table>
+      <tr>
+        <th>Nombre</th><th>Categoría</th><th>Fecha</th><th>Certificados</th><th>Estado</th><th></th>
+      </tr>
+      <tr>
+        <td>Juan Pérez</td><td><span class="cat-chip blue">Desarrollo software</span></td><td>28 ago 2026</td><td>LinkedIn + 2 privados</td>
+        <td><span class="status pending">Pendiente</span></td><td><a class="link-btn" href="detalle-postulacion.html" style="text-decoration:none;display:inline-block;">Revisar</a></td>
+      </tr>
+      <tr>
+        <td>María José Delgado</td><td><span class="cat-chip pink">Diseño gráfico</span></td><td>29 ago 2026</td><td>LinkedIn + 1 privado</td>
+        <td><span class="status pending">Pendiente</span></td><td><a class="link-btn" href="detalle-postulacion.html" style="text-decoration:none;display:inline-block;">Revisar</a></td>
+      </tr>
+      <tr>
+        <td>Andrés Muñoz</td><td><span class="cat-chip green">Finanzas</span></td><td>30 ago 2026</td><td>Sin LinkedIn · 3 privados</td>
+        <td><span class="status review">En revisión</span></td><td><a class="link-btn" href="detalle-postulacion.html" style="text-decoration:none;display:inline-block;">Revisar</a></td>
+      </tr>
+      <tr>
+        <td>Camila Rojas</td><td><span class="cat-chip amber">Marketing</span></td><td>1 sep 2026</td><td>LinkedIn únicamente</td>
+        <td><span class="status pending">Pendiente</span></td><td><a class="link-btn" href="detalle-postulacion.html" style="text-decoration:none;display:inline-block;">Revisar</a></td>
+      </tr>
+      <tr>
+        <td>Tomás Iturra</td><td><span class="cat-chip red">Salud y Bienestar</span></td><td>2 sep 2026</td><td>LinkedIn + 1 privado</td>
+        <td><span class="status pending">Pendiente</span></td><td><a class="link-btn" href="detalle-postulacion.html" style="text-decoration:none;display:inline-block;">Revisar</a></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

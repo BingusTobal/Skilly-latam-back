@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Programa tu servicio</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);
+    display:flex;justify-content:center;padding:24px 12px;
+  }
+  .frame{width:100%;max-width:900px;background:#fff;border:1px solid #000;padding:22px 26px 30px;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:16px;}
+  .logo svg{width:22px;height:22px;}
+  .navlinks{display:flex;gap:34px;font-size:14px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  .back-row{font-size:13px;margin-bottom:6px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .crumb{font-size:12px;color:#777;margin-bottom:18px;}
+
+  .service-bar{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+    background:var(--gray-bg);border:1px solid var(--gray-line);padding:12px 16px;margin-bottom:20px;
+  }
+  .service-bar h1{font-size:16px;margin:0;}
+  .service-bar .meta{font-size:12px;color:#555;}
+  .service-bar .price{font-size:16px;font-weight:bold;color:var(--red);}
+
+  h2.section-title{font-size:15px;margin:0 0 4px;}
+  p.subtitle{font-size:12px;color:#777;margin:0 0 14px;}
+
+  .layout{display:flex;gap:30px;align-items:flex-start;}
+  .col-left{flex:1.3;min-width:0;}
+  .col-right{flex:1;min-width:280px;}
+
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-header .nav{font-size:13px;color:#555;cursor:pointer;}
+  .cal-header .month{font-weight:bold;font-size:13px;}
+  .tz-note{font-size:11px;color:#999;margin-bottom:10px;}
+
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;margin-bottom:22px;}
+  .cal-grid .dow{color:#888;font-size:11px;padding-bottom:4px;}
+  .cal-grid .day{
+    padding:7px 0;border-radius:2px;color:#333;position:relative;
+  }
+  .cal-grid .day.has-slot{color:var(--navy);}
+  .cal-grid .day.disabled{color:#ccc;}
+  .cal-grid .day.selected{background:var(--navy);color:#fff;font-weight:bold;}
+
+  .time-title{font-size:13px;font-weight:bold;margin-bottom:10px;}
+  .time-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .time-slot{
+    border:1px solid #999;padding:9px 0;text-align:center;font-size:13px;cursor:pointer;
+  }
+  .time-slot.selected{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:bold;}
+
+  .pref-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .pref-header a{font-size:11px;color:#666;text-decoration:underline;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;color:#444;margin-bottom:5px;}
+  .select-box{
+    border:1px solid #999;padding:9px 10px;font-size:13px;display:flex;justify-content:space-between;
+    align-items:center;background:#fff;
+  }
+  .select-box .car{font-size:10px;color:#888;}
+
+  .pro-mini{
+    display:flex;align-items:center;gap:10px;border:1px solid var(--gray-line);
+    background:var(--gray-bg);padding:8px 10px;margin-top:8px;
+  }
+  .pro-mini .av{width:36px;height:36px;background:var(--blue);border:1px solid #000;flex-shrink:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+  .pro-mini .av svg{width:26px;height:26px;}
+  .pro-mini .txt{font-size:11px;line-height:1.4;}
+  .pro-mini .txt b{font-size:12px;display:block;}
+  .pro-mini .tag{font-size:9px;color:var(--green);border:1px solid var(--green);padding:1px 5px;display:inline-block;margin-top:2px;}
+
+  .summary-box{border:1px solid #000;padding:14px 16px;margin-bottom:8px;}
+  .summary-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid #eee;}
+  .summary-row:last-child{border-bottom:none;font-weight:bold;font-size:15px;padding-top:12px;color:var(--red);}
+
+  .escrow-note{
+    display:flex;gap:8px;font-size:11px;color:#444;background:var(--gray-bg);
+    border:1px solid var(--gray-line);padding:9px 10px;margin-bottom:14px;
+  }
+
+  .paymethods{display:flex;gap:8px;margin-bottom:16px;}
+  .pay-opt{flex:1;border:1px solid #999;padding:8px;text-align:center;font-size:11px;color:#555;}
+  .pay-opt.selected{border:2px solid #000;color:#000;font-weight:bold;}
+
+  .btn{display:block;width:100%;text-align:center;font-size:13px;padding:11px 0;border:1px solid #000;margin-bottom:8px;cursor:pointer;background:#fff;}
+  .btn-primary{background:#000;color:#fff;}
+
+  .footnote{font-size:10px;color:#888;line-height:1.5;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="back-row"><a href="catalogo.html">&larr; Volver a servicios</a></div>
+  <div class="crumb">Servicios &gt; Desarrollo software &gt; Sitio web corporativo en 15 días</div>
+
+  <div class="service-bar">
+    <div>
+      <h1>Sitio web corporativo en 15 días</h1>
+      <div class="meta">Duración estimada: 15 días · Modalidad: Remoto</div>
+    </div>
+    <div class="price">$700.000 CLP</div>
+  </div>
+
+  <h2 class="section-title">Programa tu servicio</h2>
+  <p class="subtitle">Revisa la disponibilidad y elige la fecha y hora que más te convengan</p>
+
+  <div class="layout">
+
+    <!-- LEFT: calendar -->
+    <div class="col-left">
+      <div class="cal-header">
+        <span class="nav">&lsaquo;</span>
+        <span class="month">Septiembre 2026</span>
+        <span class="nav">&rsaquo;</span>
+      </div>
+      <div class="tz-note">Hora estándar de Chile (GMT-4)</div>
+
+      <div class="cal-grid">
+        <div class="dow">lun</div><div class="dow">mar</div><div class="dow">mié</div><div class="dow">jue</div><div class="dow">vie</div><div class="dow">sáb</div><div class="dow">dom</div>
+        <div class="day disabled">1</div><div class="day has-slot">2</div><div class="day has-slot">3</div>
+        <div class="day selected">4</div><div class="day has-slot">5</div><div class="day disabled">6</div><div class="day disabled">7</div>
+        <div class="day has-slot">8</div><div class="day has-slot">9</div><div class="day has-slot">10</div><div class="day has-slot">11</div>
+        <div class="day disabled">12</div><div class="day disabled">13</div><div class="day has-slot">14</div>
+        <div class="day has-slot">15</div><div class="day has-slot">16</div><div class="day has-slot">17</div><div class="day has-slot">18</div>
+        <div class="day disabled">19</div><div class="day disabled">20</div><div class="day has-slot">21</div>
+      </div>
+
+      <div class="time-title">Disponibilidad para: viernes, 4 de septiembre</div>
+      <div class="time-grid">
+        <div class="time-slot selected">8:00</div><div class="time-slot">8:30</div>
+        <div class="time-slot">9:00</div><div class="time-slot">9:30</div>
+        <div class="time-slot">10:00</div><div class="time-slot">10:30</div>
+        <div class="time-slot">11:00</div><div class="time-slot">11:30</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: reserva -->
+    <div class="col-right">
+      <div class="pref-header">
+        <strong>Tu reserva</strong>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-row"><span>📅 Fecha</span><span>4 sep 2026, 8:00</span></div>
+        <div class="summary-row"><span>⏱ Duración estimada</span><span>15 días</span></div>
+        <div class="summary-row"><span>📍 Modalidad</span><span>Remoto</span></div>
+        <div class="summary-row"><span>💰 Total a autorizar</span><span>$700.000</span></div>
+      </div>
+
+      <div class="escrow-note">
+        <span>⚠️</span>
+        <span>Política de cancelación: si cancelas con <strong>24 horas o más</strong> de anticipación, se libera el 100% del pago autorizado. Si cancelas con menos de 24 horas, solo se reembolsa el <strong>90%</strong> por inconvenientes. Si no asistes a la reserva sin avisar, se pierde el monto completo.</span>
+      </div>
+
+      <div class="field">
+        <label>Método de pago a autorizar</label>
+        <div class="paymethods">
+          <div class="pay-opt selected">Tarjeta</div>
+          <div class="pay-opt">Transferencia</div>
+        </div>
+      </div>
+
+      <a class="btn btn-primary" style="display:block;text-decoration:none;" href="formulario-reserva.html">Solicitar reserva</a>
+
+      <p class="footnote">Si acepta, el pago queda retenido en la plataforma hasta confirmar la entrega. Skilly emite boleta de honorarios al profesional y factura a la organización.</p>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

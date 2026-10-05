@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Detalle del servicio</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --red:#c62828;
+    --green:#2e7d32;
+    --navy:#1a3a5c;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:920px;background:#fff;border:1px solid #000;padding:22px 26px 30px;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:16px;}
+  .logo svg{width:22px;height:22px;}
+  .navlinks{display:flex;gap:34px;font-size:14px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  .back-row{font-size:13px;margin-bottom:6px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .crumb{font-size:12px;color:#777;margin-bottom:20px;}
+
+  .hero{display:flex;gap:20px;align-items:center;margin-bottom:26px;}
+  .hero .icon-box{
+    width:110px;height:110px;background:var(--blue);border:1px solid #000;
+    display:flex;align-items:center;justify-content:center;font-size:44px;flex-shrink:0;
+  }
+  .hero h1{font-size:21px;margin:0 0 6px;}
+  .hero .tagline{font-size:12.5px;color:#666;}
+  .hero .cat-tag{font-size:10.5px;color:#666;display:block;margin-bottom:4px;}
+
+  .layout{display:flex;gap:30px;align-items:flex-start;}
+  .col-left{flex:1.5;min-width:0;}
+  .col-right{width:250px;flex-shrink:0;}
+
+  .section{margin-bottom:26px;}
+  .section h2{font-size:15px;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--gray-line);}
+
+  .checklist{list-style:none;padding:0;margin:0;font-size:13px;color:#333;}
+  .checklist li{padding:5px 0;padding-left:22px;position:relative;}
+  .checklist li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:bold;}
+
+  .pro-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .pro-mini{
+    display:flex;align-items:center;gap:9px;border:1px solid var(--gray-line);
+    background:var(--gray-bg);padding:8px 10px;flex:1;min-width:170px;
+  }
+  .pro-mini .av{width:32px;height:32px;background:var(--blue);border:1px solid #000;flex-shrink:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+  .pro-mini .av svg{width:24px;height:24px;}
+  .pro-mini .txt{font-size:11px;line-height:1.4;}
+  .pro-mini .txt b{font-size:12px;display:block;}
+  .pro-mini .tag{font-size:9px;color:var(--green);border:1px solid var(--green);padding:1px 5px;display:inline-block;margin-top:2px;}
+
+  .faq-item{margin-bottom:14px;}
+  .faq-item .q{font-size:13px;font-weight:bold;margin-bottom:4px;}
+  .faq-item .a{font-size:12.5px;color:#555;line-height:1.5;}
+
+  .quote-box{
+    border:1px solid var(--gray-line);background:var(--gray-bg);padding:12px 14px;font-size:12.5px;
+    color:#444;font-style:italic;margin-bottom:12px;
+  }
+  .quote-box .who{display:block;font-size:10.5px;color:#888;font-style:normal;margin-top:6px;}
+
+  /* STICKY SUMMARY */
+  .summary-box{border:1px solid #000;padding:18px 16px;position:sticky;top:20px;}
+  .summary-box .price{font-size:22px;font-weight:bold;color:var(--red);margin-bottom:10px;}
+  .summary-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #eee;color:#333;}
+  .summary-row:last-of-type{border-bottom:none;}
+  .btn-reserve{
+    display:block;width:100%;text-align:center;background:#000;color:#fff;
+    padding:12px 0;font-size:13px;margin-top:14px;cursor:pointer;
+  }
+  .fav-link{display:block;text-align:center;font-size:11px;color:#666;margin-top:10px;text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="back-row"><a href="catalogo.html">&larr; Volver al catálogo</a></div>
+  <div class="crumb">Servicios &gt; Desarrollo software &gt; Sitio web corporativo en 15 días</div>
+
+  <div class="hero">
+    <div class="icon-box">💻</div>
+    <div>
+      <span class="cat-tag">Desarrollo software</span>
+      <h1>Sitio web corporativo en 15 días</h1>
+      <div class="tagline">Landing responsive, lista para publicar, con acompañamiento durante todo el proceso</div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <div class="col-left">
+
+      <div class="section">
+        <h2>¿Qué incluye este servicio?</h2>
+        <ul class="checklist">
+          <li>Diseño responsive de hasta 5 secciones</li>
+          <li>Formulario de contacto integrado</li>
+          <li>Optimización básica para buscadores (SEO on-page)</li>
+          <li>Publicación en dominio o subdominio de la organización</li>
+          <li>1 ronda de ajustes incluida tras la entrega</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>Profesionales disponibles para este servicio</h2>
+        <div class="pro-row">
+          <a href="perfil-profesional.html" style="text-decoration:none;color:inherit;"><div class="pro-mini">
+            <div class="av"><svg viewBox="0 0 100 100"><circle cx="50" cy="34" r="18" fill="#e0b58c"/><path d="M32 34 Q30 14 50 14 Q70 14 68 34" fill="#5a3a29"/><path d="M20 100 Q20 62 50 62 Q80 62 80 100 Z" fill="#d99a3c"/></svg></div>
+            <div class="txt"><b>Juan Pérez</b>Desarrollador Web<div class="tag">Inmediata</div></div>
+          </div></a>
+          <div class="pro-mini">
+            <div class="av"><svg viewBox="0 0 100 100"><circle cx="50" cy="34" r="18" fill="#e0b58c"/><path d="M32 34 Q30 14 50 14 Q70 14 68 34" fill="#5a3a29"/><path d="M20 100 Q20 62 50 62 Q80 62 80 100 Z" fill="#d99a3c"/></svg></div>
+            <div class="txt"><b>Tomás Iturra</b>Desarrollador Web<div class="tag">Por proyectos</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Preguntas frecuentes</h2>
+        <div class="faq-item">
+          <div class="q">¿Puedo pedir cambios después de la entrega?</div>
+          <div class="a">Sí, el servicio incluye una ronda de ajustes sin costo adicional. Rondas adicionales se acuerdan directamente en el chat de la solicitud.</div>
+        </div>
+        <div class="faq-item">
+          <div class="q">¿Qué pasa si el profesional no entrega a tiempo?</div>
+          <div class="a">Puedes reportar el problema antes de confirmar la entrega; el pago permanece retenido mientras Skilly revisa el caso.</div>
+        </div>
+        <div class="faq-item">
+          <div class="q">¿Puedo elegir a un profesional distinto al sugerido?</div>
+          <div class="a">Sí, al reservar puedes elegir entre los profesionales disponibles para este servicio o dejar que Skilly asigne uno automáticamente.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Comentarios de organizaciones</h2>
+        <div class="quote-box">
+          "Cumplió el alcance a tiempo, buena comunicación durante todo el proyecto."
+          <span class="who">— Constructora Alba</span>
+        </div>
+        <div class="quote-box">
+          "Buen nivel técnico, lo recontrataríamos para el siguiente sprint."
+          <span class="who">— Estudio Norte</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-right">
+      <div class="summary-box">
+        <div class="price">$700.000</div>
+        <div class="summary-row"><span>Duración estimada</span><span>15 días</span></div>
+        <div class="summary-row"><span>Modalidad</span><span>Remoto</span></div>
+        <div class="summary-row"><span>Profesionales disponibles</span><span>2</span></div>
+        <a class="btn-reserve" style="display:block;text-decoration:none;" href="programa-servicio.html">Reservar este servicio</a>
+        <a class="fav-link" href="#">☆ Guardar en favoritos</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

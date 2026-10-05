@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Ayuda</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --orange-bg:#fbe3c0;
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:920px;background:#fff;border:1px solid #000;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:16px 30px;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:14px;}
+  .logo svg{width:20px;height:20px;}
+  .navlinks{display:flex;gap:26px;font-size:13px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  .hero{background:var(--navy);color:#fff;padding:42px 30px 36px;text-align:center;}
+  .hero h1{font-size:24px;margin:0 0 20px;}
+  .search-bar{max-width:480px;margin:0 auto;display:flex;background:#fff;border:1px solid #000;}
+  .search-bar input{flex:1;border:none;padding:12px 14px;font-size:13px;color:#888;}
+  .search-bar button{border:none;border-left:1px solid #000;background:#000;color:#fff;padding:0 20px;font-size:13px;cursor:pointer;}
+
+  .section{padding:30px;border-bottom:1px solid #eee;}
+  .section h2{font-size:16px;margin:0 0 16px;}
+
+  .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .cat-tile{border:1px solid var(--gray-line);padding:16px;}
+  .cat-tile .ic{font-size:24px;margin-bottom:6px;}
+  .cat-tile .name{font-size:12.5px;font-weight:bold;margin-bottom:3px;}
+  .cat-tile .desc{font-size:11px;color:#777;}
+  .cat-tile.blue{background:var(--blue);}
+  .cat-tile.green{background:var(--green-bg);}
+  .cat-tile.orange{background:var(--orange-bg);}
+
+  .faq-group{margin-bottom:22px;}
+  .faq-group h3{font-size:13px;color:#555;margin:0 0 10px;text-transform:uppercase;letter-spacing:.3px;}
+  .faq-item{border-bottom:1px solid #eee;padding:11px 0;}
+  .faq-item .q{font-size:13px;font-weight:bold;display:flex;justify-content:space-between;cursor:pointer;}
+  .faq-item .q .car{color:#999;font-weight:normal;transition:transform .15s;}
+  .faq-item.open .q .car{transform:rotate(180deg);}
+  .faq-item .a{
+    font-size:12.5px;color:#555;line-height:1.55;margin-top:0;
+    max-height:0;overflow:hidden;transition:max-height .2s ease, margin-top .2s ease;
+  }
+  .faq-item.open .a{margin-top:8px;max-height:200px;}
+
+  .contact-box{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--gray-bg);border:1px solid var(--gray-line);padding:18px 22px;
+  }
+  .contact-box .txt b{font-size:14px;display:block;margin-bottom:3px;}
+  .contact-box .txt span{font-size:12px;color:#666;}
+  .contact-box .btn{border:1px solid #000;background:#000;color:#fff;padding:10px 20px;font-size:13px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+      Skilly Latam
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="catalogo.html">Servicios</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>¿En qué podemos ayudarte?</h1>
+    <div class="search-bar">
+      <input type="text" placeholder="Ej: cancelar una reserva, comisión, validar certificados…">
+      <button>Buscar</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Preguntas frecuentes</h2>
+
+    <div class="faq-group">
+      <h3>Reservas y pagos</h3>
+      <div class="faq-item">
+        <div class="q">¿Cuándo se me cobra el servicio? <span class="car">⌄</span></div>
+        <div class="a">Al reservar, solo se autoriza el monto en tu método de pago. El cobro efectivo ocurre únicamente cuando el profesional acepta la solicitud dentro del plazo asignado.</div>
+      </div>
+      <div class="faq-item">
+        <div class="q">¿Qué pasa si el profesional rechaza mi solicitud? <span class="car">⌄</span></div>
+        <div class="a">La autorización de pago se libera automáticamente sin costo para ti. Puedes volver al detalle del servicio y elegir a otro profesional disponible, o dejar que Skilly te asigne uno.</div>
+      </div>
+      <div class="faq-item">
+        <div class="q">¿Puedo hacer una reserva sin tener cuenta? <span class="car">⌄</span></div>
+        <div class="a">Sí. Al reservar te pedimos solo tus datos de contacto y de tu organización en el formulario de reserva, sin necesidad de crear una contraseña. Si ya tienes cuenta, puedes iniciar sesión para no volver a ingresarlos.</div>
+      </div>
+      <div class="faq-item">
+        <div class="q">¿Cuál es la política de cancelación? <span class="car">⌄</span></div>
+        <div class="a">Si cancelas con 24 horas o más de anticipación, se libera el 100% del pago. Con menos de 24 horas, se reembolsa el 90%. Si no avisas y no asistes, se pierde el monto completo.</div>
+      </div>
+      <div class="faq-item">
+        <div class="q">¿Cómo se calcula la comisión de gestión de Skilly? <span class="car">⌄</span></div>
+        <div class="a">Skilly cobra un porcentaje sobre el valor del servicio al momento en que se libera el pago. El profesional siempre ve el monto neto que recibirá, ya con la comisión descontada.</div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <h3>Profesionales</h3>
+      <div class="faq-item">
+        <div class="q">¿Cómo valida Skilly a los profesionales? <span class="car">⌄</span></div>
+        <div class="a">El perfil de LinkedIn se verifica automáticamente. Los certificados adicionales se revisan de forma manual antes de aprobar la postulación.</div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <h3>Disputas</h3>
+      <div class="faq-item">
+        <div class="q">El servicio entregado no cumple lo acordado, ¿qué hago? <span class="car">⌄</span></div>
+        <div class="a">Antes de confirmar la entrega, usa la opción "Reportar un problema". El pago permanece retenido mientras Skilly revisa el caso, en vez de liberarse automáticamente.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="border-bottom:none;">
+    <div class="contact-box">
+      <div class="txt">
+        <b>¿No encontraste lo que buscabas?</b>
+        <span>Nuestro equipo responde de lunes a viernes, 9:00–18:00</span>
+        <span style="display:block;margin-top:6px;"><a href="mailto:mariajose@skillylatam.com?subject=Hola%2C%20soy" style="color:#000;text-decoration:underline;">hola@skillylatam.com</a></span>
+      </div>
+      <div class="btn">Contactar a soporte</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.faq-item .q').forEach(q => {
+    q.addEventListener('click', () => {
+      q.parentElement.classList.toggle('open');
+    });
+  });
+</script>
+</body>
+</html>

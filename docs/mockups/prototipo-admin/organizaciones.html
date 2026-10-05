@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Organizaciones</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --amber-bg:#fbeecb;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .search-row{display:flex;margin-bottom:18px;border:1px solid #000;max-width:340px;}
+  .search-row input{flex:1;border:none;padding:9px 11px;font-size:12.5px;color:#888;}
+  .search-row button{border:none;border-left:1px solid #000;background:#000;color:#fff;padding:0 16px;font-size:12.5px;cursor:pointer;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  td{padding:10px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;}
+
+  .status{font-size:10.5px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:bold;}
+  .status.active{color:var(--green);background:var(--green-bg);}
+  .status.new{color:#8a6300;background:var(--amber-bg);}
+
+  .link-btn{font-size:11.5px;border:1px solid #000;padding:5px 12px;background:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html" class="active">Organizaciones</a>
+      <a href="comisiones.html">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Organizaciones</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ok"><b>58</b><span>Organizaciones activas</span></div>
+      <div class="kpi"><b>6</b><span>Nuevas este mes</span></div>
+      <div class="kpi"><b>$18.400.000</b><span>Gasto acumulado (histórico)</span></div>
+      <div class="kpi"><b>2.3</b><span>Servicios promedio por organización</span></div>
+    </div>
+
+    <div class="search-row">
+      <input type="text" placeholder="Buscar por nombre o RUT…">
+      <button>Buscar</button>
+    </div>
+
+    <table>
+      <tr>
+        <th>Organización</th><th>RUT</th><th>Contacto</th><th>Servicios contratados</th><th>Gasto total</th><th>Estado</th><th></th>
+      </tr>
+      <tr>
+        <td>Constructora Alba SpA</td><td>76.541.230-K</td><td>Marcela Ibáñez</td>
+        <td class="num">5</td><td class="num">$2.150.000</td>
+        <td><span class="status active">Activa</span></td><td><a class="link-btn" href="historial-organizacion.html" style="text-decoration:none;display:inline-block;">Ver</a></td>
+      </tr>
+      <tr>
+        <td>Estudio Norte Ltda.</td><td>77.902.114-5</td><td>Felipe Contreras</td>
+        <td class="num">3</td><td class="num">$1.480.000</td>
+        <td><span class="status active">Activa</span></td><td><a class="link-btn" href="historial-organizacion.html" style="text-decoration:none;display:inline-block;">Ver</a></td>
+      </tr>
+      <tr>
+        <td>Comercial Rojas y Cía.</td><td>78.115.887-2</td><td>Camila Rojas H.</td>
+        <td class="num">2</td><td class="num">$430.000</td>
+        <td><span class="status active">Activa</span></td><td><a class="link-btn" href="historial-organizacion.html" style="text-decoration:none;display:inline-block;">Ver</a></td>
+      </tr>
+      <tr>
+        <td>Grupo Iturra</td><td>76.220.556-9</td><td>Tomás Iturra P.</td>
+        <td class="num">1</td><td class="num">$150.000</td>
+        <td><span class="status new">Nueva</span></td><td><a class="link-btn" href="historial-organizacion.html" style="text-decoration:none;display:inline-block;">Ver</a></td>
+      </tr>
+      <tr>
+        <td>Clínica del Sur SpA</td><td>77.334.902-1</td><td>Daniela Soto</td>
+        <td class="num">4</td><td class="num">$960.000</td>
+        <td><span class="status active">Activa</span></td><td><a class="link-btn" href="historial-organizacion.html" style="text-decoration:none;display:inline-block;">Ver</a></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

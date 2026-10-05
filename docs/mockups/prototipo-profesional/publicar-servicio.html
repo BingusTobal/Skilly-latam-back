@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Publicar servicio</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --red:#c62828; --green:#2e7d32; --amber:#b8860b;
+    --blue-bg:#cfe8f3; --green-bg:#dcf0d8; --amber-bg:#fbeecb;
+    --gray-line:#d0d0d0; --gray-bg:#f5f5f5; --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:900px;background:#fff;border:1px solid #000;padding:22px 28px 32px;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:16px;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:14px;}
+  .logo svg{width:20px;height:20px;}
+  .navlinks{display:flex;gap:24px;font-size:13px;align-items:center;}
+  .navlinks a{color:#000;text-decoration:none;}
+  .navlinks .me{color:#666;font-size:12px;}
+
+  .back-row{font-size:13px;margin-bottom:6px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .crumb{font-size:12px;color:#777;margin-bottom:18px;}
+
+  h1.title{font-size:21px;margin:0 0 4px;}
+  p.subtitle{font-size:12.5px;color:#777;margin:0 0 22px;}
+
+  .layout{display:flex;gap:30px;align-items:flex-start;}
+  .col-left{flex:1.6;min-width:0;}
+  .col-right{width:250px;flex-shrink:0;}
+
+  .section{margin-bottom:24px;}
+  .section h2{font-size:14px;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--gray-line);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;color:#444;margin-bottom:6px;}
+  .field label .req{color:var(--red);}
+  .field .hint{font-size:10.5px;color:#999;margin-top:4px;}
+  .input-box{border:1px solid #999;padding:10px 11px;font-size:13px;color:#999;background:#fff;}
+  .textarea-box{border:1px solid #999;min-height:64px;padding:10px 11px;font-size:12.5px;color:#999;background:#fff;}
+  .select-box{border:1px solid #999;padding:10px 11px;font-size:13px;display:flex;justify-content:space-between;align-items:center;background:#fff;}
+  .select-box .car{font-size:10px;color:#888;}
+  .field-row{display:flex;gap:14px;}
+  .field-row .field{flex:1;}
+
+  /* entregables */
+  .deliv-item{display:flex;align-items:center;gap:9px;border:1px solid var(--gray-line);background:var(--gray-bg);padding:9px 11px;margin-bottom:8px;font-size:12.5px;}
+  .deliv-item .check{color:var(--green);font-weight:bold;}
+  .deliv-item .del{margin-left:auto;color:#999;font-size:11px;cursor:pointer;}
+  .add-btn{border:1px dashed #999;background:#fff;padding:9px 11px;font-size:12px;color:#666;width:100%;text-align:left;cursor:pointer;}
+
+  /* modalidad radios */
+  .radio-row{display:flex;gap:18px;flex-wrap:wrap;}
+  .radio-opt{display:flex;align-items:center;gap:7px;font-size:12.5px;}
+  .radio-opt .dot{width:12px;height:12px;border:1px solid #555;border-radius:50%;display:inline-block;}
+  .radio-opt.sel .dot{background:#000;}
+
+  /* price preview */
+  .price-box{border:1px solid #000;padding:14px 16px;margin-bottom:8px;background:var(--gray-bg);}
+  .price-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid #e4e4e4;}
+  .price-row:last-child{border-bottom:none;font-weight:bold;font-size:15px;color:var(--green);padding-top:10px;}
+
+  .review-note{display:flex;gap:8px;font-size:11.5px;color:#444;background:var(--amber-bg);border:1px solid var(--amber);padding:10px 12px;margin-bottom:16px;}
+
+  .btn{display:block;width:100%;text-align:center;font-size:13px;padding:12px 0;border:1px solid #000;margin-bottom:9px;cursor:pointer;background:#fff;}
+  .btn-primary{background:#000;color:#fff;}
+
+  .footnote{font-size:10.5px;color:#888;line-height:1.5;}
+
+  .status-tag{display:inline-block;font-size:10px;padding:3px 8px;border-radius:2px;background:var(--blue-bg);color:var(--navy);font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+      Skilly Latam
+    </div>
+    <div class="navlinks">
+      <a href="mis-servicios.html">Mis servicios</a>
+      <a href="mis-solicitudes.html">Mis solicitudes</a>
+      <a href="#">Help</a>
+      <span class="me">Juan Pérez</span>
+    </div>
+  </div>
+
+  <div class="back-row"><a href="mis-servicios.html">&larr; Volver a mis servicios</a></div>
+  <div class="crumb">Mis servicios &gt; Publicar nuevo servicio</div>
+
+  <h1 class="title">Publicar un nuevo servicio</h1>
+  <p class="subtitle">Describe el servicio que ofreces. Una vez enviado, Skilly lo revisa antes de publicarlo en el catálogo.</p>
+
+  <div class="layout">
+
+    <!-- IZQUIERDA: formulario -->
+    <div class="col-left">
+
+      <div class="section">
+        <h2>Información general</h2>
+
+        <div class="field">
+          <label>Nombre del servicio <span class="req">*</span></label>
+          <div class="input-box">Ej: Sitio web corporativo en 15 días</div>
+          <div class="hint">Un nombre concreto que indique qué recibe la organización</div>
+        </div>
+
+        <div class="field">
+          <label>Categoría <span class="req">*</span></label>
+          <div class="select-box">
+            <span>Desarrollo software</span>
+            <span class="car">▾</span>
+          </div>
+          <div class="hint">Solo puedes publicar en las categorías aprobadas en tu perfil</div>
+        </div>
+
+        <div class="field">
+          <label>Descripción breve <span class="req">*</span></label>
+          <div class="textarea-box">Ej: Landing responsive, lista para publicar, con acompañamiento durante todo el proceso…</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>¿Qué incluye el servicio?</h2>
+        <div class="deliv-item"><span class="check">✓</span> Diseño responsive de hasta 5 secciones <span class="del">✕</span></div>
+        <div class="deliv-item"><span class="check">✓</span> Formulario de contacto integrado <span class="del">✕</span></div>
+        <div class="deliv-item"><span class="check">✓</span> 1 ronda de ajustes incluida tras la entrega <span class="del">✕</span></div>
+        <button class="add-btn">+ Agregar otro entregable</button>
+      </div>
+
+      <div class="section">
+        <h2>Condiciones de entrega</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Duración estimada <span class="req">*</span></label>
+            <div class="input-box">15 días</div>
+          </div>
+          <div class="field">
+            <label>Tiempo de entrega <span class="req">*</span></label>
+            <div class="select-box"><span>Este mes</span><span class="car">▾</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Modalidad <span class="req">*</span></label>
+          <div class="radio-row">
+            <div class="radio-opt sel"><span class="dot"></span> Remoto</div>
+            <div class="radio-opt"><span class="dot"></span> Presencial</div>
+            <div class="radio-opt"><span class="dot"></span> Mixto</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Cupos simultáneos</label>
+          <div class="input-box">2 servicios a la vez</div>
+          <div class="hint">Cuántas reservas de este servicio puedes atender al mismo tiempo</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DERECHA: precio y publicación -->
+    <div class="col-right">
+
+      <div class="section" style="margin-bottom:16px;">
+        <h2>Precio</h2>
+        <div class="field">
+          <label>Precio del servicio <span class="req">*</span></label>
+          <div class="input-box">$700.000 CLP</div>
+        </div>
+      </div>
+
+      <div class="price-box">
+        <div class="price-row"><span>Precio publicado</span><span>$700.000</span></div>
+        <div class="price-row"><span>Comisión Skilly (10%)</span><span>− $70.000</span></div>
+        <div class="price-row"><span>Recibirás</span><span>$630.000</span></div>
+      </div>
+      <p class="footnote" style="margin:0 0 16px;">El monto neto se calcula automáticamente según la tasa vigente de tu categoría.</p>
+
+      <div class="review-note">
+        <span>⏳</span>
+        <span>Este servicio quedará en estado <span class="status-tag">En revisión</span> hasta que Skilly lo apruebe. No será visible en el catálogo hasta entonces.</span>
+      </div>
+
+      <div class="btn btn-primary">Enviar a revisión</div>
+      <div class="btn">Guardar borrador</div>
+
+      <p class="footnote">Podrás editar o pausar el servicio en cualquier momento desde "Mis servicios", incluso después de publicado.</p>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

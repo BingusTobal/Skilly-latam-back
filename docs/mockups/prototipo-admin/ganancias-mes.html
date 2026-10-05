@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Ganancias por mes</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --red:#c62828; --green:#2e7d32;
+    --blue-bg:#cfe8f3; --green-bg:#dcf0d8; --gray-line:#d0d0d0; --gray-bg:#f5f5f5; --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .back-row{font-size:13px;margin-bottom:14px;}
+  .back-row a{color:#333;text-decoration:none;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .month-picker{display:flex;align-items:center;gap:10px;border:1px solid #000;padding:7px 14px;font-size:13px;}
+  .month-picker .nav{cursor:pointer;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .panel{border:1px solid var(--gray-line);padding:16px 18px;margin-bottom:22px;}
+  .panel h2{font-size:14px;margin:0 0 14px;}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:11.5px;}
+  .bar-row .label{width:80px;flex-shrink:0;color:#444;}
+  .bar-track{flex:1;background:#eee;height:16px;}
+  .bar-fill{height:100%;background:var(--navy);}
+  .bar-row .val{width:120px;text-align:right;color:#666;flex-shrink:0;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  td{padding:10px 10px;border-bottom:1px solid #eee;}
+  td.num{text-align:right;}
+  tr:last-child td{border-bottom:none;}
+  tr.total td{font-weight:bold;border-top:1px solid #000;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="side">
+    <div class="logo"><svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg></div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html" class="active">Comisiones</a>
+    </nav>
+  </div>
+  <div class="main">
+    <div class="back-row"><a href="comisiones.html">&larr; Volver a Comisiones</a></div>
+    <div class="topbar">
+      <h1>Ganancias por mes</h1>
+      <div class="month-picker"><span class="nav">&lsaquo;</span> Septiembre 2026 <span class="nav">&rsaquo;</span></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ok"><b>$1.240.000</b><span>Total generado en sep 2026</span></div>
+      <div class="kpi"><b>+7,8%</b><span>vs. agosto 2026 ($1.150.000)</span></div>
+      <div class="kpi"><b>34</b><span>Servicios facturados</span></div>
+      <div class="kpi"><b>$36.470</b><span>Comisión promedio por servicio</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>Desglose por categoría — Septiembre 2026</h2>
+      <div class="bar-row"><span class="label">Salud y Bienestar</span><div class="bar-track"><div class="bar-fill" style="width:80%;"></div></div><span class="val">$420.000</span></div>
+      <div class="bar-row"><span class="label">Desarrollo software</span><div class="bar-track"><div class="bar-fill" style="width:65%;"></div></div><span class="val">$340.000</span></div>
+      <div class="bar-row"><span class="label">Diseño gráfico</span><div class="bar-track"><div class="bar-fill" style="width:45%;"></div></div><span class="val">$235.000</span></div>
+      <div class="bar-row"><span class="label">Marketing</span><div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div><span class="val">$155.000</span></div>
+      <div class="bar-row"><span class="label">Finanzas</span><div class="bar-track"><div class="bar-fill" style="width:17%;"></div></div><span class="val">$90.000</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>Servicios liberados este mes</h2>
+      <table>
+        <tr><th>Servicio</th><th>Organización</th><th>Monto servicio</th><th>Comisión</th><th>Fecha liberación</th></tr>
+        <tr><td>Sitio web corporativo en 15 días</td><td>Constructora Alba</td><td class="num">$700.000</td><td class="num">$70.000</td><td>19 sep 2026</td></tr>
+        <tr><td>Rediseño UX/UI de landing</td><td>Estudio Norte</td><td class="num">$650.000</td><td class="num">$65.000</td><td>17 sep 2026</td></tr>
+        <tr><td>Taller de bienestar laboral</td><td>Grupo Iturra</td><td class="num">$150.000</td><td class="num">$12.000</td><td>15 sep 2026</td></tr>
+        <tr><td>Evaluación psicolaboral</td><td>Comercial Rojas</td><td class="num">$80.000</td><td class="num">$6.400</td><td>12 sep 2026</td></tr>
+        <tr class="total"><td colspan="3">Total del mes</td><td class="num">$1.240.000</td><td></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

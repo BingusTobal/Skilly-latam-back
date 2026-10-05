@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Inicia sesión o crea tu cuenta</title>
+<style>
+  :root{
+    --blue:#cfe8f3;
+    --red:#c62828;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:620px;background:#fff;border:1px solid #000;padding:22px 26px 30px;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:20px;}
+  .logo svg{width:22px;height:22px;}
+  .navlinks{display:flex;gap:34px;font-size:14px;}
+  .navlinks a{color:#000;text-decoration:none;}
+
+  .service-preview{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--gray-bg);border:1px solid var(--gray-line);padding:10px 14px;margin-bottom:20px;font-size:12px;
+  }
+  .service-preview b{font-size:13px;}
+  .service-preview .price{color:var(--red);font-weight:bold;}
+
+  h1.title{font-size:20px;margin:0 0 4px;}
+  p.subtitle{font-size:12px;color:#777;margin:0 0 20px;}
+
+  .tabs{display:flex;border-bottom:1px solid var(--gray-line);margin-bottom:22px;}
+  .tab{padding:10px 18px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;}
+  .tab.active{color:#000;font-weight:bold;border-bottom:2px solid #000;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12px;color:#444;margin-bottom:5px;}
+  .field-row{display:flex;gap:12px;}
+  .field-row .field{flex:1;}
+  .input-box{border:1px solid #999;padding:9px 10px;font-size:13px;color:#999;background:#fff;}
+
+  .check-row{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#555;margin:14px 0 18px;}
+  .check-row .box{width:13px;height:13px;border:1px solid #666;flex-shrink:0;margin-top:1px;}
+
+  .link{font-size:11px;color:#333;text-decoration:underline;}
+
+  .btn{display:block;width:100%;text-align:center;font-size:13px;padding:11px 0;border:1px solid #000;margin-bottom:10px;cursor:pointer;background:#fff;}
+  .btn-primary{background:#000;color:#fff;}
+
+  .guest-note{
+    font-size:11px;color:#888;text-align:center;margin-top:6px;line-height:1.5;
+  }
+  .guest-note a{color:#333;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topnav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <div class="navlinks">
+      <a href="home.html">Home</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <div class="service-preview">
+    <span>Estás por solicitar: <b>Sitio web corporativo en 15 días</b></span>
+    <span class="price">$700.000</span>
+  </div>
+
+  <h1 class="title">Inicia sesión o crea tu cuenta</h1>
+  <p class="subtitle">Necesitas una cuenta para enviar solicitudes y gestionar tus pagos. Puedes seguir explorando el catálogo sin registrarte.</p>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-login">Iniciar sesión</div>
+    <div class="tab" id="tab-register">Crear cuenta</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="panel active" id="panel-login">
+    <div class="field">
+      <label>Correo corporativo</label>
+      <div class="input-box">nombre@empresa.cl</div>
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <div class="input-box">••••••••</div>
+    </div>
+    <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+
+    <a class="btn btn-primary" style="margin-top:20px;display:block;text-decoration:none;" href="mis-reservas.html">Iniciar sesión y continuar</a>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="panel" id="panel-register">
+    <div class="field">
+      <label>Nombre de la organización</label>
+      <div class="input-box">Ej: Constructora Alba SpA</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>RUT de la empresa</label>
+        <div class="input-box">76.XXX.XXX-X</div>
+      </div>
+      <div class="field">
+        <label>Nombre de contacto</label>
+        <div class="input-box">Quien gestiona la cuenta</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Correo corporativo</label>
+        <div class="input-box">nombre@empresa.cl</div>
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <div class="input-box">+56 9 XXXX XXXX</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Contraseña</label>
+        <div class="input-box">••••••••</div>
+      </div>
+      <div class="field">
+        <label>Confirmar contraseña</label>
+        <div class="input-box">••••••••</div>
+      </div>
+    </div>
+
+    <div class="check-row">
+      <span class="box"></span>
+      <span>Acepto los términos y condiciones y la política de privacidad de Skilly Latam.</span>
+    </div>
+
+    <a class="btn btn-primary" style="display:block;text-decoration:none;" href="mis-reservas.html">Crear cuenta y continuar</a>
+  </div>
+
+  <p class="guest-note">¿Solo quieres seguir mirando? <a href="catalogo.html">Volver al catálogo sin iniciar sesión</a></p>
+
+</div>
+
+<script>
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const panelLogin = document.getElementById('panel-login');
+  const panelRegister = document.getElementById('panel-register');
+
+  tabLogin.addEventListener('click', () => {
+    tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+    panelLogin.classList.add('active'); panelRegister.classList.remove('active');
+  });
+  tabRegister.addEventListener('click', () => {
+    tabRegister.classList.add('active'); tabLogin.classList.remove('active');
+    panelRegister.classList.add('active'); panelLogin.classList.remove('active');
+  });
+</script>
+</body>
+</html>

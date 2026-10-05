@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Skilly Latam — Comisiones</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --red:#c62828;
+    --green:#2e7d32;
+    --blue-bg:#cfe8f3;
+    --green-bg:#dcf0d8;
+    --gray-line:#d0d0d0;
+    --gray-bg:#f5f5f5;
+    --ink:#1a1a1a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center;padding:24px 12px;}
+  .frame{width:100%;max-width:980px;background:#fff;border:1px solid #000;display:flex;min-height:640px;}
+
+  .side{width:190px;flex-shrink:0;border-right:1px solid #000;background:var(--navy);color:#fff;padding:18px 0;}
+  .side .logo{padding:0 18px 20px;}
+  .side .logo svg{width:20px;height:20px;}
+  .side nav a{display:block;padding:11px 18px;font-size:13px;color:#cfe0ee;text-decoration:none;border-left:3px solid transparent;}
+  .side nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#59c3ff;font-weight:bold;}
+
+  .main{flex:1;padding:22px 26px 30px;min-width:0;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .topbar h1{font-size:19px;margin:0;}
+  .admin-id{font-size:12px;color:#666;}
+
+  .kpis{display:flex;gap:14px;margin-bottom:26px;}
+  .kpi{flex:1;border:1px solid var(--gray-line);background:var(--blue-bg);padding:14px;text-align:center;}
+  .kpi b{display:block;font-size:20px;}
+  .kpi span{font-size:11px;color:#555;}
+  .kpi.ok{background:var(--green-bg);}
+  .kpi.ok b{color:var(--green);}
+
+  .row{display:flex;gap:20px;margin-bottom:26px;}
+  .panel{flex:1;border:1px solid var(--gray-line);padding:16px 18px;}
+  .panel h2{font-size:14px;margin:0 0 14px;}
+
+  /* rate config */
+  .rate-config{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .rate-config .val{font-size:26px;font-weight:bold;color:var(--navy);}
+  .rate-config .lbl{font-size:11px;color:#777;}
+  .edit-btn{font-size:11.5px;border:1px solid #000;padding:6px 14px;background:#fff;cursor:pointer;}
+
+  .rate-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .rate-table th{text-align:left;font-weight:normal;color:#888;font-size:10.5px;border-bottom:1px solid var(--gray-line);padding:6px 4px;}
+  .rate-table td{padding:7px 4px;border-bottom:1px solid #f0f0f0;}
+  .rate-table td:last-child{text-align:right;font-weight:bold;}
+
+  /* bar chart */
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:11.5px;}
+  .bar-row .label{width:60px;flex-shrink:0;color:#444;}
+  .bar-track{flex:1;background:#eee;height:14px;position:relative;}
+  .bar-fill{height:100%;background:var(--navy);}
+  .bar-row .val{width:80px;text-align:right;color:#666;flex-shrink:0;}
+
+  table.full{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.full th{text-align:left;font-size:11px;color:#777;font-weight:normal;border-bottom:1px solid var(--gray-line);padding:8px 10px;}
+  table.full td{padding:10px 10px;border-bottom:1px solid #eee;}
+  table.full tr:last-child td{border-bottom:none;}
+  table.full td.num{text-align:right;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="side">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+    </div>
+    <nav>
+      <a href="resumen.html">Resumen</a>
+      <a href="postulaciones.html">Postulaciones</a>
+      <a href="disputas.html">Disputas</a>
+      <a href="profesionales.html">Profesionales</a>
+      <a href="organizaciones.html">Organizaciones</a>
+      <a href="comisiones.html" class="active">Comisiones</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Comisiones</h1>
+      <div class="admin-id">Sesión: admin@skillylatam.com</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ok"><b>$1.240.000</b><span>Comisión recaudada este mes</span></div>
+      <div class="kpi"><b>$9.860.000</b><span>Comisión acumulada (histórico)</span></div>
+      <div class="kpi"><b>10%</b><span>Tasa vigente</span></div>
+      <div class="kpi"><b>34</b><span>Servicios facturados este mes</span></div>
+    </div>
+
+    <div class="row">
+      <div class="panel">
+        <h2>Configuración de tasa</h2>
+        <div class="rate-config">
+          <div>
+            <div class="val">10%</div>
+            <div class="lbl">Tasa global vigente desde el 1 sep 2026</div>
+          </div>
+          <button class="edit-btn">Editar tasa</button>
+        </div>
+
+        <table class="rate-table">
+          <tr><th>Categoría</th><th style="text-align:right;">Tasa</th></tr>
+          <tr><td>Desarrollo software</td><td>10%</td></tr>
+          <tr><td>Diseño gráfico</td><td>10%</td></tr>
+          <tr><td>Finanzas</td><td>10%</td></tr>
+          <tr><td>Marketing</td><td>10%</td></tr>
+          <tr><td>Salud y Bienestar</td><td>8%</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Comisión recaudada — últimos 6 meses <a href="ganancias-mes.html" style="font-size:11px;font-weight:normal;color:#1a3a5c;">Ver detalle mensual →</a></h2>
+        <div class="bar-row"><span class="label">Abr</span><div class="bar-track"><div class="bar-fill" style="width:55%;"></div></div><span class="val">$780.000</span></div>
+        <div class="bar-row"><span class="label">May</span><div class="bar-track"><div class="bar-fill" style="width:62%;"></div></div><span class="val">$890.000</span></div>
+        <div class="bar-row"><span class="label">Jun</span><div class="bar-track"><div class="bar-fill" style="width:70%;"></div></div><span class="val">$1.010.000</span></div>
+        <div class="bar-row"><span class="label">Jul</span><div class="bar-track"><div class="bar-fill" style="width:75%;"></div></div><span class="val">$1.080.000</span></div>
+        <div class="bar-row"><span class="label">Ago</span><div class="bar-track"><div class="bar-fill" style="width:80%;"></div></div><span class="val">$1.150.000</span></div>
+        <div class="bar-row"><span class="label">Sep</span><div class="bar-track"><div class="bar-fill" style="width:86%;"></div></div><span class="val">$1.240.000</span></div>
+      </div>
+    </div>
+
+    <h2 style="font-size:14px;margin-bottom:10px;">Detalle por servicio liberado</h2>
+    <table class="full">
+      <tr><th>Servicio</th><th>Organización</th><th>Monto servicio</th><th>Comisión</th><th>Fecha liberación</th></tr>
+      <tr><td>Sitio web corporativo en 15 días</td><td>Constructora Alba</td><td class="num">$700.000</td><td class="num">$70.000</td><td>19 sep 2026</td></tr>
+      <tr><td>Rediseño UX/UI de landing</td><td>Estudio Norte</td><td class="num">$650.000</td><td class="num">$65.000</td><td>17 sep 2026</td></tr>
+      <tr><td>Taller de bienestar laboral</td><td>Grupo Iturra</td><td class="num">$150.000</td><td class="num">$12.000</td><td>15 sep 2026</td></tr>
+      <tr><td>Evaluación psicolaboral</td><td>Comercial Rojas</td><td class="num">$80.000</td><td class="num">$6.400</td><td>12 sep 2026</td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

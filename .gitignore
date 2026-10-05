@@ -1,0 +1,38 @@
+# Entorno
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Variables de entorno: nunca versionar
+.env
+*.env
+!.env.example
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documentos generados
+*.docx.tmp
+
+# LibreOffice deja archivos de lock
+.~lock.*#
