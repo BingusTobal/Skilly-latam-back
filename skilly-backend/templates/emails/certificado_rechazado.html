@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+{% block titulo %}Documento no aprobado{% endblock %}
+{% block contenido %}
+<p>Hola {{ nombre }},</p>
+
+<p>El siguiente documento no fue aprobado en la revisión:</p>
+
+<div class="bloque">
+    <p><strong>{{ certificado.nombre }}</strong></p>
+    {% if comentarios %}<p>{{ comentarios }}</p>{% endif %}
+</div>
+
+<p>
+    Puedes subir un documento nuevo desde tu perfil cuando quieras. Este aviso es
+    independiente del estado de tu postulación.
+</p>
+
+<p>Equipo Skilly Latam</p>
+{% endblock %}

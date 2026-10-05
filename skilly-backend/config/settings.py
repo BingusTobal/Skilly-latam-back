@@ -125,12 +125,15 @@ DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.mysql").strip()
 if DB_ENGINE == "django.db.backends.sqlite3":
     # Solo para tests locales donde no hay MariaDB levantado.
     # La app real corre siempre sobre MariaDB.
+    #
+    # DB_NAME se respeta también aquí (igual que en el bloque de MariaDB). Con
+    # el path fijo, `DB_NAME=/tmp/x.sqlite3 manage.py migrate` migraba en
+    # silencio la base de siempre y la base desechable quedaba vacía, lo que
+    # hace imposible probar migraciones sobre una base limpia.
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            # DB_NAME se respeta para poder levantar una base desechable y
-            # aislada (por ejemplo /tmp/smoke.sqlite3) sin tocar db.sqlite3.
-            "NAME": os.environ.get("DB_NAME") or (BASE_DIR / "db.sqlite3"),
+            "NAME": os.environ.get("DB_NAME", BASE_DIR / "db.sqlite3"),
         }
     }
 else:
@@ -223,6 +226,10 @@ if EMAIL_BACKEND.startswith("django_ses"):
     AWS_SES_REGION_NAME = os.environ.get("AWS_SES_REGION_NAME", "us-east-1")
 
 EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))
+
+# Frontend en otro repositorio (D4). Se usa para armar los enlaces de los
+# correos (restablecer contraseña, confirmar token mágico de la reserva D7).
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
 # ---------------------------------------------------------------------------
 # 0.6 CORS

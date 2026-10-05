@@ -1,0 +1,11 @@
+Hola {{ nombre }},
+
+Revisamos tu postulación y la devolvimos para que ajustes algunos detalles.
+
+Qué corregir:
+{{ comentarios }}
+
+Cuando lo ajustes, vuelve a enviarla desde tu perfil y la revisaremos
+nuevamente.
+
+Equipo Skilly Latam

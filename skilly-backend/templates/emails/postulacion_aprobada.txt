@@ -1,0 +1,8 @@
+Hola {{ nombre }},
+
+Tu postulación fue aprobada. Ya puedes publicar servicios en el catálogo.
+
+Recuerda que los documentos que subiste se revisan por separado: cuando
+termines, te avisaremos si alguno queda pendiente.
+
+Equipo Skilly Latam

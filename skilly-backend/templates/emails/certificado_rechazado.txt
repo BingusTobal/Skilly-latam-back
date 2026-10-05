@@ -1,0 +1,13 @@
+Hola {{ nombre }},
+
+El siguiente documento no fue aprobado en la revisión:
+
+{{ certificado.nombre }}
+{% if comentarios %}
+{{ comentarios }}
+{% endif %}
+
+Puedes subir un documento nuevo desde tu perfil cuando quieras. Este aviso es
+independiente del estado de tu postulación.
+
+Equipo Skilly Latam

@@ -19,8 +19,10 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    # Autenticacion JWT (0.17)
+    # Autenticacion JWT (0.17) y perfil/registro (Sprint 1)
     path("api/auth/", include("apps.usuarios.urls_auth")),
+    # Postulaciones y certificados (Sprint 1)
+    path("api/postulaciones/", include("apps.postulaciones.urls")),
     # API por app (se va poblando sprint a sprint)
     path("api/", include("apps.usuarios.urls")),
 ]

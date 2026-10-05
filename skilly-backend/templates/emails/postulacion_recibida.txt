@@ -1,0 +1,8 @@
+Hola {{ nombre }},
+
+Recibimos tu postulación. Nuestro equipo la va a revisar y te escribimos
+apenas tengamos un resultado.
+
+Mientras tanto puedes revisar tu perfil y tus documentos.
+
+Equipo Skilly Latam

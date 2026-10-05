@@ -89,6 +89,23 @@ class EsPostulante(BasePermission):
         return perfil.estado in ("postulando", "aprobado")
 
 
+class EsPostulanteOAdmin(BasePermission):
+    """Postulante o administrador.
+
+    Necesario donde el endpoint sirve tanto al profesional (su propia
+    postulación) como al admin (moderación). DRF exige que PASEN TODOS los
+    permisos de la lista, así que `[EsPostulante, EsAdmin]` significaría
+    "postulante Y admin", que es justo lo contrario de lo que se quiere.
+    """
+
+    message = "Se requiere ser profesional postulante o administrador."
+
+    def has_permission(self, request, view):
+        if EsAdmin().has_permission(request, view):
+            return True
+        return EsPostulante().has_permission(request, view)
+
+
 class EsPropietarioOAdmin(BasePermission):
     """El objeto pertenece al usuario, salvo que sea admin.
 
@@ -145,21 +162,31 @@ class ConflictoOperacion(APIException):
 def exception_handler(exc, context):
     """Normaliza los errores de la API.
 
-    Los errores de validacion de Django (incluido el validador de RUT) y los
-    de la base de datos se traducen a respuestas JSON consistentes.
+    Traduce los errores de Django (incluido el validador de RUT y los `clean()`
+    de los modelos) al MISMO formato que usa DRF y simplejwt: `{"detail": ...}`.
+
+    Antes estos errores de Django devolvían `{"error": ...}` y los de DRF
+    `{"detail": ...}`, así que la misma API respondía con dos claves según de
+    dónde saliera el fallo. El frontend tenía que probar las dos. Acá se
+    normaliza todo a `detail`, que es además lo que ya emiten `simplejwt` y
+    las vistas del Sprint 1.
+
+    Lo que NO se hace es atrapar excepciones desconocidas: se devuelve None y
+    DRF las vuelve a lanzar, para que un error de programación reviente en los
+    logs en vez de disfrazarse de respuesta.
     """
     if isinstance(exc, ValidationError):
         detalle = getattr(exc, "message_dict", None) or getattr(exc, "messages", [str(exc)])
-        return Response({"error": detalle}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": detalle}, status=status.HTTP_400_BAD_REQUEST)
 
     if isinstance(exc, Http404):
         return Response(
-            {"error": "Recurso no encontrado."}, status=status.HTTP_404_NOT_FOUND
+            {"detail": "Recurso no encontrado."}, status=status.HTTP_404_NOT_FOUND
         )
 
     if isinstance(exc, PermissionDenied):
         return Response(
-            {"error": str(exc.detail) if hasattr(exc, "detail") else str(exc)},
+            {"detail": str(exc.detail) if hasattr(exc, "detail") else str(exc)},
             status=status.HTTP_403_FORBIDDEN,
         )
 

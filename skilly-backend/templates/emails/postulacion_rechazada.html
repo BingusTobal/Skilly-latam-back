@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+{% block titulo %}Tu postulación no fue aprobada{% endblock %}
+{% block contenido %}
+<p>Hola {{ nombre }},</p>
+
+<p>Revisamos tu postulación y por ahora no podemos aprobarla.</p>
+
+<div class="bloque">
+    <p><strong>Motivo:</strong></p>
+    <p>{{ comentarios }}</p>
+</div>
+
+<p>
+    Puedes volver a postular en cualquier momento desde tu perfil. Si crees que
+    se trata de un error, responde este correo y lo revisamos.
+</p>
+
+<p>Equipo Skilly Latam</p>
+{% endblock %}

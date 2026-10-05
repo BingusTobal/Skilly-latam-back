@@ -1,0 +1,11 @@
+Hola {{ nombre }},
+
+Revisamos tu postulación y por ahora no podemos aprobarla.
+
+Motivo:
+{{ comentarios }}
+
+Puedes volver a postular en cualquier momento desde tu perfil. Si crees que se
+trata de un error, responde este correo y lo revisamos.
+
+Equipo Skilly Latam

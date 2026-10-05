@@ -1,0 +1,9 @@
+Hola {{ nombre }},
+
+Tu cuenta de organización en Skilly Latam quedó lista.
+
+Desde el catálogo puedes reservar el servicio que necesites. Si prefieres
+reservar sin crear cuenta, también puedes: te pedimos solo los datos de
+contacto.
+
+Equipo Skilly Latam

@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+{% block titulo %}Tu postulación necesita correcciones{% endblock %}
+{% block contenido %}
+<p>Hola {{ nombre }},</p>
+
+<p>Revisamos tu postulación y la devolvimos para que ajustes algunos detalles.</p>
+
+<div class="bloque">
+    <p><strong>Qué corregir:</strong></p>
+    <p>{{ comentarios }}</p>
+</div>
+
+<p>
+    Cuando lo ajustes, vuelve a enviarla desde tu perfil y la revisaremos
+    nuevamente.
+</p>
+
+<p>Equipo Skilly Latam</p>
+{% endblock %}
