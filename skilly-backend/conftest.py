@@ -185,6 +185,90 @@ def postulacion(db, profesional):
     )
 
 
+# ===========================================================================
+# Fixtures del catálogo: categorías y servicios
+# ===========================================================================
+
+
+@pytest.fixture
+def categoria(db):
+    from apps.catalogo.models import Categoria
+
+    return Categoria.objects.create(
+        nombre="Diseño y desarrollo web",
+        slug="diseno-desarrollo-web",
+        aprobada=True,
+        activa=True,
+    )
+
+
+@pytest.fixture
+def categoria_otra(db):
+    from apps.catalogo.models import Categoria
+
+    return Categoria.objects.create(
+        nombre="Marketing digital",
+        slug="marketing-digital",
+        aprobada=True,
+        activa=True,
+    )
+
+
+def _crear_servicio(profesional, categoria, **overrides):
+    from apps.catalogo.models import Servicio
+
+    datos = {
+        "titulo": "Landing page profesional",
+        "descripcion_corta": "Una landing page a medida.",
+        "descripcion_larga": "Incluye diseño, maquetación y publicación.",
+        "precio": 150000,
+        "formato": Servicio.FORMATO_REMOTO,
+        "estado": Servicio.ESTADO_BORRADOR,
+        "palabras_clave": "landing, web, diseño",
+    }
+    datos.update(overrides)
+    return Servicio.objects.create(profesional=profesional, categoria=categoria, **datos)
+
+
+@pytest.fixture
+def servicio_borrador(db, profesional_aprobado, categoria):
+    return _crear_servicio(profesional_aprobado, categoria)
+
+
+@pytest.fixture
+def servicio_en_revision(db, profesional_aprobado, categoria):
+    return _crear_servicio(
+        profesional_aprobado,
+        categoria,
+        estado="en_revision",
+    )
+
+
+@pytest.fixture
+def servicio_aprobado(db, profesional_aprobado, categoria):
+    from django.utils import timezone
+
+    return _crear_servicio(
+        profesional_aprobado,
+        categoria,
+        estado="aprobado",
+        fecha_publicacion=timezone.now(),
+    )
+
+
+@pytest.fixture
+def servicio_aprobado_otra_categoria(db, profesional_aprobado, categoria_otra):
+    from django.utils import timezone
+
+    return _crear_servicio(
+        profesional_aprobado,
+        categoria_otra,
+        titulo="Campaña de Google Ads",
+        estado="aprobado",
+        fecha_publicacion=timezone.now(),
+    )
+
+
 @pytest.fixture
 def certificado_sin_revisar(db, postulacion):
     """Documento adjunto esperando moderación manual."""
