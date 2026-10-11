@@ -300,3 +300,59 @@ def certificado_linkedin(db, postulacion):
         enlace="https://www.linkedin.com/in/juan-perez",
         estado=Certificado.ESTADO_VERIFICADO_AUTOMATICO,
     )
+
+
+# ===========================================================================
+# Fixtures del Sprint 3: horarios y reservas
+# ===========================================================================
+@pytest.fixture
+def horario_semanal(db, profesional_aprobado):
+    """Disponibilidad de lunes a domingo, 09:00–18:00 (para elegir cualquier día)."""
+    from apps.usuarios.models import Horario
+
+    return [
+        Horario.objects.create(
+            profesional=profesional_aprobado,
+            dia_semana=dia,
+            hora_inicio="09:00",
+            hora_fin="18:00",
+            activo=True,
+        )
+        for dia in range(7)
+    ]
+
+
+@pytest.fixture
+def fecha_futura():
+    """Un día hábil en el futuro, para reservar sin chocar con el pasado."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    return timezone.localdate() + timedelta(days=7)
+
+
+@pytest.fixture
+def reserva_pendiente(db, servicio_aprobado, organizacion, profesional_aprobado, fecha_futura):
+    from datetime import time, timedelta
+
+    from django.utils import timezone
+
+    from apps.reservas.models import EventoReserva, Reserva
+
+    reserva = Reserva.objects.create(
+        servicio=servicio_aprobado,
+        profesional=profesional_aprobado,
+        organizacion=organizacion,
+        fecha=fecha_futura,
+        hora_inicio=time(10, 0),
+        hora_fin=time(13, 0),
+        precio_acordado=servicio_aprobado.precio,
+        formato=servicio_aprobado.formato,
+        contacto_nombre="Marcela Ibáñez",
+        contacto_email="organizacion@test.skilly",
+        contacto_telefono="+56912345678",
+        expira_en=timezone.now() + timedelta(hours=6),
+    )
+    EventoReserva.objects.create(reserva=reserva, tipo=EventoReserva.TIPO_CREADA)
+    return reserva

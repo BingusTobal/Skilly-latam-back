@@ -1,0 +1,24 @@
+{% extends "emails/base.html" %}
+{% block titulo %}Activa tu cuenta de Skilly{% endblock %}
+{% block contenido %}
+<p>Hola {{ nombre }},</p>
+
+<p>
+    Recibimos tu reserva de <strong>{{ reserva.servicio.titulo }}</strong> para el
+    {{ reserva.fecha }} a las {{ reserva.hora_inicio|time:"H:i" }}.
+</p>
+
+<p>
+    Para acompañarte creamos tu cuenta en Skilly con este correo. Actívala y
+    define tu contraseña para gestionar tus reservas y confirmar la entrega:
+</p>
+
+<p><a href="{{ enlace }}">Activar mi cuenta</a></p>
+
+<p>
+    Mientras el profesional responde, puedes seguir tu solicitud con el enlace
+    que te mostramos al reservar.
+</p>
+
+<p>Equipo Skilly Latam</p>
+{% endblock %}

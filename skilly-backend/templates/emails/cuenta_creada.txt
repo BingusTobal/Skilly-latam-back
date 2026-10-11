@@ -1,0 +1,12 @@
+Hola {{ nombre }},
+
+Recibimos tu reserva de "{{ reserva.servicio.titulo }}" para el {{ reserva.fecha }} a las {{ reserva.hora_inicio|time:"H:i" }}.
+
+Para acompañarte creamos tu cuenta en Skilly con este correo. Actívala y define tu contraseña para gestionar tus reservas y confirmar la entrega:
+
+{{ enlace }}
+
+Mientras el profesional responde, puedes seguir tu solicitud con el enlace que
+te mostramos al reservar.
+
+Equipo Skilly Latam

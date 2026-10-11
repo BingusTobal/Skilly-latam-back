@@ -95,6 +95,54 @@ def enviar_password_reset(usuario, enlace):
 
 
 # ---------------------------------------------------------------------------
+# Sprint 3 — cuenta automática de la reserva de invitado
+# ---------------------------------------------------------------------------
+def enviar_cuenta_creada(usuario, organizacion, reserva, enlace):
+    """Correo con el enlace para activar la cuenta creada al reservar.
+
+    La cuenta nace con contraseña inutilizable, así que este correo es el
+    único camino para que el invitado entre: define su contraseña y luego
+    inicia sesión para confirmar la entrega.
+    """
+    from django.template.loader import render_to_string
+
+    contexto = {
+        "nombre": usuario.first_name or usuario.email,
+        "enlace": enlace,
+        "reserva": reserva,
+        "organizacion": organizacion,
+        "usuario": usuario,
+    }
+    cuerpo = render_to_string("emails/cuenta_creada.txt", contexto)
+    html = render_to_string("emails/cuenta_creada.html", contexto)
+
+    return _enviar(
+        "Tu reserva quedó creada — activa tu cuenta",
+        cuerpo,
+        [usuario.email],
+        plantilla_html=html,
+        contexto=contexto,
+    )
+
+
+def enviar_reserva_registrada(usuario, reserva):
+    """Aviso a una cuenta ya existente de que le registraron una reserva."""
+    from django.template.loader import render_to_string
+
+    contexto = {"nombre": usuario.first_name or usuario.email, "reserva": reserva}
+    cuerpo = render_to_string("emails/reserva_registrada.txt", contexto)
+    html = render_to_string("emails/reserva_registrada.html", contexto)
+
+    return _enviar(
+        "Registramos una nueva reserva con tu correo",
+        cuerpo,
+        [usuario.email],
+        plantilla_html=html,
+        contexto=contexto,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Postulaciones. Todas se disparan desde el panel admin (1.11 y 1.12).
 # ---------------------------------------------------------------------------
 def _destinatario_postulacion(postulacion):

@@ -36,3 +36,4 @@ Thumbs.db
 
 # LibreOffice deja archivos de lock
 .~lock.*#
+datos/

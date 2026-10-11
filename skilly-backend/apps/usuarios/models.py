@@ -251,10 +251,14 @@ class Organizacion(models.Model):
     telefono = models.CharField(max_length=30, blank=True)
 
     # Decisión 4: RUT con validación de módulo 11, igual que en Profesional.
+    # Opcional para la organización invitada (D7): una reserva sin cuenta puede
+    # no traer RUT todavía. `clean()` lo exige si la organización es registrada.
     rut = models.CharField(
         "RUT",
         max_length=12,
         unique=True,
+        null=True,
+        blank=True,
         validators=[VALIDADOR_RUT_MODULO11],
         help_text="Sin puntos ni guiones, o con ellos: se normaliza al guardar.",
     )
@@ -298,6 +302,11 @@ class Organizacion(models.Model):
         if self.modo == self.MODO_REGISTRADA and self.usuario_id is None:
             raise ValidationError(
                 {"modo": "Una organización registrada debe tener un usuario asociado."}
+            )
+        # El RUT es opcional solo para la invitada; una registrada lo necesita.
+        if self.modo == self.MODO_REGISTRADA and not self.rut:
+            raise ValidationError(
+                {"rut": "Una organización registrada debe tener RUT."}
             )
 
     @property

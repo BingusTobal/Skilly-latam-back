@@ -228,6 +228,7 @@ class Servicio(models.Model):
         self.fecha_revision = timezone.now()
         self.revisado_por = admin_usuario
         self.save()
+        RevisionServicio.registrar(self, RevisionServicio.ACCION_APROBAR, admin_usuario)
         return self
 
     def devolver(self, admin_usuario=None, comentarios=""):
@@ -243,6 +244,9 @@ class Servicio(models.Model):
         self.fecha_revision = timezone.now()
         self.revisado_por = admin_usuario
         self.save()
+        RevisionServicio.registrar(
+            self, RevisionServicio.ACCION_DEVOLVER, admin_usuario, comentarios
+        )
         return self
 
     def rechazar(self, admin_usuario=None, comentarios=""):
@@ -258,13 +262,19 @@ class Servicio(models.Model):
         self.fecha_revision = timezone.now()
         self.revisado_por = admin_usuario
         self.save()
+        RevisionServicio.registrar(
+            self, RevisionServicio.ACCION_RECHAZAR, admin_usuario, comentarios
+        )
         return self
 
-    def suspender(self, admin_usuario=None):
+    def suspender(self, admin_usuario=None, comentarios=""):
         self.estado = self.ESTADO_SUSPENDIDO
         self.fecha_revision = timezone.now()
         self.revisado_por = admin_usuario
         self.save()
+        RevisionServicio.registrar(
+            self, RevisionServicio.ACCION_SUSPENDER, admin_usuario, comentarios
+        )
         return self
 
     @property
@@ -296,3 +306,57 @@ class Entregable(models.Model):
         super().clean()
         if not self.nombre.strip():
             raise ValidationError({"nombre": "El nombre del entregable es obligatorio."})
+
+
+class RevisionServicio(models.Model):
+    """Bitácora de moderación de un servicio (DoD 2.6).
+
+    Cada vez que un administrador aprueba, devuelve, rechaza o suspende un
+    servicio se deja un registro inmutable. `Servicio.comentarios_admin` guarda
+    solo el último comentario; esta tabla conserva el historial completo para
+    que se pueda auditar qué pasó con una publicación.
+    """
+
+    ACCION_APROBAR = "aprobar"
+    ACCION_DEVOLVER = "devolver"
+    ACCION_RECHAZAR = "rechazar"
+    ACCION_SUSPENDER = "suspender"
+    ACCION_CHOICES = [
+        (ACCION_APROBAR, "Aprobado"),
+        (ACCION_DEVOLVER, "Devuelto"),
+        (ACCION_RECHAZAR, "Rechazado"),
+        (ACCION_SUSPENDER, "Suspendido"),
+    ]
+
+    servicio = models.ForeignKey(
+        Servicio,
+        on_delete=models.CASCADE,
+        related_name="revisiones",
+    )
+    accion = models.CharField(max_length=20, choices=ACCION_CHOICES)
+    admin = models.ForeignKey(
+        "usuarios.Usuario",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="revisiones_servicios",
+    )
+    comentario = models.TextField(blank=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "revisión de servicio"
+        verbose_name_plural = "revisiones de servicios"
+        ordering = ["-creado_en"]
+
+    def __str__(self):
+        return f"{self.servicio.titulo}: {self.get_accion_display()}"
+
+    @classmethod
+    def registrar(cls, servicio, accion, admin=None, comentario=""):
+        return cls.objects.create(
+            servicio=servicio,
+            accion=accion,
+            admin=admin,
+            comentario=(comentario or "").strip(),
+        )

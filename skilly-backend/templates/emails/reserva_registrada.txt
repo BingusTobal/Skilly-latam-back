@@ -1,0 +1,7 @@
+Hola {{ nombre }},
+
+Se registró una reserva con tu correo: "{{ reserva.servicio.titulo }}" el {{ reserva.fecha }} a las {{ reserva.hora_inicio|time:"H:i" }}.
+
+Ingresa a Skilly para ver el detalle y gestionarla.
+
+Equipo Skilly Latam

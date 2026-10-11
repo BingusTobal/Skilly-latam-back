@@ -337,6 +337,12 @@ DIAS_VENTANA_AUTORIZACION_WEBPAY = int(
 # D7: duracion del token magico de la reserva sin cuenta (horas).
 TOKEN_MAGICO_HORAS = int(os.environ.get("TOKEN_MAGICO_HORAS", "24"))
 
+# Validez del enlace para activar la cuenta creada en una reserva de invitado
+# (y del restablecer contraseña). 3 dias por defecto.
+PASSWORD_RESET_TIMEOUT = int(
+    os.environ.get("PASSWORD_RESET_TIMEOUT", str(60 * 60 * 24 * 3))
+)
+
 MONTO_MINIMO_SERVICIO = int(os.environ.get("MONTO_MINIMO_SERVICIO", "5000"))
 TASA_COMISION_DEFECTO = float(os.environ.get("TASA_COMISION_DEFECTO", "0.10"))
 
@@ -347,6 +353,14 @@ HORAS_CANCELACION_SIN_PENALIDAD = int(
 PORCENTAJE_REEMBOLSO_CANCELACION_TARDIA = int(
     os.environ.get("PORCENTAJE_REEMBOLSO_CANCELACION_TARDIA", "90")
 )
+
+# R11 (regla del negocio): colchon de bloqueo tras cada reserva. Una reserva
+# que empieza a las 16:00 deja bloqueados los slots dentro de las 3 horas
+# siguientes, asi que la proxima reserva puede empezar recien a las 19:00.
+HORAS_BLOQUEO_RESERVA = int(os.environ.get("HORAS_BLOQUEO_RESERVA", "3"))
+
+# Granularidad de la grilla de horarios ofrecida a la organizacion (ticket 3.1).
+SLOT_MINUTOS = int(os.environ.get("SLOT_MINUTOS", "30"))
 
 # R5: unicos formatos de ejecucion permitidos.
 FORMATOS_EJECUCION = ("remoto", "presencial", "hibrido")
@@ -362,7 +376,14 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE_CANONICAL = True
-CELERY_BEAT_SCHEDULE = {}
+# 3.13: vence las reservas cuyo plazo de respuesta expiró. Con Redis caído en
+# desarrollo, se corre también con `manage.py procesar_vencidas`.
+CELERY_BEAT_SCHEDULE = {
+    "expirar-reservas-vencidas": {
+        "task": "reservas.procesar_vencidas",
+        "schedule": 900.0,  # cada 15 minutos
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Logging

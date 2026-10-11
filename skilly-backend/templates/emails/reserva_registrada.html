@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+{% block titulo %}Nueva reserva registrada{% endblock %}
+{% block contenido %}
+<p>Hola {{ nombre }},</p>
+
+<p>
+    Se registró una reserva con tu correo:
+    <strong>{{ reserva.servicio.titulo }}</strong> el {{ reserva.fecha }} a las
+    {{ reserva.hora_inicio|time:"H:i" }}.
+</p>
+
+<p>Ingresa a Skilly para ver el detalle y gestionarla.</p>
+
+<p>Equipo Skilly Latam</p>
+{% endblock %}
