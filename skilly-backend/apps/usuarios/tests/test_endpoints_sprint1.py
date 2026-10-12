@@ -435,6 +435,42 @@ class TestHorarios:
         assert respuesta.status_code in (400, 404)
         assert Horario.objects.filter(pk=horario_ajeno.pk).exists()
 
+    def test_actualiza_un_horario(self, profesional_client, profesional):
+        horario = Horario.objects.create(
+            profesional=profesional,
+            dia_semana=0,
+            hora_inicio="09:00",
+            hora_fin="17:00",
+        )
+        respuesta = profesional_client.patch(
+            f"{self.url}{horario.pk}/",
+            {"hora_fin": "18:00"},
+            format="json",
+        )
+        assert respuesta.status_code == 200
+        horario.refresh_from_db()
+        assert horario.hora_fin.strftime("%H:%M") == "18:00"
+
+    def test_actualizar_no_choca_con_otro_bloque(self, profesional_client, profesional):
+        Horario.objects.create(
+            profesional=profesional,
+            dia_semana=0,
+            hora_inicio="09:00",
+            hora_fin="13:00",
+        )
+        horario = Horario.objects.create(
+            profesional=profesional,
+            dia_semana=1,
+            hora_inicio="09:00",
+            hora_fin="13:00",
+        )
+        respuesta = profesional_client.patch(
+            f"{self.url}{horario.pk}/",
+            {"dia_semana": 0},
+            format="json",
+        )
+        assert respuesta.status_code == 400
+
 
 # ===========================================================================
 # Perfil profesional (1.9)

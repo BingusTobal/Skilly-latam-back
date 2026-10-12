@@ -4,9 +4,11 @@ Regla de negocio: el profesional ve SOLO el monto neto (`monto_neto`), nunca el
 desglose bruto + comisión. Por eso su serializer no expone `precio_acordado`.
 La organización ve el precio que paga (`precio_acordado`).
 """
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.catalogo.models import Servicio
+from apps.usuarios.models import validar_rut
 
 from .models import Reserva
 
@@ -25,6 +27,15 @@ class CrearReservaSerializer(serializers.Serializer):
     empresa = serializers.CharField(max_length=200, required=False, allow_blank=True)
     rut = serializers.CharField(max_length=12, required=False, allow_blank=True)
     mensaje = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+
+    def validate_rut(self, valor):
+        if not valor:
+            return valor
+        try:
+            validar_rut(valor)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc)) from exc
+        return valor
 
 
 class ReservaResumenServicioSerializer(serializers.ModelSerializer):

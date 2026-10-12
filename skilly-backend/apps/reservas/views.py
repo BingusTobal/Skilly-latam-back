@@ -14,6 +14,7 @@ from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -139,7 +140,6 @@ class ReservaViewSet(viewsets.GenericViewSet):
                 raise PermissionDenied("Esta reserva no te pertenece.")
         return reserva
 
-    # --------------------------------------------------------------- lectura
     def create(self, request):
         serializer = CrearReservaSerializer(
             data=request.data, context={"request": request}
@@ -151,6 +151,15 @@ class ReservaViewSet(viewsets.GenericViewSet):
         organizacion = None
         if creada_por is not None:
             organizacion = getattr(creada_por, "organizacion", None)
+            if organizacion is None:
+                raise DRFValidationError(
+                    {
+                        "detail": (
+                            "Necesitas completar tu perfil de organización para "
+                            "realizar una reserva."
+                        )
+                    }
+                )
 
         datos = {
             clave: data.get(clave, "")
@@ -167,6 +176,10 @@ class ReservaViewSet(viewsets.GenericViewSet):
             )
         except (DjangoValidationError, ValueError) as exc:
             _traducir(exc)
+        except IntegrityError:
+            raise DRFValidationError(
+                {"detail": "No se pudo completar la reserva."}
+            )
 
         salida = self._serializer_para(reserva, request).data
         if token:

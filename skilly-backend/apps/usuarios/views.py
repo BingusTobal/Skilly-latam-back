@@ -344,6 +344,7 @@ class HorarioDetailView(APIView):
 
     def patch(self, request, pk):
         horario = self._horario(request, pk)
+        profesional = getattr(request.user, "profesional", None)
         serializer = HorarioSerializer(
             horario,
             data=request.data,

@@ -71,6 +71,26 @@ class TestCrearReservaAPI:
         resp = anon_client.get(f"{URL_RESERVAS}{reserva_pendiente.id}/?token=nope")
         assert resp.status_code == 404
 
+    def test_rut_invalido_devuelve_400(
+        self, anon_client, servicio_aprobado, horario_semanal, fecha_futura
+    ):
+        resp = anon_client.post(
+            URL_RESERVAS,
+            _cuerpo(servicio_aprobado, fecha_futura, rut="12.345.678-3"),
+            format="json",
+        )
+        assert resp.status_code == 400
+        assert "rut" in resp.data
+
+    def test_profesional_autenticado_no_puede_reservar(
+        self, profesional_client, servicio_aprobado, horario_semanal, fecha_futura
+    ):
+        resp = profesional_client.post(
+            URL_RESERVAS, _cuerpo(servicio_aprobado, fecha_futura), format="json"
+        )
+        assert resp.status_code == 400
+        assert Reserva.objects.count() == 0
+
 
 @pytest.mark.django_db
 class TestPermisos:

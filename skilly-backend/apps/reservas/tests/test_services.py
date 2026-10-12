@@ -121,6 +121,21 @@ class TestCuentaInvitada:
         Usuario = get_user_model()
         assert Usuario.objects.filter(email="invitado@test.skilly").count() == 1
 
+    def test_email_normalizado_en_minusculas(
+        self, servicio_aprobado, horario_semanal, fecha_futura
+    ):
+        from django.contrib.auth import get_user_model
+
+        reserva, _ = self._reservar(
+            servicio=servicio_aprobado,
+            fecha=fecha_futura,
+            hora="10:00",
+            datos=_datos(email="Mixto@Test.Skilly"),
+        )
+        Usuario = get_user_model()
+        usuario = Usuario.objects.get(pk=reserva.organizacion.usuario_id)
+        assert usuario.email == "mixto@test.skilly"
+
     def test_email_existente_se_enlaza_a_su_organizacion(
         self, servicio_aprobado, horario_semanal, fecha_futura, organizacion
     ):
@@ -135,6 +150,25 @@ class TestCuentaInvitada:
         assert reserva.organizacion_id == organizacion.id
         Usuario = get_user_model()
         assert Usuario.objects.filter(email__iexact=organizacion.email_contacto).count() == 1
+
+    def test_usuario_organizacion_sin_perfil_usa_rut_existente(
+        self, servicio_aprobado, horario_semanal, fecha_futura, organizacion
+    ):
+        from django.contrib.auth import get_user_model
+
+        Usuario = get_user_model()
+        Usuario.objects.create_user(
+            email="sinperfil@test.skilly",
+            password="SinPerfil123!",
+            tipo=Usuario.TIPO_ORGANIZACION,
+        )
+        reserva, _ = self._reservar(
+            servicio=servicio_aprobado,
+            fecha=fecha_futura,
+            hora="10:00",
+            datos=_datos(email="sinperfil@test.skilly", rut=organizacion.rut),
+        )
+        assert reserva.organizacion_id == organizacion.id
 
     def test_email_de_profesional_no_crea_cuenta(
         self, servicio_aprobado, horario_semanal, fecha_futura, profesional

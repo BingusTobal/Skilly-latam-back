@@ -327,8 +327,6 @@ class HorarioSerializer(serializers.ModelSerializer):
             "hora_inicio",
             "hora_fin",
             "activo",
-            "hora_inicio",
-            "hora_fin",
             "resumen",
         ]
         read_only_fields = ["id", "profesional", "profesional_nombre"]
@@ -368,7 +366,7 @@ class HorarioSerializer(serializers.ModelSerializer):
             candidato.pk = self.instance.pk
 
         try:
-            candidato.full_clean(exclude=["profesional"])
+            candidato.full_clean(exclude=["profesional", "id"])
         except DjangoValidationError as exc:
             if hasattr(exc, "message_dict"):
                 raise serializers.ValidationError(exc.message_dict) from exc

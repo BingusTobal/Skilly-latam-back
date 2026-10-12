@@ -22,7 +22,7 @@ from django.utils.http import urlsafe_base64_encode
 
 from apps.catalogo.models import Servicio
 from apps.usuarios.correo import enviar_cuenta_creada, enviar_reserva_registrada
-from apps.usuarios.models import Horario, Organizacion
+from apps.usuarios.models import Horario, Organizacion, validar_rut
 
 from .models import Disputa, EventoReserva, Reserva
 
@@ -115,8 +115,9 @@ def _crear_usuario_invitado(datos):
     """
     nombre = (datos.get("nombre") or "").strip()
     partes = nombre.split(" ")
+    email_norm = Usuario.objects.normalize_email(datos["email"]).lower()
     usuario = Usuario(
-        email=Usuario.objects.normalize_email(datos["email"]),
+        email=email_norm,
         first_name=partes[0][:150] if partes else "",
         last_name=" ".join(partes[1:])[:150] if len(partes) > 1 else "",
         tipo=Usuario.TIPO_ORGANIZACION,
@@ -128,12 +129,21 @@ def _crear_usuario_invitado(datos):
 
 
 def _crear_organizacion_invitada(datos, usuario):
+    rut = (datos.get("rut") or "").strip()
+    if rut:
+        try:
+            validar_rut(rut)
+            rut_limpio = rut.replace(".", "").replace("-", "").upper()
+        except ValueError:
+            rut_limpio = None
+    else:
+        rut_limpio = None
     return Organizacion.objects.create(
         nombre=datos.get("empresa") or datos.get("nombre") or "Organización invitada",
         nombre_contacto=datos.get("nombre") or "Contacto invitado",
         email_contacto=datos["email"],
         telefono=datos.get("telefono", ""),
-        rut=datos.get("rut") or None,
+        rut=rut_limpio,
         modo=Organizacion.MODO_INVITADA,
         usuario=usuario,
     )
@@ -142,26 +152,19 @@ def _crear_organizacion_invitada(datos, usuario):
 def _resolver_organizacion(organizacion, creada_por, datos):
     """Decide a qué organización pertenece la reserva y arma su cuenta.
 
-    Devuelve `(organizacion, aviso)` donde `avisar` es:
+    Devuelve `(organizacion, aviso)` donde `aviso` es:
       - "cuenta_nueva": se creó una cuenta; hay que enviar el correo de
         activación para que el invitado defina su contraseña.
       - "existente": el correo ya tenía cuenta; se enlaza la reserva a su
         organización y se avisa por correo.
       - None: reserva autenticada (o sin cuenta asociable): sin correo.
-
-    Reglas:
-      - Con sesión: la organización del usuario, sin cuenta nueva.
-      - Correo ya registrado con organización: se reutiliza esa organización.
-      - Correo de un profesional/admin: se crea la invitada pero NO se cuelga
-        de esa cuenta (no se mezclan roles).
-      - RUT ya existente sin usuario: se le ata la cuenta nueva.
     """
     if organizacion is not None:
         return organizacion, None
     if creada_por is not None:
         return getattr(creada_por, "organizacion", None), None
 
-    email = Usuario.objects.normalize_email(datos["email"])
+    email = Usuario.objects.normalize_email(datos["email"]).lower()
     usuario = Usuario.objects.filter(email__iexact=email).first()
 
     if usuario is not None:
@@ -169,25 +172,52 @@ def _resolver_organizacion(organizacion, creada_por, datos):
         if existente is not None:
             return existente, {"cuenta": "existente", "usuario": usuario}
         if usuario.tipo == Usuario.TIPO_ORGANIZACION:
+            # El usuario tiene cuenta tipo organizacion pero sin perfil: intentar
+            # reutilizar por RUT si existe para no violar UNIQUE; de lo contrario
+            # crear org e intentar guardar.
+            rut = (datos.get("rut") or "").strip()
+            rut_limpio = rut
+            if rut:
+                try:
+                    validar_rut(rut)
+                    rut_limpio = rut.replace(".", "").replace("-", "").upper()
+                except ValueError:
+                    rut_limpio = None
+            if rut_limpio:
+                existente_rut = Organizacion.objects.filter(rut=rut_limpio).first()
+                if existente_rut is not None:
+                    if existente_rut.usuario_id is not None:
+                        return existente_rut, {
+                            "cuenta": "existente",
+                            "usuario": existente_rut.usuario,
+                        }
+                    existente_rut.usuario = usuario
+                    existente_rut.modo = Organizacion.MODO_INVITADA
+                    existente_rut.save(update_fields=["usuario", "modo"])
+                    return existente_rut, {"cuenta": "existente", "usuario": usuario}
             organizacion = _crear_organizacion_invitada(datos, usuario)
             return organizacion, {"cuenta": "existente", "usuario": usuario}
         # Profesional o admin: no se le cuelga una organización.
         organizacion = _crear_organizacion_invitada(datos, None)
         return organizacion, {"cuenta": None, "usuario": None}
 
-    # Sin usuario con ese correo: reutilizamos una organización por RUT si
-    # existe (para no violar el unique del RUT), atándole la cuenta nueva.
-    rut = (datos.get("rut") or "").strip().replace(".", "").replace("-", "").upper()
+    rut = (datos.get("rut") or "").strip()
     if rut:
-        existente = Organizacion.objects.filter(rut=rut).first()
-        if existente is not None:
-            if existente.usuario_id is not None:
-                return existente, {"cuenta": "existente", "usuario": existente.usuario}
-            usuario = _crear_usuario_invitado(datos)
-            existente.usuario = usuario
-            existente.modo = Organizacion.MODO_INVITADA
-            existente.save(update_fields=["usuario", "modo"])
-            return existente, {"cuenta": "nueva", "usuario": usuario}
+        try:
+            validar_rut(rut)
+            rut_limpio = rut.replace(".", "").replace("-", "").upper()
+        except ValueError:
+            rut_limpio = None
+        if rut_limpio:
+            existente = Organizacion.objects.filter(rut=rut_limpio).first()
+            if existente is not None:
+                if existente.usuario_id is not None:
+                    return existente, {"cuenta": "existente", "usuario": existente.usuario}
+                usuario = _crear_usuario_invitado(datos)
+                existente.usuario = usuario
+                existente.modo = Organizacion.MODO_INVITADA
+                existente.save(update_fields=["usuario", "modo"])
+                return existente, {"cuenta": "nueva", "usuario": usuario}
 
     usuario = _crear_usuario_invitado(datos)
     organizacion = _crear_organizacion_invitada(datos, usuario)
