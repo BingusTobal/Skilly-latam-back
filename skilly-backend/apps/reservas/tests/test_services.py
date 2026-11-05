@@ -79,6 +79,19 @@ class TestCrearReserva:
                 datos=_datos(email="otro@test.skilly"),
             )
 
+    def test_rechaza_servicio_con_precio_invalido(
+        self, servicio_aprobado, horario_semanal, fecha_futura
+    ):
+        servicio_aprobado.precio = 1000
+        servicio_aprobado.save(update_fields=["precio"])
+        with pytest.raises(ValidationError):
+            services.crear_reserva(
+                servicio=servicio_aprobado,
+                fecha=fecha_futura,
+                hora_inicio="10:00",
+                datos=_datos(email="precio@test.skilly"),
+            )
+
     def test_rechaza_fecha_pasada(self, servicio_aprobado, horario_semanal):
         ayer = timezone.localdate() - timedelta(days=1)
         with pytest.raises(ValidationError):
@@ -136,39 +149,41 @@ class TestCuentaInvitada:
         usuario = Usuario.objects.get(pk=reserva.organizacion.usuario_id)
         assert usuario.email == "mixto@test.skilly"
 
-    def test_email_existente_se_enlaza_a_su_organizacion(
+    def test_email_de_cuenta_registrada_se_rechaza(
         self, servicio_aprobado, horario_semanal, fecha_futura, organizacion
     ):
-        from django.contrib.auth import get_user_model
+        with pytest.raises(ValidationError):
+            self._reservar(
+                servicio=servicio_aprobado,
+                fecha=fecha_futura,
+                hora="10:00",
+                datos=_datos(email=organizacion.email_contacto),
+            )
+        assert Reserva.objects.count() == 0
 
+    def test_rut_de_organizacion_registrada_se_rechaza(
+        self, servicio_aprobado, horario_semanal, fecha_futura, organizacion
+    ):
+        with pytest.raises(ValidationError):
+            self._reservar(
+                servicio=servicio_aprobado,
+                fecha=fecha_futura,
+                hora="10:00",
+                datos=_datos(email="otro@test.skilly", rut=organizacion.rut),
+            )
+        assert Reserva.objects.count() == 0
+
+    def test_organizacion_invitada_sin_cuenta_reutiliza_su_rut(
+        self, servicio_aprobado, horario_semanal, fecha_futura, organizacion_invitada
+    ):
         reserva, _ = self._reservar(
             servicio=servicio_aprobado,
             fecha=fecha_futura,
             hora="10:00",
-            datos=_datos(email=organizacion.email_contacto),
+            datos=_datos(email="nuevo@test.skilly", rut=organizacion_invitada.rut),
         )
-        assert reserva.organizacion_id == organizacion.id
-        Usuario = get_user_model()
-        assert Usuario.objects.filter(email__iexact=organizacion.email_contacto).count() == 1
-
-    def test_usuario_organizacion_sin_perfil_usa_rut_existente(
-        self, servicio_aprobado, horario_semanal, fecha_futura, organizacion
-    ):
-        from django.contrib.auth import get_user_model
-
-        Usuario = get_user_model()
-        Usuario.objects.create_user(
-            email="sinperfil@test.skilly",
-            password="SinPerfil123!",
-            tipo=Usuario.TIPO_ORGANIZACION,
-        )
-        reserva, _ = self._reservar(
-            servicio=servicio_aprobado,
-            fecha=fecha_futura,
-            hora="10:00",
-            datos=_datos(email="sinperfil@test.skilly", rut=organizacion.rut),
-        )
-        assert reserva.organizacion_id == organizacion.id
+        assert reserva.organizacion_id == organizacion_invitada.id
+        assert reserva.organizacion.usuario is not None
 
     def test_email_de_profesional_no_crea_cuenta(
         self, servicio_aprobado, horario_semanal, fecha_futura, profesional
@@ -206,7 +221,7 @@ class TestCuentaInvitada:
         assert "/activar-cuenta/" in mail.outbox[0].alternatives[0][0]
         assert mail.outbox[0].to == ["invitado@test.skilly"]
 
-    def test_envia_aviso_a_cuenta_existente(
+    def test_no_avisa_a_cuenta_registrada_por_email_no_verificado(
         self,
         servicio_aprobado,
         horario_semanal,
@@ -217,15 +232,14 @@ class TestCuentaInvitada:
         from django.core import mail
 
         with django_capture_on_commit_callbacks(execute=True):
-            self._reservar(
-                servicio=servicio_aprobado,
-                fecha=fecha_futura,
-                hora="10:00",
-                datos=_datos(email=organizacion.email_contacto),
-            )
-        assert len(mail.outbox) == 1
-        assert "reserva" in mail.outbox[0].subject.lower()
-        assert mail.outbox[0].to == [organizacion.email_contacto]
+            with pytest.raises(ValidationError):
+                self._reservar(
+                    servicio=servicio_aprobado,
+                    fecha=fecha_futura,
+                    hora="10:00",
+                    datos=_datos(email=organizacion.email_contacto),
+                )
+        assert mail.outbox == []
 
 
 @pytest.mark.django_db

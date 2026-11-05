@@ -22,7 +22,13 @@ from django.utils.http import urlsafe_base64_encode
 
 from apps.catalogo.models import Servicio
 from apps.usuarios.correo import enviar_cuenta_creada, enviar_reserva_registrada
-from apps.usuarios.models import Horario, Organizacion, validar_rut
+from apps.usuarios.models import (
+    Horario,
+    Organizacion,
+    Profesional,
+    normalizar_rut,
+    validar_rut,
+)
 
 from .models import Disputa, EventoReserva, Reserva
 
@@ -128,15 +134,21 @@ def _crear_usuario_invitado(datos):
     return usuario
 
 
-def _crear_organizacion_invitada(datos, usuario):
+def _rut_limpio(datos):
+    """Devuelve el RUT normalizado si es válido, o None si falta o no sirve."""
     rut = (datos.get("rut") or "").strip()
-    if rut:
-        try:
-            validar_rut(rut)
-            rut_limpio = rut.replace(".", "").replace("-", "").upper()
-        except ValueError:
-            rut_limpio = None
-    else:
+    if not rut:
+        return None
+    try:
+        validar_rut(rut)
+    except ValueError:
+        return None
+    return normalizar_rut(rut)
+
+
+def _crear_organizacion_invitada(datos, usuario):
+    rut_limpio = _rut_limpio(datos)
+    if rut_limpio and Organizacion.objects.filter(rut=rut_limpio).exists():
         rut_limpio = None
     return Organizacion.objects.create(
         nombre=datos.get("empresa") or datos.get("nombre") or "Organización invitada",
@@ -158,6 +170,11 @@ def _resolver_organizacion(organizacion, creada_por, datos):
       - "existente": el correo ya tenía cuenta; se enlaza la reserva a su
         organización y se avisa por correo.
       - None: reserva autenticada (o sin cuenta asociable): sin correo.
+
+    Una reserva sin sesión solo puede reutilizar cuentas invitadas que aún no
+    tienen contraseña usable. Si el correo o el RUT apuntan a una cuenta
+    registrada se rechaza: enlazarla sin verificación permitiría a un tercero
+    reservar a nombre de esa organización.
     """
     if organizacion is not None:
         return organizacion, None
@@ -168,29 +185,26 @@ def _resolver_organizacion(organizacion, creada_por, datos):
     usuario = Usuario.objects.filter(email__iexact=email).first()
 
     if usuario is not None:
-        existente = getattr(usuario, "organizacion", None)
-        if existente is not None:
-            return existente, {"cuenta": "existente", "usuario": usuario}
         if usuario.tipo == Usuario.TIPO_ORGANIZACION:
-            # El usuario tiene cuenta tipo organizacion pero sin perfil: intentar
-            # reutilizar por RUT si existe para no violar UNIQUE; de lo contrario
-            # crear org e intentar guardar.
-            rut = (datos.get("rut") or "").strip()
-            rut_limpio = rut
-            if rut:
-                try:
-                    validar_rut(rut)
-                    rut_limpio = rut.replace(".", "").replace("-", "").upper()
-                except ValueError:
-                    rut_limpio = None
+            if usuario.has_usable_password():
+                raise ValidationError(
+                    "Ese correo ya tiene una cuenta. Inicia sesión para reservar."
+                )
+            existente = getattr(usuario, "organizacion", None)
+            if existente is not None:
+                return existente, {"cuenta": "existente", "usuario": usuario}
+
+            rut_limpio = _rut_limpio(datos)
             if rut_limpio:
                 existente_rut = Organizacion.objects.filter(rut=rut_limpio).first()
                 if existente_rut is not None:
-                    if existente_rut.usuario_id is not None:
-                        return existente_rut, {
-                            "cuenta": "existente",
-                            "usuario": existente_rut.usuario,
-                        }
+                    if (
+                        existente_rut.usuario_id is not None
+                        and existente_rut.usuario_id != usuario.pk
+                    ):
+                        raise ValidationError(
+                            "Ese RUT ya está asociado a otra cuenta. Revisa tus datos."
+                        )
                     existente_rut.usuario = usuario
                     existente_rut.modo = Organizacion.MODO_INVITADA
                     existente_rut.save(update_fields=["usuario", "modo"])
@@ -201,23 +215,19 @@ def _resolver_organizacion(organizacion, creada_por, datos):
         organizacion = _crear_organizacion_invitada(datos, None)
         return organizacion, {"cuenta": None, "usuario": None}
 
-    rut = (datos.get("rut") or "").strip()
-    if rut:
-        try:
-            validar_rut(rut)
-            rut_limpio = rut.replace(".", "").replace("-", "").upper()
-        except ValueError:
-            rut_limpio = None
-        if rut_limpio:
-            existente = Organizacion.objects.filter(rut=rut_limpio).first()
-            if existente is not None:
-                if existente.usuario_id is not None:
-                    return existente, {"cuenta": "existente", "usuario": existente.usuario}
-                usuario = _crear_usuario_invitado(datos)
-                existente.usuario = usuario
-                existente.modo = Organizacion.MODO_INVITADA
-                existente.save(update_fields=["usuario", "modo"])
-                return existente, {"cuenta": "nueva", "usuario": usuario}
+    rut_limpio = _rut_limpio(datos)
+    if rut_limpio:
+        existente = Organizacion.objects.filter(rut=rut_limpio).first()
+        if existente is not None:
+            if existente.usuario_id is not None:
+                raise ValidationError(
+                    "Ese RUT ya está registrado. Inicia sesión para reservar."
+                )
+            usuario = _crear_usuario_invitado(datos)
+            existente.usuario = usuario
+            existente.modo = Organizacion.MODO_INVITADA
+            existente.save(update_fields=["usuario", "modo"])
+            return existente, {"cuenta": "nueva", "usuario": usuario}
 
     usuario = _crear_usuario_invitado(datos)
     organizacion = _crear_organizacion_invitada(datos, usuario)
@@ -241,6 +251,16 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
     if servicio.estado != Servicio.ESTADO_APROBADO or not servicio.activo:
         raise ValidationError("El servicio no está disponible para reservar.")
 
+    if (
+        servicio.precio is None
+        or servicio.precio < settings.MONTO_MINIMO_SERVICIO
+        or servicio.precio != int(servicio.precio)
+    ):
+        raise ValidationError(
+            "El servicio tiene un precio inválido: debe ser un entero en CLP "
+            f"y ser al menos ${settings.MONTO_MINIMO_SERVICIO}."
+        )
+
     if isinstance(hora_inicio, str):
         hora_inicio = _time.fromisoformat(hora_inicio)
 
@@ -250,6 +270,8 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
     inicio_dt = aware(fecha, hora_inicio)
     if inicio_dt <= timezone.now():
         raise ValidationError("Ese horario ya pasó. Elige otro.")
+
+    Profesional.objects.select_for_update().get(pk=servicio.profesional_id)
 
     slots = calcular_slots(servicio, fecha)
     disponible = any(

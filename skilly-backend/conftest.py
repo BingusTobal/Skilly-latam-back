@@ -4,6 +4,8 @@ Fixtures compartidas de pytest. Ticket 0.16.
 La configuracion de base de datos vive en config/settings_test.py (referenciado
 desde pytest.ini). Aqui solo van las fixtures.
 """
+import os
+
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -356,3 +358,13 @@ def reserva_pendiente(db, servicio_aprobado, organizacion, profesional_aprobado,
     )
     EventoReserva.objects.create(reserva=reserva, tipo=EventoReserva.TIPO_CREADA)
     return reserva
+
+
+def pytest_collection_modifyitems(config, items):
+    """Salta pruebas MariaDB salvo que se pida explicitamente."""
+    if os.environ.get("RUN_MARIADB_TESTS") == "1":
+        return
+    skip = pytest.mark.skip(reason="Requiere MariaDB real (RUN_MARIADB_TESTS=1).")
+    for item in items:
+        if "mariadb" in item.keywords:
+            item.add_marker(skip)

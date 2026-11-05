@@ -21,12 +21,21 @@ class TestConstantesDeNegocio:
     """0.9: los defaults aprobados en CONTEXTO-ARQUITECTURA.docx."""
 
     def test_plazo_respuesta_profesional(self):
-        # R12: 6 horas, segun solicitud.html:84
-        assert settings.PLAZO_RESPUESTA_PROFESIONAL_HORAS == 6
+        # R12: 12 horas (decision Sprint 4; antes 6)
+        assert settings.PLAZO_RESPUESTA_PROFESIONAL_HORAS == 12
 
     def test_recordatorio_antes_de_vencer(self):
         # R12: recordatorio en T0+4h, antes del vencimiento
         assert settings.PLAZO_RECORDATORIO_HORAS < settings.PLAZO_RESPUESTA_PROFESIONAL_HORAS
+
+    def test_margen_y_anticipacion_de_reserva(self):
+        # Sprint 4: min(ahora + 12 h, inicio - 3 h) y reserva con 12 h de aviso
+        assert settings.HORAS_MARGEN_RESPUESTA == 3
+        assert settings.HORAS_ANTICIPACION_MINIMA_RESERVA == 12
+
+    def test_ventana_de_pago_pendiente(self):
+        # Sprint 4: la reserva bloquea el horario 15 min mientras se paga
+        assert settings.MINUTOS_PAGO_PENDIENTE == 15
 
     def test_plazo_revision_organizacion(self):
         # R18: auto liberacion a los 5 dias

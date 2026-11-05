@@ -1,5 +1,6 @@
 # Serializers para catálogo: Servicio, Entregable, Categoría
 
+from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
@@ -125,6 +126,19 @@ class ServicioProfesionalSerializer(serializers.ModelSerializer):
         if request and hasattr(request.user, "profesional"):
             return request.user.profesional
         return None
+
+    def validate_precio(self, valor):
+        if valor is None:
+            return valor
+        if valor < settings.MONTO_MINIMO_SERVICIO:
+            raise serializers.ValidationError(
+                f"El precio mínimo es ${settings.MONTO_MINIMO_SERVICIO} CLP."
+            )
+        if valor != valor.to_integral_value():
+            raise serializers.ValidationError(
+                "El precio debe ser un entero en CLP, sin decimales."
+            )
+        return valor
 
     def validate_categoria(self, categoria):
         if not categoria.aprobada or not categoria.activa:

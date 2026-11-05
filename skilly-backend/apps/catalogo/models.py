@@ -5,6 +5,7 @@ Ticket 0.15 (sprint actual) adelantado: se crea Categoria porque el comando
 cargar_seed lo necesita. Servicio y Entregable son del Sprint 2 (tickets 2.2
 y 2.3) y siguen pendientes.
 """
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -181,8 +182,19 @@ class Servicio(models.Model):
                 {"ubicacion": "La ubicación es obligatoria para presencial o semipresencial."}
             )
 
-        if self.precio is not None and self.precio < 0:
-            raise ValidationError({"precio": "El precio debe ser mayor o igual a 0."})
+        if self.precio is not None:
+            if self.precio < settings.MONTO_MINIMO_SERVICIO:
+                raise ValidationError(
+                    {
+                        "precio": (
+                            f"El precio mínimo es ${settings.MONTO_MINIMO_SERVICIO} CLP."
+                        )
+                    }
+                )
+            if self.precio != self.precio.to_integral_value():
+                raise ValidationError(
+                    {"precio": "El precio debe ser un entero en CLP, sin decimales."}
+                )
 
         if self.estado == self.ESTADO_EN_REVISION:
             if not self.profesional or self.profesional.estado != Profesional.ESTADO_APROBADO:

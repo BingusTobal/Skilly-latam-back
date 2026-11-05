@@ -219,11 +219,16 @@ EMAIL_BACKEND = os.environ.get(
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "contacto@skillylatam.com")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-if EMAIL_BACKEND.startswith("django_ses"):
-    # Amazon SES via django-anymail. Verificar el dominio en SES antes de prod.
-    AWS_SES_ACCESS_KEY_ID = os.environ.get("AWS_SES_ACCESS_KEY_ID", "")
-    AWS_SES_SECRET_ACCESS_KEY = os.environ.get("AWS_SES_SECRET_ACCESS_KEY", "")
-    AWS_SES_REGION_NAME = os.environ.get("AWS_SES_REGION_NAME", "us-east-1")
+# Amazon SES via django-anymail. En produccion el backend es
+# "anymail.backends.amazon_ses.EmailBackend"; en desarrollo se usa consola.
+if EMAIL_BACKEND.startswith("anymail"):
+    _ses_params = {"region_name": os.environ.get("AWS_SES_REGION_NAME", "us-east-1")}
+    _ses_key = os.environ.get("AWS_SES_ACCESS_KEY_ID", "")
+    _ses_secret = os.environ.get("AWS_SES_SECRET_ACCESS_KEY", "")
+    if _ses_key and _ses_secret:
+        _ses_params["aws_access_key_id"] = _ses_key
+        _ses_params["aws_secret_access_key"] = _ses_secret
+    ANYMAIL = {"AMAZON_SES_CLIENT_PARAMS": _ses_params}
 
 EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))
 
@@ -316,12 +321,23 @@ AUTHENTICATION_BACKENDS = [
 # son los aprobados en CONTEXTO-ARQUITECTURA.docx (seccion 12.1).
 
 # R12: plazo de respuesta del profesional antes de que la reserva venza.
+# Decision Sprint 4: 12 h, con tope para no cruzar el inicio del servicio.
 PLAZO_RESPUESTA_PROFESIONAL_HORAS = int(
-    os.environ.get("PLAZO_RESPUESTA_PROFESIONAL_HORAS", "6")
+    os.environ.get("PLAZO_RESPUESTA_PROFESIONAL_HORAS", "12")
 )
 
 # R12: recordatorio al profesional antes de que venza.
 PLAZO_RECORDATORIO_HORAS = int(os.environ.get("PLAZO_RECORDATORIO_HORAS", "4"))
+
+# Margen minimo entre el vencimiento del plazo de respuesta y el inicio del
+# servicio: el plazo efectivo es min(ahora + 12 h, inicio - 3 h).
+HORAS_MARGEN_RESPUESTA = int(os.environ.get("HORAS_MARGEN_RESPUESTA", "3"))
+
+# Anticipacion minima para reservar. Evita que el plazo de respuesta del
+# profesional se cruce con el inicio del servicio.
+HORAS_ANTICIPACION_MINIMA_RESERVA = int(
+    os.environ.get("HORAS_ANTICIPACION_MINIMA_RESERVA", "12")
+)
 
 # R18: auto liberacion del pago si la organizacion no confirma la entrega.
 PLAZO_REVISION_ORGANIZACION_DIAS = int(
@@ -333,6 +349,27 @@ PLAZO_REVISION_ORGANIZACION_DIAS = int(
 DIAS_VENTANA_AUTORIZACION_WEBPAY = int(
     os.environ.get("DIAS_VENTANA_AUTORIZACION_WEBPAY", "7")
 )
+
+# --- Pasarela de pago (Sprint 4, docs/PAGOS_TRANSBANK.md) ---
+# fake permite desarrollar sin credenciales. En produccion el gateway falso
+# debe habilitarse explicitamente.
+PAYMENT_GATEWAY = os.environ.get("PAYMENT_GATEWAY", "fake").strip().lower()
+ALLOW_FAKE_GATEWAY = env_bool("ALLOW_FAKE_GATEWAY", DEBUG)
+TRANSBANK_ENV = os.environ.get("TRANSBANK_ENV", "integration").strip().lower()
+# El codigo y la API key de integracion se copian al .env local desde la
+# documentacion oficial; no se versionan valores.
+TRANSBANK_COMMERCE_CODE = os.environ.get("TRANSBANK_COMMERCE_CODE", "")
+TRANSBANK_API_KEY_SECRET = os.environ.get("TRANSBANK_API_KEY_SECRET", "")
+TRANSBANK_RETURN_URL = os.environ.get(
+    "TRANSBANK_RETURN_URL",
+    "http://localhost:8000/api/pagos/transbank/retorno/",
+)
+FRONTEND_PAYMENT_RESULT_URL = os.environ.get(
+    "FRONTEND_PAYMENT_RESULT_URL",
+    "http://localhost:5173/pago/resultado",
+)
+# Ventana para iniciar el pago antes de liberar el horario.
+MINUTOS_PAGO_PENDIENTE = int(os.environ.get("MINUTOS_PAGO_PENDIENTE", "15"))
 
 # D7: duracion del token magico de la reserva sin cuenta (horas).
 TOKEN_MAGICO_HORAS = int(os.environ.get("TOKEN_MAGICO_HORAS", "24"))

@@ -6,6 +6,8 @@ Cubre el flujo de publicación y revisión de servicios (R9): el profesional
 crea el servicio, lo envía a revisión, y el administrador aprueba, devuelve
 con comentarios o rechaza.
 """
+from decimal import Decimal
+
 import pytest
 from django.core.exceptions import ValidationError
 
@@ -78,6 +80,28 @@ class TestValidacionesServicio:
             categoria=categoria,
             titulo="Curso",
             precio=-1,
+            formato=Servicio.FORMATO_REMOTO,
+        )
+        with pytest.raises(ValidationError):
+            servicio.full_clean()
+
+    def test_precio_bajo_minimo_invalido(self, profesional_aprobado, categoria):
+        servicio = Servicio(
+            profesional=profesional_aprobado,
+            categoria=categoria,
+            titulo="Curso",
+            precio=1000,
+            formato=Servicio.FORMATO_REMOTO,
+        )
+        with pytest.raises(ValidationError):
+            servicio.full_clean()
+
+    def test_precio_con_decimales_invalido(self, profesional_aprobado, categoria):
+        servicio = Servicio(
+            profesional=profesional_aprobado,
+            categoria=categoria,
+            titulo="Curso",
+            precio=Decimal("10000.50"),
             formato=Servicio.FORMATO_REMOTO,
         )
         with pytest.raises(ValidationError):
@@ -245,6 +269,36 @@ class TestApiProfesionalServicios:
         respuesta = profesional_client.post(self.url, payload, format="json")
         assert respuesta.status_code == 201
         assert Servicio.objects.count() == 1
+
+    def test_rechaza_precio_bajo_minimo(
+        self, profesional_aprobado, profesional_client, categoria
+    ):
+        payload = {
+            "titulo": "Servicio barato",
+            "descripcion_corta": "corta",
+            "descripcion_larga": "larga",
+            "precio": 1000,
+            "formato": "remoto",
+            "categoria": categoria.id,
+        }
+        respuesta = profesional_client.post(self.url, payload, format="json")
+        assert respuesta.status_code == 400
+        assert "precio" in respuesta.data
+
+    def test_rechaza_precio_con_decimales(
+        self, profesional_aprobado, profesional_client, categoria
+    ):
+        payload = {
+            "titulo": "Servicio con decimales",
+            "descripcion_corta": "corta",
+            "descripcion_larga": "larga",
+            "precio": "10000.50",
+            "formato": "remoto",
+            "categoria": categoria.id,
+        }
+        respuesta = profesional_client.post(self.url, payload, format="json")
+        assert respuesta.status_code == 400
+        assert "precio" in respuesta.data
 
     def test_profesional_no_aprobado_no_crea(
         self, profesional, profesional_client, categoria

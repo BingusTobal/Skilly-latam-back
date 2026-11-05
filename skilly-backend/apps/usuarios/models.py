@@ -15,6 +15,13 @@ from django.utils import timezone
 from django.utils.deconstruct import deconstructible
 
 
+def normalizar_rut(valor):
+    """Deja un RUT sin puntos ni guiones y con el digito verificador en mayuscula."""
+    if not valor:
+        return ""
+    return str(valor).replace(".", "").replace("-", "").strip().upper()
+
+
 def validar_rut(valor):
     """Valida un RUT chileno (modulo 11). Tickets 1.1 y 0.13.
 
@@ -25,7 +32,7 @@ def validar_rut(valor):
     if not valor:
         return
 
-    limpio = str(valor).replace(".", "").replace("-", "").upper()
+    limpio = normalizar_rut(valor)
     if len(limpio) < 2:
         raise ValueError("El RUT es demasiado corto.")
 
@@ -293,7 +300,7 @@ class Organizacion(models.Model):
     def save(self, *args, **kwargs):
         # Normaliza el RUT: sin puntos ni guiones, siempre.
         if self.rut:
-            self.rut = self.rut.replace(".", "").replace("-", "").upper()
+            self.rut = normalizar_rut(self.rut)
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -393,7 +400,7 @@ class Profesional(models.Model):
 
     def save(self, *args, **kwargs):
         if self.rut:
-            self.rut = self.rut.replace(".", "").replace("-", "").upper()
+            self.rut = normalizar_rut(self.rut)
         super().save(*args, **kwargs)
 
     @property

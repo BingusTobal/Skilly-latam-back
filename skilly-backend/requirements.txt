@@ -27,6 +27,10 @@ drf-spectacular==0.30.0
 celery==5.6.3
 redis==8.1.0
 
+# --- Pagos Transbank Webpay Plus (Sprint 4) ---
+# marshmallow llega como dependencia transitiva (ver requirements.lock.txt).
+transbank-sdk==6.1.0
+
 # --- Produccion ---
 gunicorn==26.2.0
 whitenoise==6.12.0

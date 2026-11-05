@@ -23,6 +23,11 @@ USAR_S3 = False
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 CELERY_TASK_ALWAYS_EAGER = True
 
+# Pagos: gateway falso; los tests nunca tocan Transbank.
+PAYMENT_GATEWAY = "fake"
+ALLOW_FAKE_GATEWAY = True
+MINUTOS_PAGO_PENDIENTE = 15
+
 # MD5 es mas rapido que PBKDF2 y suficiente para tests.
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",

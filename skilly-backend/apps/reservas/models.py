@@ -29,6 +29,7 @@ class Reserva(models.Model):
     reservar: si el servicio cambia de precio después, la reserva no se altera.
     """
 
+    ESTADO_PENDIENTE_PAGO = "pendiente_pago"
     ESTADO_PENDIENTE_ACEPTACION = "pendiente_aceptacion"
     ESTADO_EN_CURSO = "en_curso"
     ESTADO_ENTREGADO_POR_CONFIRMAR = "entregado_por_confirmar"
@@ -37,6 +38,7 @@ class Reserva(models.Model):
     ESTADO_VENCIDA = "vencida"
     ESTADO_CON_DISPUTA = "con_disputa"
     ESTADO_CHOICES = [
+        (ESTADO_PENDIENTE_PAGO, "Pendiente de pago"),
         (ESTADO_PENDIENTE_ACEPTACION, "Pendiente de aceptación"),
         (ESTADO_EN_CURSO, "En curso"),
         (ESTADO_ENTREGADO_POR_CONFIRMAR, "Entregado, por confirmar"),
@@ -49,6 +51,7 @@ class Reserva(models.Model):
     # Estados que ocupan el calendario del profesional: mientras una reserva
     # esté en uno de estos, su ventana (inicio + colchón) está bloqueada.
     ESTADOS_VIGENTES = (
+        ESTADO_PENDIENTE_PAGO,
         ESTADO_PENDIENTE_ACEPTACION,
         ESTADO_EN_CURSO,
         ESTADO_ENTREGADO_POR_CONFIRMAR,
@@ -104,7 +107,7 @@ class Reserva(models.Model):
     estado = models.CharField(
         max_length=30,
         choices=ESTADO_CHOICES,
-        default=ESTADO_PENDIENTE_ACEPTACION,
+        default=ESTADO_PENDIENTE_PAGO,
         db_index=True,
     )
 
@@ -205,6 +208,7 @@ class EventoReserva(models.Model):
     """
 
     TIPO_CREADA = "creada"
+    TIPO_PAGO_CONFIRMADO = "pago_confirmado"
     TIPO_ACEPTADA = "aceptada"
     TIPO_RECHAZADA = "rechazada"
     TIPO_ENTREGADA = "entregada"
@@ -214,6 +218,7 @@ class EventoReserva(models.Model):
     TIPO_PROBLEMA = "problema_reportado"
     TIPO_CHOICES = [
         (TIPO_CREADA, "Creada"),
+        (TIPO_PAGO_CONFIRMADO, "Pago confirmado"),
         (TIPO_ACEPTADA, "Aceptada"),
         (TIPO_RECHAZADA, "Rechazada"),
         (TIPO_ENTREGADA, "Marcada como entregada"),
