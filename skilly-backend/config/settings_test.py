@@ -27,6 +27,14 @@ CELERY_TASK_ALWAYS_EAGER = True
 PAYMENT_GATEWAY = "fake"
 ALLOW_FAKE_GATEWAY = True
 MINUTOS_PAGO_PENDIENTE = 15
+REST_FRAMEWORK = {
+    **REST_FRAMEWORK,  # noqa: F405
+    "DEFAULT_THROTTLE_RATES": {
+        "pago_iniciar": "1000/min",
+        "pago_retorno": "1000/min",
+        "pago_estado": "1000/min",
+    },
+}
 
 # MD5 es mas rapido que PBKDF2 y suficiente para tests.
 PASSWORD_HASHERS = [

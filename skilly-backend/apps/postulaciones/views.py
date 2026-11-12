@@ -23,7 +23,12 @@ from apps.usuarios.correo import (
     enviar_postulacion_recibida,
     enviar_postulacion_rechazada,
 )
-from apps.usuarios.permisos import EsAdmin, EsPostulante, EsPostulanteOAdmin
+from apps.usuarios.permisos import (
+    EsAdmin,
+    EsPostulante,
+    EsPostulanteOAdmin,
+    EsProfesional,
+)
 
 from .models import Certificado, Postulacion
 from .serializers import (
@@ -88,9 +93,14 @@ class CrearPostulacionView(APIView):
 
 
 class MiPostulacionView(APIView):
-    """GET /api/postulaciones/mias/ — el profesional ve su trámite."""
+    """GET /api/postulaciones/mias/ — el profesional ve su trámite.
 
-    permission_classes = [EsPostulante]
+    Usa `EsProfesional` y no `EsPostulante` a propósito: una postulación
+    rechazada es terminal, pero el profesional igual necesita leer el motivo.
+    `EsPostulante` dejaría fuera justo a quien más necesita ver los comentarios.
+    """
+
+    permission_classes = [EsProfesional]
 
     def get(self, request):
         profesional = getattr(request.user, "profesional", None)

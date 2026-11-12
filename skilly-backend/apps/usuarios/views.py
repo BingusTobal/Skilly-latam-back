@@ -380,7 +380,17 @@ class AdminListarOrganizacionesView(APIView):
     permission_classes = [EsAdmin]
 
     def get(self, request):
-        qs = Organizacion.objects.select_related("usuario").order_by("nombre")
+        from django.db.models import Count, Max, Sum
+
+        qs = (
+            Organizacion.objects.select_related("usuario")
+            .annotate(
+                reservas_count=Count("reservas", distinct=True),
+                gasto_total=Sum("reservas__precio_acordado"),
+                ultima_reserva=Max("reservas__creada_en"),
+            )
+            .order_by("nombre")
+        )
 
         modo = request.query_params.get("modo")
         if modo:
@@ -407,7 +417,26 @@ class AdminListarProfesionalesView(APIView):
     permission_classes = [EsAdmin]
 
     def get(self, request):
-        qs = Profesional.objects.select_related("usuario").order_by("nombre_completo")
+        from django.db.models import Count, Q
+
+        qs = (
+            Profesional.objects.select_related("usuario")
+            .annotate(
+                servicios_completados=Count(
+                    "reservas",
+                    filter=Q(reservas__estado="finalizada"),
+                    distinct=True,
+                ),
+                disputas_abiertas=Count(
+                    "reservas__disputa",
+                    filter=Q(
+                        reservas__disputa__estado__in=["abierta", "en_revision"]
+                    ),
+                    distinct=True,
+                ),
+            )
+            .order_by("nombre_completo")
+        )
 
         estado = request.query_params.get("estado")
         if estado:
@@ -425,3 +454,62 @@ class AdminListarProfesionalesView(APIView):
             )
 
         return Response(ProfesionalAdminSerializer(qs, many=True).data)
+
+class AdminOrganizacionDetalleView(APIView):
+    """GET /api/auth/admin/organizaciones/{pk}/ — ficha e historial de reservas.
+
+    Alimenta la pantalla `historial-organizacion` del mockup admin. No expone
+    datos de contacto del profesional: el admin ve el historial comercial de la
+    organización, no la agenda privada de terceros.
+    """
+
+    permission_classes = [EsAdmin]
+
+    def get(self, request, pk):
+        from django.db.models import Sum
+
+        from apps.reservas.models import Reserva
+
+        organizacion = (
+            Organizacion.objects.select_related("usuario").filter(pk=pk).first()
+        )
+        if organizacion is None:
+            raise NotFound("Organización no encontrada.")
+
+        reservas = (
+            Reserva.objects.filter(organizacion=organizacion)
+            .select_related("servicio", "profesional")
+            .order_by("-creada_en")
+        )
+        total_reservas = reservas.count()
+        gasto_total = reservas.aggregate(total=Sum("precio_acordado"))["total"] or 0
+        disputas = reservas.filter(disputa__isnull=False).count()
+        ultima = reservas.first()
+
+        estado = request.query_params.get("estado")
+        if estado:
+            reservas = reservas.filter(estado=estado)
+
+        return Response(
+            {
+                "organizacion": OrganizacionAdminSerializer(organizacion).data,
+                "kpis": {
+                    "reservas": total_reservas,
+                    "gasto_total": gasto_total,
+                    "disputas": disputas,
+                    "ultima_reserva": ultima.creada_en.isoformat() if ultima else None,
+                },
+                "reservas": [
+                    {
+                        "id": reserva.id,
+                        "servicio": reserva.servicio.titulo,
+                        "profesional": reserva.profesional.nombre_completo,
+                        "fecha": reserva.fecha.isoformat(),
+                        "monto": reserva.precio_acordado,
+                        "estado": reserva.estado,
+                        "estado_nombre": reserva.get_estado_display(),
+                    }
+                    for reserva in reservas
+                ],
+            }
+        )

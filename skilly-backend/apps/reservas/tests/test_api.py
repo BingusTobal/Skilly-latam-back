@@ -32,7 +32,7 @@ class TestCrearReservaAPI:
         )
         assert resp.status_code == 201
         assert resp.data["token"]
-        assert resp.data["estado"] == Reserva.ESTADO_PENDIENTE_ACEPTACION
+        assert resp.data["estado"] == Reserva.ESTADO_PENDIENTE_PAGO
         reserva = Reserva.objects.get(pk=resp.data["id"])
         assert reserva.organizacion.usuario is not None
         assert reserva.organizacion.modo == "invitada"

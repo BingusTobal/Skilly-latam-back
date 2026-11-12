@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    AdminDisputasView,
     ReservaViewSet,
     ServicioDisponibilidadView,
     ServicioSlotsView,
@@ -11,6 +12,7 @@ router = DefaultRouter()
 router.register(r"reservas", ReservaViewSet, basename="reserva")
 
 urlpatterns = [
+    path("admin/disputas/", AdminDisputasView.as_view(), name="admin-disputas"),
     path("servicios/<int:pk>/slots/", ServicioSlotsView.as_view(), name="servicio-slots"),
     path(
         "servicios/<int:pk>/disponibilidad/",

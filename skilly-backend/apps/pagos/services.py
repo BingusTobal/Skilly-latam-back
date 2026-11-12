@@ -6,6 +6,7 @@ transacción de base de datos. Los estados transitorios (`capturando`,
 `cancelando`, `reembolsando`) permiten separar la fase de bloqueo de la llamada
 HTTP.
 """
+import logging
 import uuid
 from dataclasses import dataclass
 from datetime import timedelta
@@ -16,13 +17,15 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from apps.reservas.models import Reserva
+from apps.reservas.models import Disputa, EventoReserva, Reserva
 
 from . import estados
 from .gateway import get_gateway
 from .gateway.base import ErrorPasarela, permite_captura_diferida
 from .models import Pago
 from .seguridad import sanear
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -56,6 +59,30 @@ def _plazo_pago(ahora=None):
     return ahora + timedelta(minutes=settings.MINUTOS_PAGO_PENDIENTE)
 
 
+def _activar_reserva_tras_pago(pago):
+    """La reserva pasa a la espera del profesional cuando el pago se aprueba."""
+    from apps.reservas.services import activar_tras_pago
+
+    reserva = Reserva.objects.select_for_update().get(pk=pago.reserva_id)
+    return activar_tras_pago(reserva)
+
+
+def _cancelar_reserva_por_pago(pago, motivo):
+    """Libera el horario si el pago no llegó a buen término."""
+    reserva = Reserva.objects.select_for_update().get(pk=pago.reserva_id)
+    if reserva.estado != Reserva.ESTADO_PENDIENTE_PAGO:
+        return reserva
+    reserva.estado = Reserva.ESTADO_CANCELADA
+    reserva.cancelada_en = timezone.now()
+    reserva.save(update_fields=["estado", "cancelada_en", "actualizada_en"])
+    EventoReserva.objects.create(
+        reserva=reserva,
+        tipo=EventoReserva.TIPO_CANCELADA,
+        detalle=motivo,
+    )
+    return reserva
+
+
 def _fusionar_respuesta(pago, respuesta):
     """Conserva datos previos y agrega la última respuesta ya saneada."""
     pago.respuesta_pasarela = {
@@ -82,6 +109,8 @@ def iniciar_pago(reserva, *, gateway=None, actor=Pago.ACTOR_USUARIO, return_url=
 
     with transaction.atomic():
         reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado != Reserva.ESTADO_PENDIENTE_PAGO:
+            raise ValidationError("La reserva no está pendiente de pago.")
         activo = (
             Pago.objects.select_for_update()
             .filter(reserva=reserva, estado__in=estados.ESTADOS_VIGENTES)
@@ -224,6 +253,11 @@ def confirmar_pago(token, *, gateway=None, actor=Pago.ACTOR_SISTEMA):
                 actor=actor,
                 motivo=resultado.error or "La pasarela no confirmó el pago.",
             )
+            if destino in {estados.EXPIRADO, estados.RECHAZADO}:
+                _cancelar_reserva_por_pago(
+                    pago,
+                    "El pago no se completó; se libera el horario reservado.",
+                )
         return pago
 
     discrepancias = []
@@ -262,8 +296,9 @@ def confirmar_pago(token, *, gateway=None, actor=Pago.ACTOR_SISTEMA):
         pago.cuotas = resultado.cuotas
         pago.tarjeta_ultimos4 = resultado.tarjeta_ultimos4
         pago.codigo_respuesta = resultado.codigo_respuesta
-        pago.capturado_en_autorizacion = not permite_captura_diferida(
-            resultado.tipo_pago
+        pago.capturado_en_autorizacion = (
+            resultado.estado == "CAPTURED"
+            or not permite_captura_diferida(resultado.tipo_pago)
         )
         _fusionar_respuesta(pago, resultado.respuesta)
         pago.save(
@@ -291,6 +326,29 @@ def confirmar_pago(token, *, gateway=None, actor=Pago.ACTOR_SISTEMA):
                 if destino == estados.AUTORIZADO
                 else "Pago confirmado y cobrado (débito/prepago)."
             ),
+        )
+        _activar_reserva_tras_pago(pago)
+    return pago
+
+
+def abandonar_pago(token, *, actor=Pago.ACTOR_USUARIO):
+    """Marca como rechazado un intento que el usuario abandonó en Webpay."""
+    pago = Pago.objects.filter(token=token).first()
+    if pago is None:
+        return None
+
+    with transaction.atomic():
+        pago = Pago.objects.select_for_update().get(pk=pago.pk)
+        if pago.estado != estados.INICIADO:
+            return pago
+        pago.pasar_a(
+            estados.RECHAZADO,
+            actor=actor,
+            motivo="El usuario abandonó el pago en la pasarela.",
+        )
+        _cancelar_reserva_por_pago(
+            pago,
+            "El pago fue abandonado; se libera el horario reservado.",
         )
     return pago
 
@@ -376,6 +434,14 @@ def capturar_pago(pago, *, gateway=None, actor=Pago.ACTOR_PROFESIONAL):
     return pago
 
 
+def _disputa_abierta(reserva_id):
+    """True si la reserva tiene una disputa que todavía no se resolvió (R18)."""
+    return Disputa.objects.filter(
+        reserva_id=reserva_id,
+        estado__in=(Disputa.ESTADO_ABIERTA, Disputa.ESTADO_EN_REVISION),
+    ).exists()
+
+
 def liberar_pago(pago, *, actor=Pago.ACTOR_ADMIN):
     """Marca que el neto corresponde al profesional. No llama a la pasarela."""
     with transaction.atomic():
@@ -384,6 +450,15 @@ def liberar_pago(pago, *, actor=Pago.ACTOR_ADMIN):
             return pago
         if pago.estado != estados.RETENIDO:
             raise ValidationError("Solo se puede liberar un pago retenido.")
+        # R18 / guard de disputa: ni la confirmación manual ni la
+        # auto-liberación pueden mover dinero mientras el conflicto esté abierto.
+        if (
+            pago.reserva.estado == Reserva.ESTADO_CON_DISPUTA
+            or _disputa_abierta(pago.reserva_id)
+        ):
+            raise ValidationError(
+                "No se puede liberar un pago con una disputa abierta."
+            )
         pago.pasar_a(
             estados.LIBERADO,
             actor=actor,
@@ -542,6 +617,10 @@ def expirar_pago(pago, *, actor=Pago.ACTOR_SISTEMA):
             actor=actor,
             motivo="Venció el plazo del intento de pago.",
         )
+        _cancelar_reserva_por_pago(
+            pago,
+            "Venció el plazo para pagar; se libera el horario reservado.",
+        )
     return pago
 
 
@@ -562,5 +641,155 @@ def expirar_pagos_vencidos(ahora=None):
                 actor=Pago.ACTOR_SISTEMA,
                 motivo="Venció la ventana para completar el pago.",
             )
+            _cancelar_reserva_por_pago(
+                pago,
+                "Venció el plazo para pagar; se libera el horario reservado.",
+            )
             total += 1
+    return total
+
+
+def _conciliar_iniciado(pago, resultado, gateway):
+    """Corrige un pago `iniciado` a partir del estado informado por la pasarela."""
+    if resultado.estado == "CAPTURED":
+        with transaction.atomic():
+            pago = Pago.objects.select_for_update().get(pk=pago.pk)
+            if pago.estado != estados.INICIADO:
+                return False
+            pago.codigo_autorizacion = resultado.codigo_autorizacion
+            pago.tipo_pago = resultado.tipo_pago
+            pago.cuotas = resultado.cuotas
+            pago.tarjeta_ultimos4 = resultado.tarjeta_ultimos4
+            pago.codigo_respuesta = resultado.codigo_respuesta
+            pago.capturado_en_autorizacion = True
+            _fusionar_respuesta(pago, resultado.respuesta)
+            pago.save(
+                update_fields=[
+                    "codigo_autorizacion",
+                    "tipo_pago",
+                    "cuotas",
+                    "tarjeta_ultimos4",
+                    "codigo_respuesta",
+                    "capturado_en_autorizacion",
+                    "respuesta_pasarela",
+                    "actualizado_en",
+                ]
+            )
+            pago.pasar_a(
+                estados.RETENIDO,
+                actor=Pago.ACTOR_SISTEMA,
+                motivo="Conciliación: el pago ya estaba capturado.",
+            )
+            _activar_reserva_tras_pago(pago)
+        return True
+    if resultado.estado == "AUTHORIZED":
+        confirmar_pago(pago.token, gateway=gateway)
+        return True
+    if resultado.estado in {"REJECTED", "EXPIRED"}:
+        destino = (
+            estados.EXPIRADO
+            if resultado.estado == "EXPIRED"
+            else estados.RECHAZADO
+        )
+        with transaction.atomic():
+            pago = Pago.objects.select_for_update().get(pk=pago.pk)
+            if pago.estado != estados.INICIADO:
+                return False
+            pago.pasar_a(
+                destino,
+                actor=Pago.ACTOR_SISTEMA,
+                motivo="Conciliación: la pasarela informa que el pago no se completó.",
+            )
+            _cancelar_reserva_por_pago(
+                pago,
+                "El pago no se completó; se libera el horario reservado.",
+            )
+        return True
+    return False
+
+
+def _conciliar_capturando(pago, resultado):
+    """Corrige un pago `capturando` según el estado real de la pasarela."""
+    if resultado.estado == "CAPTURED":
+        destino = estados.RETENIDO
+        motivo = "Conciliación: la captura sí se había realizado."
+    elif resultado.estado == "AUTHORIZED":
+        destino = estados.AUTORIZADO
+        motivo = "Conciliación: la captura no se realizó; se puede reintentar."
+    else:
+        return False
+
+    with transaction.atomic():
+        pago = Pago.objects.select_for_update().get(pk=pago.pk)
+        if pago.estado != estados.CAPTURANDO:
+            return False
+        pago.pasar_a(destino, actor=Pago.ACTOR_SISTEMA, motivo=motivo)
+    return True
+
+
+def conciliar_pagos(ahora=None):
+    """Red de seguridad sin webhooks: corrige pagos iniciados o capturando."""
+    ahora = ahora or timezone.now()
+    umbral = ahora - timedelta(
+        minutes=getattr(settings, "MINUTOS_CONCILIACION_PAGOS", 5)
+    )
+    ids = list(
+        Pago.objects.filter(
+            estado__in=[estados.INICIADO, estados.CAPTURANDO],
+            actualizado_en__lt=umbral,
+        ).values_list("pk", flat=True)
+    )
+
+    gateway = get_gateway()
+    total = 0
+    for pk in ids:
+        pago = Pago.objects.filter(pk=pk).first()
+        if pago is None or not pago.token:
+            continue
+        try:
+            resultado = gateway.estado(pago.token)
+        except ErrorPasarela:
+            logger.exception("No se pudo conciliar el pago %s.", pk)
+            continue
+
+        if not resultado.ok:
+            logger.warning(
+                "Conciliación del pago %s devolvió estado %s: %s",
+                pk,
+                resultado.estado,
+                resultado.error,
+            )
+            continue
+
+        if pago.estado == estados.INICIADO:
+            corregido = _conciliar_iniciado(pago, resultado, gateway)
+        elif pago.estado == estados.CAPTURANDO:
+            corregido = _conciliar_capturando(pago, resultado)
+        else:
+            corregido = False
+        if corregido:
+            total += 1
+    return total
+
+
+def alertar_autorizaciones_por_vencer(ahora=None):
+    """Registra una alerta para autorizaciones cerca del límite de captura."""
+    ahora = ahora or timezone.now()
+    dias_aviso = max(
+        getattr(settings, "DIAS_VENTANA_AUTORIZACION_WEBPAY", 7) - 1, 0
+    )
+    limite = ahora - timedelta(days=dias_aviso)
+    pagos = Pago.objects.filter(
+        estado=estados.AUTORIZADO, autorizado_en__lt=limite
+    ).order_by("autorizado_en")
+
+    total = 0
+    for pago in pagos:
+        logger.warning(
+            "Autorización próxima a vencer: pago %s (reserva %s, token %s).",
+            pago.referencia_publica,
+            pago.reserva_id,
+            pago.token_corto,
+        )
+        total += 1
     return total

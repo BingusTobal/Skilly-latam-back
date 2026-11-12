@@ -29,12 +29,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.catalogo.models import Servicio
+from apps.usuarios.permisos import EsAdmin
 
 from . import services
-from .models import Reserva
+from .models import Disputa, Reserva
 from .serializers import (
     AccionReservaSerializer,
     CrearReservaSerializer,
+    DisputaAdminSerializer,
     ReservaOrganizacionSerializer,
     ReservaProfesionalSerializer,
 )
@@ -308,3 +310,44 @@ class ReservaViewSet(viewsets.GenericViewSet):
         except (DjangoValidationError, ValueError) as exc:
             _traducir(exc)
         return Response(ReservaOrganizacionSerializer(reserva).data)
+
+
+# ===========================================================================
+# Panel de administración: cola de disputas
+# ===========================================================================
+class AdminDisputasView(APIView):
+    """GET /api/admin/disputas/ — bandeja de disputas del panel admin.
+
+    Filtros: `?estado=abierta|en_revision|resuelta` y `?q=` (servicio,
+    organización o profesional). Solo lectura: la resolución llega con la fase
+    de disputas, que aplicará el resultado sobre el pago.
+    """
+
+    permission_classes = [EsAdmin]
+
+    def get(self, request):
+        qs = (
+            Disputa.objects.select_related(
+                "reserva",
+                "reserva__servicio",
+                "reserva__organizacion",
+                "reserva__profesional",
+            )
+            .order_by("-creada_en")
+        )
+
+        estado = request.query_params.get("estado")
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        busqueda = (request.query_params.get("q") or "").strip()
+        if busqueda:
+            from django.db.models import Q
+
+            qs = qs.filter(
+                Q(reserva__servicio__titulo__icontains=busqueda)
+                | Q(reserva__organizacion__nombre__icontains=busqueda)
+                | Q(reserva__profesional__nombre_completo__icontains=busqueda)
+            )
+
+        return Response(DisputaAdminSerializer(qs, many=True).data)

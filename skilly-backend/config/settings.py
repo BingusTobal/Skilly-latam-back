@@ -271,6 +271,12 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_RATES": {
+        # Pagos: iniciar es más restrictivo para evitar transacciones masivas.
+        "pago_iniciar": "10/min",
+        "pago_retorno": "60/min",
+        "pago_estado": "60/min",
+    },
     "EXCEPTION_HANDLER": "apps.usuarios.permisos.exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
@@ -364,12 +370,18 @@ TRANSBANK_RETURN_URL = os.environ.get(
     "TRANSBANK_RETURN_URL",
     "http://localhost:8000/api/pagos/transbank/retorno/",
 )
+# Timeout de las llamadas HTTP al SDK; por defecto el SDK usa 600 s, demasiado.
+TRANSBANK_TIMEOUT = int(os.environ.get("TRANSBANK_TIMEOUT", "10"))
 FRONTEND_PAYMENT_RESULT_URL = os.environ.get(
     "FRONTEND_PAYMENT_RESULT_URL",
     "http://localhost:5173/pago/resultado",
 )
 # Ventana para iniciar el pago antes de liberar el horario.
 MINUTOS_PAGO_PENDIENTE = int(os.environ.get("MINUTOS_PAGO_PENDIENTE", "15"))
+# Antigüedad mínima antes de conciliar un pago contra la pasarela.
+MINUTOS_CONCILIACION_PAGOS = int(
+    os.environ.get("MINUTOS_CONCILIACION_PAGOS", "5")
+)
 
 # D7: duracion del token magico de la reserva sin cuenta (horas).
 TOKEN_MAGICO_HORAS = int(os.environ.get("TOKEN_MAGICO_HORAS", "24"))
@@ -419,6 +431,22 @@ CELERY_BEAT_SCHEDULE = {
     "expirar-reservas-vencidas": {
         "task": "reservas.procesar_vencidas",
         "schedule": 900.0,  # cada 15 minutos
+    },
+    "liberar-entregas-vencidas": {
+        "task": "reservas.liberar_entregas_vencidas",
+        "schedule": 3600.0,  # cada hora (R18: plazo de 5 días)
+    },
+    "expirar-pagos-pendientes": {
+        "task": "pagos.expirar_pagos_pendientes",
+        "schedule": 60.0,  # cada minuto
+    },
+    "conciliar-pagos": {
+        "task": "pagos.conciliar_pagos",
+        "schedule": 300.0,  # cada 5 minutos
+    },
+    "alertar-autorizaciones-por-vencer": {
+        "task": "pagos.alertar_autorizaciones_por_vencer",
+        "schedule": 86400.0,  # diaria
     },
 }
 

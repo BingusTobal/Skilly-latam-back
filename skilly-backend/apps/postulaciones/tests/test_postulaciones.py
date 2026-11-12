@@ -242,6 +242,16 @@ class TestMiPostulacion:
         assert respuesta.data["estado"] == "devuelta"
         assert respuesta.data["comentarios_admin"] == "Indica el número de años."
 
+    def test_profesional_rechazado_tambien_ve_su_postulacion(
+        self, profesional_client, postulacion, usuario_admin
+    ):
+        """El rechazo es terminal, pero el motivo debe seguir siendo legible."""
+        postulacion.rechazar(usuario_admin, "No cubrimos tu especialidad.")
+        respuesta = profesional_client.get(self.url)
+        assert respuesta.status_code == 200
+        assert respuesta.data["estado"] == "rechazada"
+        assert respuesta.data["comentarios_admin"] == "No cubrimos tu especialidad."
+
 
 # ===========================================================================
 # Reenvío (1.10)

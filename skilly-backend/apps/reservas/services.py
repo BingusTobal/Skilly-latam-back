@@ -9,6 +9,7 @@ Regla de bloqueo (R11): una reserva vigente bloquea los slots dentro de las
 `HORAS_BLOQUEO_RESERVA` horas siguientes a su inicio. Reservar a las 16:00 con
 un colchón de 3 h deja libres recién desde las 19:00.
 """
+import logging
 from datetime import datetime, timedelta, time as _time
 
 from django.conf import settings
@@ -21,6 +22,10 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from apps.catalogo.models import Servicio
+from apps.pagos import estados as pagos_estados
+from apps.pagos import services as pagos_services
+from apps.pagos.gateway.base import ErrorPasarela
+from apps.pagos.models import Pago
 from apps.usuarios.correo import enviar_cuenta_creada, enviar_reserva_registrada
 from apps.usuarios.models import (
     Horario,
@@ -34,6 +39,7 @@ from .models import Disputa, EventoReserva, Reserva
 
 Usuario = get_user_model()
 ZONA = timezone.get_current_timezone()
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -42,6 +48,15 @@ ZONA = timezone.get_current_timezone()
 def aware(fecha, hora):
     """Combina fecha y hora locales (America/Santiago) en un datetime aware."""
     return timezone.make_aware(datetime.combine(fecha, hora), ZONA)
+
+
+def plazo_respuesta(reserva, ahora=None):
+    """Fecha límite del profesional, sin pasar del margen previo al servicio."""
+    ahora = ahora or timezone.now()
+    vencimiento = ahora + timedelta(hours=settings.PLAZO_RESPUESTA_PROFESIONAL_HORAS)
+    inicio = aware(reserva.fecha, reserva.hora_inicio)
+    tope = inicio - timedelta(hours=settings.HORAS_MARGEN_RESPUESTA)
+    return min(vencimiento, tope)
 
 
 def _ventana_bloqueo(reserva):
@@ -285,7 +300,7 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
 
     organizacion, aviso = _resolver_organizacion(organizacion, creada_por, datos)
 
-    plazo = settings.PLAZO_RESPUESTA_PROFESIONAL_HORAS
+    ventana_pago = timedelta(minutes=settings.MINUTOS_PAGO_PENDIENTE)
     reserva = Reserva.objects.create(
         servicio=servicio,
         profesional=servicio.profesional,
@@ -301,13 +316,14 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
         contacto_email=datos["email"],
         contacto_telefono=datos.get("telefono", ""),
         mensaje=datos.get("mensaje", ""),
-        expira_en=timezone.now() + timedelta(hours=plazo),
+        estado=Reserva.ESTADO_PENDIENTE_PAGO,
+        expira_en=timezone.now() + ventana_pago,
     )
     EventoReserva.objects.create(
         reserva=reserva,
         tipo=EventoReserva.TIPO_CREADA,
         actor=creada_por,
-        detalle="Solicitud de reserva creada.",
+        detalle="Solicitud de reserva creada; pendiente de pago.",
     )
 
     if aviso and aviso.get("cuenta") == "nueva":
@@ -347,43 +363,126 @@ def porcentaje_reembolso(reserva, ahora=None):
     return settings.PORCENTAJE_REEMBOLSO_CANCELACION_TARDIA
 
 
-@transaction.atomic
-def aceptar(reserva, actor=None):
-    if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
-        raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
-    if reserva.expirada:
-        raise ValidationError("El plazo para responder esta solicitud venció.")
-    reserva.estado = Reserva.ESTADO_EN_CURSO
-    reserva.aceptada_en = timezone.now()
-    reserva.save(update_fields=["estado", "aceptada_en", "actualizada_en"])
-    _evento(reserva, EventoReserva.TIPO_ACEPTADA, actor, "El profesional aceptó la solicitud.")
-    return reserva
+def _pago_activo(reserva):
+    """Pago vigente de la reserva, si existe."""
+    return pagos_services.pago_vigente(reserva)
+
+
+def _actor_pago(actor, defecto=Pago.ACTOR_SISTEMA):
+    if actor is None:
+        return defecto
+    if getattr(actor, "es_admin_plataforma", False):
+        return Pago.ACTOR_ADMIN
+    if getattr(actor, "profesional", None) is not None:
+        return Pago.ACTOR_PROFESIONAL
+    if getattr(actor, "organizacion", None) is not None:
+        return Pago.ACTOR_USUARIO
+    return defecto
 
 
 @transaction.atomic
-def rechazar(reserva, actor=None, motivo=""):
-    if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
-        raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
-    reserva.estado = Reserva.ESTADO_CANCELADA
-    reserva.motivo_rechazo = (motivo or "").strip()
-    reserva.cancelada_por = actor
-    reserva.cancelada_en = timezone.now()
-    reserva.save(
-        update_fields=[
-            "estado",
-            "motivo_rechazo",
-            "cancelada_por",
-            "cancelada_en",
-            "actualizada_en",
-        ]
-    )
+def activar_tras_pago(reserva, actor=None):
+    """Arranca el reloj del profesional cuando el pago quedó confirmado."""
+    if reserva.estado != Reserva.ESTADO_PENDIENTE_PAGO:
+        return reserva
+    reserva.estado = Reserva.ESTADO_PENDIENTE_ACEPTACION
+    reserva.expira_en = plazo_respuesta(reserva)
+    reserva.save(update_fields=["estado", "expira_en", "actualizada_en"])
     _evento(
         reserva,
-        EventoReserva.TIPO_RECHAZADA,
+        EventoReserva.TIPO_PAGO_CONFIRMADO,
         actor,
-        reserva.motivo_rechazo or "El profesional rechazó la solicitud.",
+        "Pago confirmado; comienza el plazo de respuesta del profesional.",
     )
     return reserva
+
+
+def aceptar(reserva, actor=None):
+    """Acepta la solicitud y captura el pago (tres fases, sin HTTP bloqueado)."""
+    original = reserva
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+            raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
+        if reserva.expirada:
+            raise ValidationError("El plazo para responder esta solicitud venció.")
+        pago = _pago_activo(reserva)
+        if pago is None:
+            raise ValidationError("La reserva no tiene un pago confirmado.")
+        if pago.estado not in {pagos_estados.AUTORIZADO, pagos_estados.RETENIDO}:
+            raise ValidationError("El pago de esta reserva no está listo para capturar.")
+
+    if pago.estado == pagos_estados.AUTORIZADO:
+        pago = pagos_services.capturar_pago(
+            pago, actor=_actor_pago(actor, Pago.ACTOR_PROFESIONAL)
+        )
+
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+            raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
+        pago = Pago.objects.select_for_update().get(pk=pago.pk)
+        if pago.estado != pagos_estados.RETENIDO:
+            raise ValidationError("La captura del pago no se completó.")
+        reserva.estado = Reserva.ESTADO_EN_CURSO
+        reserva.aceptada_en = timezone.now()
+        reserva.save(update_fields=["estado", "aceptada_en", "actualizada_en"])
+        _evento(
+            reserva,
+            EventoReserva.TIPO_ACEPTADA,
+            actor,
+            "El profesional aceptó la solicitud.",
+        )
+    original.refresh_from_db()
+    return original
+
+
+def rechazar(reserva, actor=None, motivo=""):
+    """Rechaza la solicitud revocando o reembolsando el pago."""
+    original = reserva
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+            raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
+        pago = _pago_activo(reserva)
+        accion = _accion_sobre_pago(pago, 100)
+
+    if accion[0] == "cancelar":
+        pagos_services.cancelar_pago(
+            pago, actor=_actor_pago(actor, Pago.ACTOR_PROFESIONAL)
+        )
+    elif accion[0] == "reembolsar":
+        pagos_services.reembolsar_pago(
+            pago,
+            porcentaje=accion[1],
+            actor=_actor_pago(actor, Pago.ACTOR_PROFESIONAL),
+        )
+
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+            raise ValidationError("Esta reserva ya no está pendiente de aceptación.")
+        reserva.estado = Reserva.ESTADO_CANCELADA
+        reserva.motivo_rechazo = (motivo or "").strip()
+        reserva.cancelada_por = actor
+        reserva.cancelada_en = timezone.now()
+        reserva.save(
+            update_fields=[
+                "estado",
+                "motivo_rechazo",
+                "cancelada_por",
+                "cancelada_en",
+                "actualizada_en",
+            ]
+        )
+        _evento(
+            reserva,
+            EventoReserva.TIPO_RECHAZADA,
+            actor,
+            reserva.motivo_rechazo or "El profesional rechazó la solicitud.",
+        )
+    original.refresh_from_db()
+    return original
 
 
 @transaction.atomic
@@ -402,48 +501,147 @@ def marcar_entregado(reserva, actor=None):
     return reserva
 
 
-@transaction.atomic
-def confirmar_entrega(reserva, actor=None):
+def _disputa_abierta(reserva):
+    """True si la reserva tiene una disputa sin resolver (R18)."""
+    if reserva.estado == Reserva.ESTADO_CON_DISPUTA:
+        return True
+    return Disputa.objects.filter(
+        reserva_id=reserva.pk,
+        estado__in=(Disputa.ESTADO_ABIERTA, Disputa.ESTADO_EN_REVISION),
+    ).exists()
+
+
+def _finalizar_entrega(reserva, actor, detalle, *, actor_pago=Pago.ACTOR_USUARIO):
+    """Cierra una entrega, libera el pago y deja el evento en la bitácora."""
     if reserva.estado != Reserva.ESTADO_ENTREGADO_POR_CONFIRMAR:
         raise ValidationError("Solo se puede confirmar una entrega marcada como entregada.")
+    if _disputa_abierta(reserva):
+        raise ValidationError(
+            "No se puede confirmar la entrega: la reserva tiene una disputa abierta."
+        )
+    pago = _pago_activo(reserva)
+    if pago is not None:
+        if pago.estado == pagos_estados.RETENIDO:
+            pagos_services.liberar_pago(
+                pago, actor=_actor_pago(actor, actor_pago)
+            )
+        elif pago.estado != pagos_estados.LIBERADO:
+            raise ValidationError("El pago de esta reserva no se puede liberar.")
     reserva.estado = Reserva.ESTADO_FINALIZADA
     reserva.confirmada_en = timezone.now()
     reserva.save(update_fields=["estado", "confirmada_en", "actualizada_en"])
-    _evento(
-        reserva,
-        EventoReserva.TIPO_CONFIRMADA,
-        actor,
-        "La organización confirmó la entrega. Se libera el pago (simulado).",
-    )
+    _evento(reserva, EventoReserva.TIPO_CONFIRMADA, actor, detalle)
     return reserva
 
 
 @transaction.atomic
-def cancelar(reserva, actor=None, motivo=""):
-    if reserva.estado not in (
-        Reserva.ESTADO_PENDIENTE_ACEPTACION,
-        Reserva.ESTADO_EN_CURSO,
-    ):
-        raise ValidationError("Esta reserva ya no se puede cancelar.")
-    porcentaje = porcentaje_reembolso(reserva)
-    reserva.estado = Reserva.ESTADO_CANCELADA
-    reserva.motivo_cancelacion = (motivo or "").strip()
-    reserva.cancelada_por = actor
-    reserva.cancelada_en = timezone.now()
-    reserva.save(
-        update_fields=[
-            "estado",
-            "motivo_cancelacion",
-            "cancelada_por",
-            "cancelada_en",
-            "actualizada_en",
-        ]
+def confirmar_entrega(reserva, actor=None):
+    return _finalizar_entrega(
+        reserva,
+        actor,
+        "La organización confirmó la entrega. Se libera el pago.",
     )
-    detalle = f"Reserva cancelada. Reembolso del {porcentaje}% (simulado)."
-    if reserva.motivo_cancelacion:
-        detalle = f"{detalle} Motivo: {reserva.motivo_cancelacion}"
-    _evento(reserva, EventoReserva.TIPO_CANCELADA, actor, detalle)
-    return reserva
+
+
+def liberar_entregas_vencidas(ahora=None):
+    """R18: libera entregas que la organización no confirmó en el plazo."""
+    ahora = ahora or timezone.now()
+    limite = ahora - timedelta(days=settings.PLAZO_REVISION_ORGANIZACION_DIAS)
+    ids = list(
+        Reserva.objects.filter(
+            estado=Reserva.ESTADO_ENTREGADO_POR_CONFIRMAR,
+            entregado_en__isnull=False,
+            entregado_en__lte=limite,
+        ).values_list("pk", flat=True)
+    )
+
+    total = 0
+    for pk in ids:
+        with transaction.atomic():
+            reserva = Reserva.objects.select_for_update().get(pk=pk)
+            if reserva.estado != Reserva.ESTADO_ENTREGADO_POR_CONFIRMAR:
+                continue
+            if _disputa_abierta(reserva):
+                continue
+            try:
+                _finalizar_entrega(
+                    reserva,
+                    None,
+                    "Venció el plazo de revisión de la organización. "
+                    "Se libera el pago automáticamente.",
+                    actor_pago=Pago.ACTOR_SISTEMA,
+                )
+            except (ValidationError, ErrorPasarela):
+                logger.exception(
+                    "No se pudo liberar automáticamente la reserva %s.", pk
+                )
+                continue
+            total += 1
+    return total
+
+
+def cancelar(reserva, actor=None, motivo=""):
+    """Cancela la reserva y reembolsa según la anticipación (24 h)."""
+    original = reserva
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado not in (
+            Reserva.ESTADO_PENDIENTE_ACEPTACION,
+            Reserva.ESTADO_EN_CURSO,
+        ):
+            raise ValidationError("Esta reserva ya no se puede cancelar.")
+        porcentaje = porcentaje_reembolso(reserva)
+        pago = _pago_activo(reserva)
+        accion = _accion_sobre_pago(pago, porcentaje)
+
+    if accion[0] == "cancelar":
+        pagos_services.cancelar_pago(
+            pago, actor=_actor_pago(actor, Pago.ACTOR_USUARIO)
+        )
+    elif accion[0] == "reembolsar":
+        pagos_services.reembolsar_pago(
+            pago,
+            porcentaje=accion[1],
+            actor=_actor_pago(actor, Pago.ACTOR_USUARIO),
+        )
+
+    with transaction.atomic():
+        reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+        if reserva.estado not in (
+            Reserva.ESTADO_PENDIENTE_ACEPTACION,
+            Reserva.ESTADO_EN_CURSO,
+        ):
+            raise ValidationError("Esta reserva ya no se puede cancelar.")
+        reserva.estado = Reserva.ESTADO_CANCELADA
+        reserva.motivo_cancelacion = (motivo or "").strip()
+        reserva.cancelada_por = actor
+        reserva.cancelada_en = timezone.now()
+        reserva.save(
+            update_fields=[
+                "estado",
+                "motivo_cancelacion",
+                "cancelada_por",
+                "cancelada_en",
+                "actualizada_en",
+            ]
+        )
+        detalle = f"Reserva cancelada. Reembolso del {porcentaje}%."
+        if reserva.motivo_cancelacion:
+            detalle = f"{detalle} Motivo: {reserva.motivo_cancelacion}"
+        _evento(reserva, EventoReserva.TIPO_CANCELADA, actor, detalle)
+    original.refresh_from_db()
+    return original
+
+
+def _accion_sobre_pago(pago, porcentaje_reembolso):
+    """Decide si hay que revocar, reembolsar o no tocar el pago."""
+    if pago is None:
+        return (None, None)
+    if pago.estado == pagos_estados.AUTORIZADO:
+        return ("cancelar", None)
+    if pago.estado in {pagos_estados.RETENIDO, pagos_estados.LIBERADO}:
+        return ("reembolsar", porcentaje_reembolso)
+    return (None, None)
 
 
 @transaction.atomic
@@ -475,22 +673,50 @@ def reportar_problema(reserva, actor=None, motivo="", descripcion=""):
 # Vencimiento (R12 / ticket 3.13)
 # ---------------------------------------------------------------------------
 def expirar_vencidas(ahora=None):
-    """Pasa a 'vencida' las reservas pendientes cuyo plazo ya expiró."""
+    """Pasa a 'vencida' las reservas cuyo plazo de respuesta expiró."""
     ahora = ahora or timezone.now()
-    pendientes = Reserva.objects.filter(
-        estado=Reserva.ESTADO_PENDIENTE_ACEPTACION, expira_en__lt=ahora
+    ids = list(
+        Reserva.objects.filter(
+            estado=Reserva.ESTADO_PENDIENTE_ACEPTACION, expira_en__lt=ahora
+        ).values_list("pk", flat=True)
     )
     total = 0
-    for reserva in pendientes:
-        reserva.estado = Reserva.ESTADO_VENCIDA
-        reserva.save(update_fields=["estado", "actualizada_en"])
-        _evento(
-            reserva,
-            EventoReserva.TIPO_VENCIDA,
-            None,
-            "Venció el plazo de respuesta del profesional.",
-        )
-        total += 1
+    for pk in ids:
+        with transaction.atomic():
+            reserva = Reserva.objects.select_for_update().get(pk=pk)
+            if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+                continue
+            if not reserva.expira_en or reserva.expira_en >= ahora:
+                continue
+            pago = _pago_activo(reserva)
+            accion = _accion_sobre_pago(pago, 100)
+
+        try:
+            if accion[0] == "cancelar":
+                pagos_services.cancelar_pago(pago)
+            elif accion[0] == "reembolsar":
+                pagos_services.reembolsar_pago(pago, porcentaje=accion[1])
+        except ErrorPasarela:
+            logger.exception(
+                "No se pudo resolver el pago %s al vencer la reserva %s.",
+                pago.pk,
+                pk,
+            )
+            continue
+
+        with transaction.atomic():
+            reserva = Reserva.objects.select_for_update().get(pk=pk)
+            if reserva.estado != Reserva.ESTADO_PENDIENTE_ACEPTACION:
+                continue
+            reserva.estado = Reserva.ESTADO_VENCIDA
+            reserva.save(update_fields=["estado", "actualizada_en"])
+            _evento(
+                reserva,
+                EventoReserva.TIPO_VENCIDA,
+                None,
+                "Venció el plazo de respuesta del profesional.",
+            )
+            total += 1
     return total
 
 

@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
+from django.db.models import Sum
 from rest_framework import serializers
 
 from .models import Horario, Organizacion, Profesional
@@ -160,17 +161,41 @@ class OrganizacionAdminSerializer(OrganizacionSerializer):
     usuario_email = serializers.EmailField(source="usuario.email", read_only=True, allow_null=True)
     tiene_usuario = serializers.SerializerMethodField()
     modo_nombre = serializers.CharField(source="get_modo_display", read_only=True)
+    reservas_count = serializers.SerializerMethodField()
+    gasto_total = serializers.SerializerMethodField()
+    ultima_reserva = serializers.SerializerMethodField()
 
     class Meta(OrganizacionSerializer.Meta):
         fields = OrganizacionSerializer.Meta.fields + [
             "usuario_email",
             "tiene_usuario",
             "modo_nombre",
+            "reservas_count",
+            "gasto_total",
+            "ultima_reserva",
         ]
         read_only_fields = fields
 
     def get_tiene_usuario(self, obj):
         return obj.usuario_id is not None
+
+    def get_reservas_count(self, obj):
+        anotado = getattr(obj, "reservas_count", None)
+        return anotado if anotado is not None else obj.reservas.count()
+
+    def get_gasto_total(self, obj):
+        anotado = getattr(obj, "gasto_total", None)
+        if anotado is None:
+            anotado = obj.reservas.aggregate(total=Sum("precio_acordado"))["total"] or 0
+        return anotado
+
+    def get_ultima_reserva(self, obj):
+        anotada = getattr(obj, "ultima_reserva", None)
+        if anotada is None:
+            anotada = obj.reservas.order_by("-creada_en").values_list(
+                "creada_en", flat=True
+            ).first()
+        return anotada.isoformat() if anotada else None
 
 
 class LoginSerializer(serializers.Serializer):
@@ -297,16 +322,53 @@ class ProfesionalAdminSerializer(ProfesionalSerializer):
 
     usuario_email = serializers.EmailField(source="usuario.email", read_only=True, allow_null=True)
     postulaciones_pendientes = serializers.SerializerMethodField()
+    especialidad = serializers.SerializerMethodField()
+    servicios_completados = serializers.SerializerMethodField()
+    disputas_abiertas = serializers.SerializerMethodField()
+    fecha_aprobacion = serializers.SerializerMethodField()
 
     class Meta(ProfesionalSerializer.Meta):
         fields = ProfesionalSerializer.Meta.fields + [
             "usuario_email",
             "postulaciones_pendientes",
+            "especialidad",
+            "servicios_completados",
+            "disputas_abiertas",
+            "fecha_aprobacion",
+            "fecha_estado",
+            "creado_en",
         ]
         read_only_fields = fields
 
     def get_postulaciones_pendientes(self, obj):
         return obj.postulaciones.filter(estado="pendiente").count()
+
+    def _postulacion_reciente(self, obj):
+        return obj.postulaciones.order_by("-fecha_postulacion").first()
+
+    def get_especialidad(self, obj):
+        postulacion = self._postulacion_reciente(obj)
+        return postulacion.especialidad if postulacion else ""
+
+    def get_servicios_completados(self, obj):
+        anotado = getattr(obj, "servicios_completados", None)
+        if anotado is not None:
+            return anotado
+        return obj.reservas.filter(estado="finalizada").count()
+
+    def get_disputas_abiertas(self, obj):
+        anotado = getattr(obj, "disputas_abiertas", None)
+        if anotado is not None:
+            return anotado
+        return obj.reservas.filter(
+            disputa__estado__in=["abierta", "en_revision"]
+        ).count()
+
+    def get_fecha_aprobacion(self, obj):
+        postulacion = obj.postulaciones.filter(
+            estado="aprobada", fecha_revision__isnull=False
+        ).order_by("-fecha_revision").first()
+        return postulacion.fecha_revision.isoformat() if postulacion else None
 
 
 class HorarioSerializer(serializers.ModelSerializer):

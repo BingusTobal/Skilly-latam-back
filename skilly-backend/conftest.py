@@ -334,29 +334,87 @@ def fecha_futura():
     return timezone.localdate() + timedelta(days=7)
 
 
-@pytest.fixture
-def reserva_pendiente(db, servicio_aprobado, organizacion, profesional_aprobado, fecha_futura):
-    from datetime import time, timedelta
-
-    from django.utils import timezone
+def _reserva_base(servicio, organizacion, profesional, fecha, estado, expira_en):
+    from datetime import time
 
     from apps.reservas.models import EventoReserva, Reserva
 
     reserva = Reserva.objects.create(
-        servicio=servicio_aprobado,
-        profesional=profesional_aprobado,
+        servicio=servicio,
+        profesional=profesional,
         organizacion=organizacion,
-        fecha=fecha_futura,
+        fecha=fecha,
         hora_inicio=time(10, 0),
         hora_fin=time(13, 0),
-        precio_acordado=servicio_aprobado.precio,
-        formato=servicio_aprobado.formato,
+        precio_acordado=servicio.precio,
+        formato=servicio.formato,
         contacto_nombre="Marcela Ibáñez",
         contacto_email="organizacion@test.skilly",
         contacto_telefono="+56912345678",
-        expira_en=timezone.now() + timedelta(hours=6),
+        estado=estado,
+        expira_en=expira_en,
     )
     EventoReserva.objects.create(reserva=reserva, tipo=EventoReserva.TIPO_CREADA)
+    return reserva
+
+
+@pytest.fixture
+def reserva_por_pagar(db, servicio_aprobado, organizacion, profesional_aprobado, fecha_futura):
+    """Reserva recién creada, esperando que el usuario complete el pago."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.reservas.models import Reserva
+
+    return _reserva_base(
+        servicio_aprobado,
+        organizacion,
+        profesional_aprobado,
+        fecha_futura,
+        Reserva.ESTADO_PENDIENTE_PAGO,
+        timezone.now() + timedelta(minutes=15),
+    )
+
+
+@pytest.fixture
+def reserva_pendiente(db, servicio_aprobado, organizacion, profesional_aprobado, fecha_futura):
+    """Reserva ya pagada, esperando la respuesta del profesional."""
+    import uuid
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.pagos.gateway.fake import FakeGateway
+    from apps.pagos.models import Pago
+    from apps.reservas.models import Reserva
+
+    reserva = _reserva_base(
+        servicio_aprobado,
+        organizacion,
+        profesional_aprobado,
+        fecha_futura,
+        Reserva.ESTADO_PENDIENTE_ACEPTACION,
+        timezone.now() + timedelta(hours=6),
+    )
+    montos = Pago.calcular_montos(reserva)
+    token = f"FAKE-{uuid.uuid4().hex}"
+    pago = Pago.objects.create(
+        reserva=reserva,
+        estado="retenido",
+        token=token,
+        buy_order=f"SK{reserva.pk}{uuid.uuid4().hex}"[:26],
+        session_id=f"rsv-{reserva.pk}-{uuid.uuid4().hex}"[:61],
+        **montos,
+    )
+    FakeGateway._transacciones[token] = {
+        "buy_order": pago.buy_order,
+        "session_id": pago.session_id,
+        "monto": pago.monto_total,
+        "return_url": "",
+        "estado": "CAPTURED",
+        "capturada": True,
+    }
     return reserva
 
 

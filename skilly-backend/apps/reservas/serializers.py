@@ -10,7 +10,7 @@ from rest_framework import serializers
 from apps.catalogo.models import Servicio
 from apps.usuarios.models import validar_rut
 
-from .models import Reserva
+from .models import Disputa, Reserva
 
 
 class CrearReservaSerializer(serializers.Serializer):
@@ -143,3 +143,46 @@ class AccionReservaSerializer(serializers.Serializer):
 
     motivo = serializers.CharField(max_length=200, required=False, allow_blank=True)
     descripcion = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+
+
+class DisputaAdminSerializer(serializers.ModelSerializer):
+    """Cola de disputas del panel admin (ticket 1.14 / Sprint 5).
+
+    Solo lectura: la resolución con resultado y efecto sobre el pago llega en
+    la fase de disputas. Acá el admin necesita ver el caso completo para poder
+    priorizarlo.
+    """
+
+    reserva = serializers.IntegerField(source="reserva_id", read_only=True)
+    servicio = serializers.CharField(source="reserva.servicio.titulo", read_only=True)
+    organizacion = serializers.CharField(
+        source="reserva.organizacion.nombre", read_only=True
+    )
+    profesional = serializers.CharField(
+        source="reserva.profesional.nombre_completo", read_only=True
+    )
+    monto = serializers.DecimalField(
+        source="reserva.precio_acordado",
+        max_digits=10,
+        decimal_places=2,
+        read_only=True,
+    )
+    estado_nombre = serializers.CharField(source="get_estado_display", read_only=True)
+
+    class Meta:
+        model = Disputa
+        fields = (
+            "id",
+            "reserva",
+            "servicio",
+            "organizacion",
+            "profesional",
+            "motivo",
+            "descripcion",
+            "monto",
+            "estado",
+            "estado_nombre",
+            "creada_en",
+            "resuelta_en",
+        )
+        read_only_fields = fields

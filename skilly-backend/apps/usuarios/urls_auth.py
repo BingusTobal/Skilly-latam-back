@@ -13,6 +13,7 @@ from rest_framework_simplejwt.views import (
 from .views import (
     AdminListarOrganizacionesView,
     AdminListarProfesionalesView,
+    AdminOrganizacionDetalleView,
     CambiarPasswordView,
     HorarioDetailView,
     HorariosView,
@@ -61,6 +62,11 @@ urlpatterns = [
         "admin/organizaciones/",
         AdminListarOrganizacionesView.as_view(),
         name="admin_organizaciones",
+    ),
+    path(
+        "admin/organizaciones/<int:pk>/",
+        AdminOrganizacionDetalleView.as_view(),
+        name="admin_organizacion_detalle",
     ),
     path(
         "admin/profesionales/",

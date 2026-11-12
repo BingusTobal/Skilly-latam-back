@@ -64,7 +64,7 @@ class TestCrearReserva:
         assert usuario.tipo == "organizacion"
         assert not usuario.has_usable_password()
         assert usuario.email == "invitado@test.skilly"
-        assert reserva.estado == Reserva.ESTADO_PENDIENTE_ACEPTACION
+        assert reserva.estado == Reserva.ESTADO_PENDIENTE_PAGO
         assert services.buscar_por_token(token) == reserva
 
     def test_rechaza_slot_no_disponible(self, servicio_aprobado, horario_semanal, fecha_futura):
