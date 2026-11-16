@@ -41,6 +41,9 @@ class TestResumen:
         assert datos["kpis"]["servicios_activos"] == 1
         assert datos["kpis"]["disputas_abiertas"] == 0
         assert datos["kpis"]["comision_mes"] == 0
+        assert datos["kpis"]["reservas_activas"] == 0
+        assert datos["kpis"]["ingresos_mes"] == 0
+        assert datos["kpis"]["tasa_disputas"] == 0
         assert any(
             fila["categoria"] == servicio_aprobado.categoria.nombre
             for fila in datos["servicios_por_categoria"]

@@ -22,6 +22,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from apps.catalogo.models import Servicio
+from apps.comisiones.services import tasa_efectiva
 from apps.pagos import estados as pagos_estados
 from apps.pagos import services as pagos_services
 from apps.pagos.gateway.base import ErrorPasarela
@@ -35,7 +36,7 @@ from apps.usuarios.models import (
     validar_rut,
 )
 
-from .models import Disputa, EventoReserva, Reserva
+from .models import Disputa, EvidenciaDisputa, EventoReserva, Reserva
 
 Usuario = get_user_model()
 ZONA = timezone.get_current_timezone()
@@ -310,6 +311,7 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
         hora_inicio=hora_inicio,
         hora_fin=hora_fin,
         precio_acordado=servicio.precio,
+        tasa_comision=tasa_efectiva(servicio.categoria),
         formato=servicio.formato,
         ubicacion=servicio.ubicacion,
         contacto_nombre=datos.get("nombre", ""),
@@ -644,8 +646,53 @@ def _accion_sobre_pago(pago, porcentaje_reembolso):
     return (None, None)
 
 
+def _validar_disputable(reserva):
+    if reserva.estado not in (
+        Reserva.ESTADO_EN_CURSO,
+        Reserva.ESTADO_ENTREGADO_POR_CONFIRMAR,
+    ):
+        raise ValidationError(
+            "Solo se puede abrir una disputa de una reserva en curso o entregada."
+        )
+
+
+@transaction.atomic
+def abrir_disputa(reserva, actor, motivo, descripcion=""):
+    """Abre una disputa (tickets 5.1 y 5.2).
+
+    Puede hacerlo la organización o el profesional de la reserva; la vista
+    valida esa pertenencia antes de llamar acá. El pago queda retenido por el
+    guard de R18 mientras la disputa no se resuelva.
+    """
+    motivo = (motivo or "").strip()
+    if not motivo:
+        raise ValidationError("Debes indicar el motivo de la disputa.")
+
+    reserva = Reserva.objects.select_for_update().get(pk=reserva.pk)
+    _validar_disputable(reserva)
+    if Disputa.objects.filter(reserva=reserva).exists():
+        raise ValidationError("Esta reserva ya tiene una disputa registrada.")
+
+    disputa = Disputa.objects.create(
+        reserva=reserva,
+        motivo=motivo[:200],
+        descripcion=(descripcion or "").strip(),
+        abierta_por=actor,
+    )
+    reserva.estado = Reserva.ESTADO_CON_DISPUTA
+    reserva.save(update_fields=["estado", "actualizada_en"])
+    _evento(
+        reserva,
+        EventoReserva.TIPO_PROBLEMA,
+        actor,
+        f"Se abrió una disputa: {disputa.motivo}",
+    )
+    return disputa
+
+
 @transaction.atomic
 def reportar_problema(reserva, actor=None, motivo="", descripcion=""):
+    """Compatibilidad con el endpoint de reporte rápido de la organización."""
     if reserva.estado not in (
         Reserva.ESTADO_EN_CURSO,
         Reserva.ESTADO_ENTREGADO_POR_CONFIRMAR,
@@ -656,6 +703,7 @@ def reportar_problema(reserva, actor=None, motivo="", descripcion=""):
         defaults={
             "motivo": (motivo or "").strip() or "Problema reportado por la organización",
             "descripcion": (descripcion or "").strip(),
+            "abierta_por": actor,
         },
     )
     reserva.estado = Reserva.ESTADO_CON_DISPUTA
@@ -667,6 +715,129 @@ def reportar_problema(reserva, actor=None, motivo="", descripcion=""):
         (descripcion or motivo or "La organización reportó un problema."),
     )
     return reserva
+
+
+def agregar_evidencia(disputa, archivo, actor=None, nombre=""):
+    """Adjunta un archivo a una disputa que todavía no se resolvió (5.2)."""
+    if not disputa.esta_abierta:
+        raise ValidationError("No se puede adjuntar evidencia a una disputa resuelta.")
+    return EvidenciaDisputa.objects.create(
+        disputa=disputa,
+        archivo=archivo,
+        nombre=(nombre or "").strip()[:200] or (getattr(archivo, "name", "") or "")[:200],
+        subida_por=actor,
+    )
+
+
+def _resultado_sobre_pago(disputa, pago, resultado, porcentaje_reembolso, actor):
+    """Aplica el resultado de la disputa sobre el pago (ticket 5.3)."""
+    if resultado == Disputa.RESULTADO_PROFESIONAL:
+        pagos_services.liberar_pago(
+            pago,
+            actor=_actor_pago(actor, Pago.ACTOR_ADMIN),
+            ignorar_disputa=True,
+        )
+        return
+
+    if resultado == Disputa.RESULTADO_ORGANIZACION:
+        pagos_services.reembolsar_pago(
+            pago, porcentaje=100, actor=_actor_pago(actor, Pago.ACTOR_ADMIN)
+        )
+        return
+
+    # División: se devuelve el porcentaje acordado y el saldo se libera.
+    pagos_services.reembolsar_pago(
+        pago,
+        porcentaje=porcentaje_reembolso,
+        liberar_resto=True,
+        actor=_actor_pago(actor, Pago.ACTOR_ADMIN),
+    )
+
+
+def _cerrar_disputa(disputa, actor, resultado, resolucion, porcentaje_reembolso, pago):
+    ahora = timezone.now()
+    disputa.estado = Disputa.ESTADO_RESUELTA
+    disputa.resultado = resultado
+    disputa.porcentaje_reembolso = porcentaje_reembolso
+    disputa.resolucion = (resolucion or "").strip()
+    disputa.resuelta_por = actor
+    disputa.resuelta_en = ahora
+    disputa.save(
+        update_fields=[
+            "estado",
+            "resultado",
+            "porcentaje_reembolso",
+            "resolucion",
+            "resuelta_por",
+            "resuelta_en",
+            "actualizada_en",
+        ]
+    )
+
+    reserva = Reserva.objects.select_for_update().get(pk=disputa.reserva_id)
+    reserva.estado = Reserva.ESTADO_FINALIZADA
+    campos = ["estado", "actualizada_en"]
+    if pago.estado == pagos_estados.LIBERADO:
+        reserva.confirmada_en = ahora
+        campos.append("confirmada_en")
+    reserva.save(update_fields=campos)
+
+    detalle = f"Disputa resuelta: {disputa.get_resultado_display()}."
+    if disputa.resolucion:
+        detalle = f"{detalle} {disputa.resolucion}"
+    _evento(reserva, EventoReserva.TIPO_DISPUTA_RESUELTA, actor, detalle)
+    return disputa
+
+
+def resolver_disputa(
+    disputa,
+    actor,
+    resultado,
+    resolucion="",
+    porcentaje_reembolso=None,
+    gateway=None,
+):
+    """Resuelve una disputa y aplica el resultado sobre el pago (ticket 5.3).
+
+    Los reembolsos hablan con la pasarela, así que la disputa pasa primero a
+    'en_revision' y solo se marca resuelta cuando el pago confirma la acción.
+    Si la pasarela falla, queda en revisión para que el admin reintente.
+    """
+    if resultado not in dict(Disputa.RESULTADO_CHOICES):
+        raise ValidationError("El resultado de la disputa no es válido.")
+
+    with transaction.atomic():
+        disputa = Disputa.objects.select_for_update().get(pk=disputa.pk)
+        if not disputa.esta_abierta:
+            raise ValidationError("Esta disputa ya fue resuelta.")
+        reserva = Reserva.objects.select_for_update().get(pk=disputa.reserva_id)
+        pago = _pago_activo(reserva)
+        if pago is None or pago.estado not in pagos_estados.ESTADOS_REEMBOLSABLES:
+            raise ValidationError(
+                "El pago de esta reserva no está retenido ni liberado; no se puede resolver."
+            )
+
+        if resultado == Disputa.RESULTADO_DIVISION:
+            try:
+                porcentaje = int(porcentaje_reembolso)
+            except (TypeError, ValueError):
+                raise ValidationError("Indica el porcentaje de reembolso de la división.")
+            if not 1 <= porcentaje <= 99:
+                raise ValidationError("El porcentaje de reembolso debe estar entre 1 y 99.")
+        else:
+            porcentaje = 0
+
+        disputa.estado = Disputa.ESTADO_EN_REVISION
+        disputa.save(update_fields=["estado", "actualizada_en"])
+
+    _resultado_sobre_pago(disputa, pago, resultado, porcentaje, actor)
+
+    with transaction.atomic():
+        disputa = Disputa.objects.select_for_update().get(pk=disputa.pk)
+        pago.refresh_from_db()
+        return _cerrar_disputa(
+            disputa, actor, resultado, resolucion, porcentaje, pago
+        )
 
 
 # ---------------------------------------------------------------------------

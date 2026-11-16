@@ -515,6 +515,10 @@ class TestModeracionCertificados:
         respuesta = admin_client.get(self.url_queue())
         cola = respuesta.data["results"]
         assert [c["id"] for c in cola] == [certificado_sin_revisar.id]
+        # Ticket 5.9: el panel puede moderar sin abrir la postulación.
+        assert cola[0]["profesional_nombre"]
+        assert cola[0]["profesional_email"]
+        assert cola[0]["postulacion_id"] == certificado_sin_revisar.postulacion_id
 
     def test_aprobar_certificado(self, admin_client, certificado_sin_revisar):
         respuesta = admin_client.post(f"{self.url_cert(certificado_sin_revisar.pk)}aprobar/")

@@ -154,6 +154,38 @@ class CertificadoSerializer(serializers.ModelSerializer):
 # ===========================================================================
 # Postulaciones
 # ===========================================================================
+class CertificadoAdminSerializer(CertificadoSerializer):
+    """Cola de certificados del panel (ticket 5.9).
+
+    Agrega el contexto mínimo para moderar sin abrir cada postulación. El
+    archivo sigue siendo la URL del storage; en producción es S3 privado.
+    """
+
+    postulacion_id = serializers.IntegerField(source="postulacion.id", read_only=True)
+    profesional_id = serializers.IntegerField(
+        source="postulacion.profesional.id", read_only=True
+    )
+    profesional_nombre = serializers.CharField(
+        source="postulacion.profesional.nombre_completo", read_only=True
+    )
+    profesional_email = serializers.EmailField(
+        source="postulacion.profesional.usuario.email", read_only=True
+    )
+    especialidad = serializers.CharField(
+        source="postulacion.especialidad", read_only=True
+    )
+
+    class Meta(CertificadoSerializer.Meta):
+        fields = CertificadoSerializer.Meta.fields + [
+            "postulacion_id",
+            "profesional_id",
+            "profesional_nombre",
+            "profesional_email",
+            "especialidad",
+        ]
+        read_only_fields = fields
+
+
 class PostulacionSerializer(serializers.ModelSerializer):
     """Salida de la postulación, usada por el profesional para sí mismo."""
 

@@ -4,13 +4,18 @@ Regla de negocio: el profesional ve SOLO el monto neto (`monto_neto`), nunca el
 desglose bruto + comisión. Por eso su serializer no expone `precio_acordado`.
 La organización ve el precio que paga (`precio_acordado`).
 """
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.catalogo.models import Servicio
 from apps.usuarios.models import validar_rut
 
-from .models import Disputa, Reserva
+from .models import Disputa, EvidenciaDisputa, Reserva
+
+TIPOS_EVIDENCIA = {"application/pdf", "image/jpeg", "image/png"}
+MAX_EVIDENCIA_BYTES = 5 * 1024 * 1024
 
 
 class CrearReservaSerializer(serializers.Serializer):
@@ -54,6 +59,10 @@ class ReservaOrganizacionSerializer(serializers.ModelSerializer):
     # una vez aceptada la reserva; antes de eso no se revela el contacto.
     profesional_email = serializers.SerializerMethodField()
     profesional_telefono = serializers.SerializerMethodField()
+    disputa = serializers.SerializerMethodField()
+
+    def get_disputa(self, obj):
+        return _disputa_resumen(obj)
 
     ESTADOS_CON_CONTACTO = {
         "en_curso",
@@ -97,6 +106,7 @@ class ReservaOrganizacionSerializer(serializers.ModelSerializer):
             "mensaje",
             "motivo_rechazo",
             "motivo_cancelacion",
+            "disputa",
             "creada_en",
             "expira_en",
         )
@@ -112,6 +122,10 @@ class ReservaProfesionalSerializer(serializers.ModelSerializer):
     monto_neto = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
     )
+    disputa = serializers.SerializerMethodField()
+
+    def get_disputa(self, obj):
+        return _disputa_resumen(obj)
 
     class Meta:
         model = Reserva
@@ -132,6 +146,7 @@ class ReservaProfesionalSerializer(serializers.ModelSerializer):
             "formato",
             "ubicacion",
             "motivo_rechazo",
+            "disputa",
             "creada_en",
             "expira_en",
         )
@@ -145,29 +160,61 @@ class AccionReservaSerializer(serializers.Serializer):
     descripcion = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
 
-class DisputaAdminSerializer(serializers.ModelSerializer):
-    """Cola de disputas del panel admin (ticket 1.14 / Sprint 5).
+def _disputa_resumen(reserva):
+    """Disputa asociada a la reserva, si existe (se serializa al vuelo)."""
+    disputa = getattr(reserva, "disputa", None)
+    if disputa is None:
+        return None
+    return DisputaSerializer(disputa).data
 
-    Solo lectura: la resolución con resultado y efecto sobre el pago llega en
-    la fase de disputas. Acá el admin necesita ver el caso completo para poder
-    priorizarlo.
-    """
+
+def validar_evidencia(archivo):
+    """Valida tipo y tamaño de un archivo de evidencia (ticket 5.2)."""
+    if archivo.size > MAX_EVIDENCIA_BYTES:
+        raise serializers.ValidationError("El archivo supera el máximo de 5 MB.")
+    if archivo.content_type and archivo.content_type not in TIPOS_EVIDENCIA:
+        raise serializers.ValidationError("Solo se aceptan PDF, JPG o PNG.")
+    return archivo
+
+
+class EvidenciaDisputaSerializer(serializers.ModelSerializer):
+    archivo = serializers.SerializerMethodField()
+    subida_por = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EvidenciaDisputa
+        fields = ("id", "nombre", "archivo", "subida_por", "creada_en")
+
+    def get_archivo(self, obj):
+        try:
+            return obj.archivo.url
+        except ValueError:
+            return None
+
+    def get_subida_por(self, obj):
+        if obj.subida_por is None:
+            return None
+        return obj.subida_por.get_full_name() or obj.subida_por.email
+
+
+class DisputaSerializer(serializers.ModelSerializer):
+    """Disputa vista por las partes de la reserva."""
 
     reserva = serializers.IntegerField(source="reserva_id", read_only=True)
     servicio = serializers.CharField(source="reserva.servicio.titulo", read_only=True)
-    organizacion = serializers.CharField(
-        source="reserva.organizacion.nombre", read_only=True
+    estado_nombre = serializers.CharField(source="get_estado_display", read_only=True)
+    resultado_nombre = serializers.CharField(
+        source="get_resultado_display", read_only=True
     )
-    profesional = serializers.CharField(
-        source="reserva.profesional.nombre_completo", read_only=True
-    )
+    abierta_por = serializers.SerializerMethodField()
     monto = serializers.DecimalField(
         source="reserva.precio_acordado",
         max_digits=10,
         decimal_places=2,
         read_only=True,
     )
-    estado_nombre = serializers.CharField(source="get_estado_display", read_only=True)
+    monto_reembolso = serializers.SerializerMethodField()
+    evidencias = EvidenciaDisputaSerializer(many=True, read_only=True)
 
     class Meta:
         model = Disputa
@@ -175,14 +222,110 @@ class DisputaAdminSerializer(serializers.ModelSerializer):
             "id",
             "reserva",
             "servicio",
-            "organizacion",
-            "profesional",
             "motivo",
             "descripcion",
-            "monto",
             "estado",
             "estado_nombre",
+            "abierta_por",
+            "monto",
+            "resultado",
+            "resultado_nombre",
+            "porcentaje_reembolso",
+            "monto_reembolso",
+            "resolucion",
+            "evidencias",
             "creada_en",
+            "actualizada_en",
             "resuelta_en",
         )
         read_only_fields = fields
+
+    def get_abierta_por(self, obj):
+        if obj.abierta_por is None:
+            return None
+        return obj.abierta_por.get_full_name() or obj.abierta_por.email
+
+    def get_monto_reembolso(self, obj):
+        if obj.resultado != Disputa.RESULTADO_DIVISION or not obj.porcentaje_reembolso:
+            return None
+        total = obj.reserva.precio_acordado
+        return (total * obj.porcentaje_reembolso / 100).quantize(Decimal("0.01"))
+
+
+class CrearDisputaSerializer(serializers.Serializer):
+    """Cuerpo de POST /api/disputas/ (organización o profesional)."""
+
+    reserva = serializers.PrimaryKeyRelatedField(queryset=Reserva.objects.all())
+    motivo = serializers.CharField(max_length=200)
+    descripcion = serializers.CharField(
+        max_length=2000, required=False, allow_blank=True
+    )
+    evidencia = serializers.FileField(required=False, write_only=True)
+
+    def validate_evidencia(self, archivo):
+        return validar_evidencia(archivo)
+
+
+class EvidenciaDisputaUploadSerializer(serializers.Serializer):
+    archivo = serializers.FileField()
+    nombre = serializers.CharField(max_length=200, required=False, allow_blank=True)
+
+    def validate_archivo(self, archivo):
+        return validar_evidencia(archivo)
+
+
+class ResolverDisputaSerializer(serializers.Serializer):
+    resultado = serializers.ChoiceField(choices=Disputa.RESULTADO_CHOICES)
+    resolucion = serializers.CharField(max_length=2000)
+    porcentaje_reembolso = serializers.IntegerField(
+        min_value=1, max_value=99, required=False
+    )
+
+    def validate(self, attrs):
+        if attrs["resultado"] == Disputa.RESULTADO_DIVISION:
+            if not attrs.get("porcentaje_reembolso"):
+                raise serializers.ValidationError(
+                    {"porcentaje_reembolso": "Indica el porcentaje de la división."}
+                )
+        else:
+            attrs.pop("porcentaje_reembolso", None)
+        return attrs
+
+
+class DisputaAdminSerializer(DisputaSerializer):
+    """Cola de disputas del panel admin (tickets 1.14 y 5.3).
+
+    El admin necesita ver el caso completo (partes, pago y evidencia) para
+    poder resolverlo.
+    """
+
+    organizacion = serializers.CharField(
+        source="reserva.organizacion.nombre", read_only=True
+    )
+    profesional = serializers.CharField(
+        source="reserva.profesional.nombre_completo", read_only=True
+    )
+    pago_estado = serializers.SerializerMethodField()
+    monto_retenido = serializers.SerializerMethodField()
+
+    class Meta(DisputaSerializer.Meta):
+        fields = DisputaSerializer.Meta.fields + (
+            "organizacion",
+            "profesional",
+            "pago_estado",
+            "monto_retenido",
+        )
+        read_only_fields = fields
+
+    def _pago(self, obj):
+        return obj.reserva.pagos.order_by("-creado_en").first()
+
+    def get_pago_estado(self, obj):
+        pago = self._pago(obj)
+        return pago.estado if pago else None
+
+    def get_monto_retenido(self, obj):
+        pago = self._pago(obj)
+        if pago is None:
+            return None
+        return pago.monto_total - pago.monto_reembolsado

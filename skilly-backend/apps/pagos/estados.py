@@ -40,7 +40,9 @@ TRANSICIONES = {
     CANCELANDO: {CANCELADO, AUTORIZADO, REVISION_MANUAL},
     RETENIDO: {LIBERADO, REEMBOLSANDO, REVISION_MANUAL},
     LIBERADO: {REEMBOLSANDO},
-    REEMBOLSANDO: {REEMBOLSADO, REVISION_MANUAL},
+    # LIBERADO tras REEMBOLSANDO = reembolso parcial por división de disputa:
+    # la organización recupera su parte y el saldo queda para el profesional.
+    REEMBOLSANDO: {REEMBOLSADO, LIBERADO, REVISION_MANUAL},
     REEMBOLSADO: set(),
     CANCELADO: set(),
     RECHAZADO: set(),

@@ -62,6 +62,11 @@ class Pago(models.Model):
     monto_total = models.PositiveIntegerField()
     monto_comision = models.PositiveIntegerField()
     monto_neto = models.PositiveIntegerField()
+    # Snapshot de R17: la tasa con la que se calcularon estos montos. Cambiarla
+    # después no recalcula este pago ni los reportes históricos.
+    tasa_aplicada = models.DecimalField(
+        max_digits=5, decimal_places=4, null=True, blank=True
+    )
 
     buy_order = models.CharField(max_length=26, unique=True)
     session_id = models.CharField(max_length=61)
@@ -102,6 +107,11 @@ class Pago(models.Model):
 
     def __str__(self):
         return f"Pago {self.referencia_publica} — reserva #{self.reserva_id}"
+
+    def save(self, *args, **kwargs):
+        if self.tasa_aplicada is None and self.reserva_id:
+            self.tasa_aplicada = self.reserva.tasa_comision
+        return super().save(*args, **kwargs)
 
     @property
     def esta_vigente(self):

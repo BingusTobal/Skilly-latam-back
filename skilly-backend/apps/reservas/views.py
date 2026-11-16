@@ -24,21 +24,28 @@ from rest_framework.exceptions import (
     PermissionDenied,
     ValidationError as DRFValidationError,
 )
-from rest_framework.permissions import AllowAny
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.catalogo.models import Servicio
+from apps.pagos.gateway.base import ErrorPasarela
 from apps.usuarios.permisos import EsAdmin
 
 from . import services
 from .models import Disputa, Reserva
 from .serializers import (
     AccionReservaSerializer,
+    CrearDisputaSerializer,
     CrearReservaSerializer,
     DisputaAdminSerializer,
+    DisputaSerializer,
+    EvidenciaDisputaSerializer,
+    EvidenciaDisputaUploadSerializer,
     ReservaOrganizacionSerializer,
     ReservaProfesionalSerializer,
+    ResolverDisputaSerializer,
 )
 
 SERVICIOS_RESERVABLES = Servicio.objects.filter(
@@ -312,6 +319,124 @@ class ReservaViewSet(viewsets.GenericViewSet):
         return Response(ReservaOrganizacionSerializer(reserva).data)
 
 
+def _perfil_de(usuario):
+    return (
+        getattr(usuario, "organizacion", None),
+        getattr(usuario, "profesional", None),
+    )
+
+
+def _es_parte_de_reserva(usuario, reserva, incluir_admin=True):
+    if incluir_admin and usuario.es_admin_plataforma:
+        return True
+    organizacion, profesional = _perfil_de(usuario)
+    return bool(
+        (organizacion is not None and reserva.organizacion_id == organizacion.pk)
+        or (profesional is not None and reserva.profesional_id == profesional.pk)
+    )
+
+
+class DisputaViewSet(viewsets.GenericViewSet):
+    """Disputas abiertas por las partes de una reserva (tickets 5.1 y 5.2).
+
+    - GET  /api/disputas/                    (propias; admin ve todas)
+    - POST /api/disputas/                    (abre disputa, evidencia opcional)
+    - GET  /api/disputas/{id}/               (detalle con evidencia)
+    - POST /api/disputas/{id}/evidencias/    (multipart)
+    """
+
+    queryset = Disputa.objects.select_related(
+        "reserva",
+        "reserva__servicio",
+        "reserva__organizacion",
+        "reserva__profesional",
+        "abierta_por",
+    ).prefetch_related("evidencias")
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    serializer_class = DisputaSerializer
+
+    def _puede_ver(self, usuario, disputa):
+        return _es_parte_de_reserva(usuario, disputa.reserva)
+
+    def list(self, request):
+        usuario = request.user
+        qs = self.get_queryset()
+        if not usuario.es_admin_plataforma:
+            organizacion, profesional = _perfil_de(usuario)
+            from django.db.models import Q
+
+            filtro = Q(pk__in=[])
+            if organizacion is not None:
+                filtro |= Q(reserva__organizacion=organizacion)
+            if profesional is not None:
+                filtro |= Q(reserva__profesional=profesional)
+            qs = qs.filter(filtro)
+
+        estado = request.query_params.get("estado")
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        return Response(DisputaSerializer(qs, many=True).data)
+
+    def create(self, request):
+        cuerpo = CrearDisputaSerializer(data=request.data)
+        cuerpo.is_valid(raise_exception=True)
+        reserva = cuerpo.validated_data["reserva"]
+
+        if not _es_parte_de_reserva(request.user, reserva, incluir_admin=False):
+            raise PermissionDenied("Esta reserva no te pertenece.")
+
+        try:
+            disputa = services.abrir_disputa(
+                reserva,
+                request.user,
+                cuerpo.validated_data["motivo"],
+                cuerpo.validated_data.get("descripcion", ""),
+            )
+        except (DjangoValidationError, ValueError) as exc:
+            _traducir(exc)
+
+        evidencia = cuerpo.validated_data.get("evidencia")
+        if evidencia:
+            services.agregar_evidencia(disputa, evidencia, request.user)
+
+        disputa.refresh_from_db()
+        return Response(DisputaSerializer(disputa).data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None):
+        disputa = get_object_or_404(self.get_queryset(), pk=pk)
+        if not self._puede_ver(request.user, disputa):
+            raise PermissionDenied("No tienes permiso sobre esta disputa.")
+        return Response(DisputaSerializer(disputa).data)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        parser_classes=[MultiPartParser, FormParser],
+    )
+    def evidencias(self, request, pk=None):
+        disputa = get_object_or_404(self.get_queryset(), pk=pk)
+        if not self._puede_ver(request.user, disputa):
+            raise PermissionDenied("No tienes permiso sobre esta disputa.")
+
+        cuerpo = EvidenciaDisputaUploadSerializer(data=request.data)
+        cuerpo.is_valid(raise_exception=True)
+        try:
+            evidencia = services.agregar_evidencia(
+                disputa,
+                cuerpo.validated_data["archivo"],
+                request.user,
+                cuerpo.validated_data.get("nombre", ""),
+            )
+        except (DjangoValidationError, ValueError) as exc:
+            _traducir(exc)
+        return Response(
+            EvidenciaDisputaSerializer(evidencia).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
 # ===========================================================================
 # Panel de administración: cola de disputas
 # ===========================================================================
@@ -319,8 +444,8 @@ class AdminDisputasView(APIView):
     """GET /api/admin/disputas/ — bandeja de disputas del panel admin.
 
     Filtros: `?estado=abierta|en_revision|resuelta` y `?q=` (servicio,
-    organización o profesional). Solo lectura: la resolución llega con la fase
-    de disputas, que aplicará el resultado sobre el pago.
+    organización o profesional). La resolución se hace en
+    POST /api/admin/disputas/{id}/resolver/.
     """
 
     permission_classes = [EsAdmin]
@@ -332,7 +457,9 @@ class AdminDisputasView(APIView):
                 "reserva__servicio",
                 "reserva__organizacion",
                 "reserva__profesional",
+                "abierta_por",
             )
+            .prefetch_related("evidencias")
             .order_by("-creada_en")
         )
 
@@ -351,3 +478,38 @@ class AdminDisputasView(APIView):
             )
 
         return Response(DisputaAdminSerializer(qs, many=True).data)
+
+
+class AdminDisputaResolverView(APIView):
+    """POST /api/admin/disputas/{id}/resolver/ (ticket 5.3).
+
+    Aplica el resultado explícito sobre el pago: reembolso total a favor de la
+    organización, liberación a favor del profesional, o división con reembolso
+    parcial y liberación del saldo.
+    """
+
+    permission_classes = [EsAdmin]
+
+    def post(self, request, pk):
+        disputa = get_object_or_404(
+            Disputa.objects.select_related("reserva"), pk=pk
+        )
+        cuerpo = ResolverDisputaSerializer(data=request.data)
+        cuerpo.is_valid(raise_exception=True)
+
+        try:
+            services.resolver_disputa(disputa, request.user, **cuerpo.validated_data)
+        except (DjangoValidationError, ValueError) as exc:
+            _traducir(exc)
+        except ErrorPasarela as exc:
+            raise DRFValidationError(
+                {
+                    "detail": (
+                        "La pasarela no confirmó el reembolso; la disputa queda "
+                        f"en revisión. {exc}"
+                    )
+                }
+            )
+
+        disputa.refresh_from_db()
+        return Response(DisputaAdminSerializer(disputa).data)

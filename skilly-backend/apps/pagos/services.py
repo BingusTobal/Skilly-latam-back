@@ -442,8 +442,13 @@ def _disputa_abierta(reserva_id):
     ).exists()
 
 
-def liberar_pago(pago, *, actor=Pago.ACTOR_ADMIN):
-    """Marca que el neto corresponde al profesional. No llama a la pasarela."""
+def liberar_pago(pago, *, actor=Pago.ACTOR_ADMIN, ignorar_disputa=False):
+    """Marca que el neto corresponde al profesional. No llama a la pasarela.
+
+    `ignorar_disputa` es exclusivo del cierre de una disputa resuelta a favor
+    del profesional: en ese flujo la disputa ya está en revisión y la decisión
+    del admin es justamente la que autoriza liberar.
+    """
     with transaction.atomic():
         pago = Pago.objects.select_for_update().get(pk=pago.pk)
         if pago.estado == estados.LIBERADO:
@@ -452,7 +457,7 @@ def liberar_pago(pago, *, actor=Pago.ACTOR_ADMIN):
             raise ValidationError("Solo se puede liberar un pago retenido.")
         # R18 / guard de disputa: ni la confirmación manual ni la
         # auto-liberación pueden mover dinero mientras el conflicto esté abierto.
-        if (
+        if not ignorar_disputa and (
             pago.reserva.estado == Reserva.ESTADO_CON_DISPUTA
             or _disputa_abierta(pago.reserva_id)
         ):
@@ -474,8 +479,13 @@ def reembolsar_pago(
     porcentaje=None,
     gateway=None,
     actor=Pago.ACTOR_ADMIN,
+    liberar_resto=False,
 ):
-    """Reembolsa total o parcialmente un pago retenido/liberado."""
+    """Reembolsa total o parcialmente un pago retenido/liberado.
+
+    `liberar_resto` se usa solo en la división de una disputa: después del
+    reembolso parcial, el saldo retenido queda a favor del profesional.
+    """
     gateway = gateway or get_gateway()
 
     with transaction.atomic():
@@ -540,12 +550,26 @@ def reembolsar_pago(
                 "actualizado_en",
             ]
         )
-        pago.pasar_a(
-            estados.REEMBOLSADO,
-            actor=actor,
-            motivo=f"Reembolso de ${monto} CLP confirmado.",
-            datos={"monto": monto},
-        )
+        if liberar_resto:
+            pago.pasar_a(
+                estados.LIBERADO,
+                actor=actor,
+                motivo=(
+                    f"Reembolso parcial de ${monto} CLP confirmado; "
+                    "el saldo se libera al profesional."
+                ),
+                datos={
+                    "monto": monto,
+                    "monto_liberado": pago.monto_total - pago.monto_reembolsado,
+                },
+            )
+        else:
+            pago.pasar_a(
+                estados.REEMBOLSADO,
+                actor=actor,
+                motivo=f"Reembolso de ${monto} CLP confirmado.",
+                datos={"monto": monto},
+            )
     return pago
 
 

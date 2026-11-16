@@ -32,6 +32,7 @@ from apps.usuarios.permisos import (
 
 from .models import Certificado, Postulacion
 from .serializers import (
+    CertificadoAdminSerializer,
     CertificadoSerializer,
     CrearPostulacionSerializer,
     ModerarCertificadoSerializer,
@@ -293,7 +294,7 @@ class AdminCertificadoViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     permission_classes = [EsAdmin]
-    serializer_class = CertificadoSerializer
+    serializer_class = CertificadoAdminSerializer
     queryset = Certificado.objects.select_related(
         "postulacion", "postulacion__profesional", "postulacion__profesional__usuario"
     )
@@ -316,7 +317,7 @@ class AdminCertificadoViewSet(viewsets.ReadOnlyModelViewSet):
         except DjangoValidationError as exc:
             _traducir_validacion(exc)
 
-        return Response(CertificadoSerializer(certificado).data)
+        return Response(CertificadoAdminSerializer(certificado).data)
 
     @action(detail=True, methods=["post"])
     def rechazar(self, request, pk=None):
@@ -334,7 +335,7 @@ class AdminCertificadoViewSet(viewsets.ReadOnlyModelViewSet):
 
         enviar_certificado_rechazado(certificado)
 
-        return Response(CertificadoSerializer(certificado).data)
+        return Response(CertificadoAdminSerializer(certificado).data)
 
     def _certificado(self, pk):
         certificado = self.get_queryset().filter(pk=pk).first()

@@ -86,8 +86,8 @@ class Reserva(models.Model):
     # Fotografías del momento de reservar.
     precio_acordado = models.DecimalField(max_digits=10, decimal_places=2)
     tasa_comision = models.DecimalField(
-        max_digits=4,
-        decimal_places=3,
+        max_digits=5,
+        decimal_places=4,
         default=Decimal(str(getattr(settings, "TASA_COMISION_DEFECTO", 0.10))),
         help_text="Se descuenta del precio para obtener el monto neto del profesional.",
     )
@@ -216,6 +216,7 @@ class EventoReserva(models.Model):
     TIPO_CANCELADA = "cancelada"
     TIPO_VENCIDA = "vencida"
     TIPO_PROBLEMA = "problema_reportado"
+    TIPO_DISPUTA_RESUELTA = "disputa_resuelta"
     TIPO_CHOICES = [
         (TIPO_CREADA, "Creada"),
         (TIPO_PAGO_CONFIRMADO, "Pago confirmado"),
@@ -226,6 +227,7 @@ class EventoReserva(models.Model):
         (TIPO_CANCELADA, "Cancelada"),
         (TIPO_VENCIDA, "Vencida"),
         (TIPO_PROBLEMA, "Problema reportado"),
+        (TIPO_DISPUTA_RESUELTA, "Disputa resuelta"),
     ]
 
     reserva = models.ForeignKey(
@@ -252,11 +254,12 @@ class EventoReserva(models.Model):
 
 
 class Disputa(models.Model):
-    """Disputa sobre una reserva. Modelo base (ticket 3.7).
+    """Disputa sobre una reserva (tickets 3.7 y 5.1–5.3).
 
-    El flujo completo de moderación de disputas es del Sprint 5; acá solo se
-    registra que la organización reportó un problema y pasa la reserva a
-    'con_disputa'.
+    La abre la organización o el profesional de la reserva cuando el servicio
+    está en curso o entregado sin confirmar. Mientras exista una disputa sin
+    resolver, el pago queda retenido (R18). El admin la resuelve con un
+    resultado explícito y esa decisión se aplica sobre el pago.
     """
 
     ESTADO_ABIERTA = "abierta"
@@ -268,6 +271,15 @@ class Disputa(models.Model):
         (ESTADO_RESUELTA, "Resuelta"),
     ]
 
+    RESULTADO_ORGANIZACION = "a_favor_organizacion"
+    RESULTADO_PROFESIONAL = "a_favor_profesional"
+    RESULTADO_DIVISION = "division"
+    RESULTADO_CHOICES = [
+        (RESULTADO_ORGANIZACION, "A favor de la organización"),
+        (RESULTADO_PROFESIONAL, "A favor del profesional"),
+        (RESULTADO_DIVISION, "División"),
+    ]
+
     reserva = models.OneToOneField(
         Reserva, on_delete=models.CASCADE, related_name="disputa"
     )
@@ -276,7 +288,33 @@ class Disputa(models.Model):
     estado = models.CharField(
         max_length=20, choices=ESTADO_CHOICES, default=ESTADO_ABIERTA
     )
+    abierta_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="disputas_abiertas",
+    )
+
+    # Resultado de la moderación (ticket 5.3). Vacío mientras no se resuelva.
+    resultado = models.CharField(
+        max_length=30, choices=RESULTADO_CHOICES, blank=True
+    )
+    porcentaje_reembolso = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Porcentaje del total devuelto a la organización (solo en división).",
+    )
+    resolucion = models.TextField(blank=True)
+    resuelta_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="disputas_resueltas",
+    )
+
     creada_en = models.DateTimeField(auto_now_add=True)
+    actualizada_en = models.DateTimeField(auto_now=True)
     resuelta_en = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -286,3 +324,39 @@ class Disputa(models.Model):
 
     def __str__(self):
         return f"Disputa reserva #{self.reserva_id} ({self.get_estado_display()})"
+
+    @property
+    def esta_abierta(self):
+        return self.estado in (self.ESTADO_ABIERTA, self.ESTADO_EN_REVISION)
+
+
+class EvidenciaDisputa(models.Model):
+    """Archivo adjunto a una disputa (ticket 5.2).
+
+    Usa el storage por defecto: disco local en desarrollo, S3 privado en
+    producción, sin cambiar el código de la app.
+    """
+
+    disputa = models.ForeignKey(
+        Disputa, on_delete=models.CASCADE, related_name="evidencias"
+    )
+    archivo = models.FileField(
+        upload_to="disputas/%Y/%m/", max_length=5 * 1024 * 1024
+    )
+    nombre = models.CharField(max_length=200, blank=True)
+    subida_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="evidencias_disputa",
+    )
+    creada_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "evidencia de disputa"
+        verbose_name_plural = "evidencias de disputa"
+        ordering = ["creada_en", "id"]
+
+    def __str__(self):
+        return self.nombre or f"Evidencia #{self.pk}"
