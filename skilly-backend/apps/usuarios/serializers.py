@@ -12,9 +12,20 @@ from django.db import IntegrityError, transaction
 from django.db.models import Sum
 from rest_framework import serializers
 
-from .models import Horario, Organizacion, Profesional
+from .models import VALIDADORES_FOTO, Horario, Organizacion, Profesional
 
 Usuario = get_user_model()
+
+
+class FotoAbsolutaField(serializers.FileField):
+    """Devuelve la URL absoluta de la foto cuando hay request en el contexto."""
+
+    def to_representation(self, value):
+        if not value:
+            return None
+        url = value.url
+        request = self.context.get("request")
+        return request.build_absolute_uri(url) if request else url
 
 
 def _validar_password(value, usuario=None):
@@ -272,6 +283,10 @@ class MiPerfilProfesionalSerializer(serializers.ModelSerializer):
     estado_nombre = serializers.CharField(source="get_estado_display", read_only=True)
     postulacion_estado = serializers.SerializerMethodField()
     postulacion_id = serializers.SerializerMethodField()
+    foto = FotoAbsolutaField(
+        required=False, allow_null=True, validators=VALIDADORES_FOTO
+    )
+    quitar_foto = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = Profesional
@@ -283,6 +298,8 @@ class MiPerfilProfesionalSerializer(serializers.ModelSerializer):
             "telefono",
             "ciudad",
             "linkedin_url",
+            "foto",
+            "quitar_foto",
             "disponibilidad",
             "bio",
             "estado",
@@ -302,6 +319,13 @@ class MiPerfilProfesionalSerializer(serializers.ModelSerializer):
         postulacion = obj.postulaciones.order_by("-fecha_postulacion").first()
         return postulacion.get_estado_display() if postulacion else None
 
+    def update(self, instance, validated_data):
+        if validated_data.pop("quitar_foto", False):
+            if instance.foto:
+                instance.foto.delete(save=False)
+            validated_data["foto"] = None
+        return super().update(instance, validated_data)
+
 
 class ProfesionalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -315,6 +339,29 @@ class ProfesionalSerializer(serializers.ModelSerializer):
             "estado",
         ]
         read_only_fields = fields
+
+
+class ProfesionalPublicoSerializer(serializers.ModelSerializer):
+    foto = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profesional
+        fields = [
+            "id",
+            "nombre_completo",
+            "foto",
+            "linkedin_url",
+            "bio",
+            "ciudad",
+        ]
+        read_only_fields = fields
+
+    def get_foto(self, obj):
+        if not obj.foto:
+            return None
+        url = obj.foto.url
+        request = self.context.get("request")
+        return request.build_absolute_uri(url) if request else url
 
 
 class ProfesionalAdminSerializer(ProfesionalSerializer):

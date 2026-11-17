@@ -10,6 +10,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from apps.catalogo.models import Categoria, Entregable, Servicio
 from apps.usuarios.models import Profesional
@@ -232,6 +233,55 @@ class TestApiPublicaServicios:
     ):
         respuesta = anon_client.get(f"{self.url}{servicio_aprobado.pk}/")
         assert respuesta.data["sugerencias"] == []
+
+    def test_detalle_incluye_perfil_publico_del_profesional(
+        self, anon_client, servicio_aprobado
+    ):
+        profesional = servicio_aprobado.profesional
+        profesional.bio = "Especialista en desarrollo web."
+        profesional.linkedin_url = "https://www.linkedin.com/in/juan-perez"
+        profesional.save()
+
+        respuesta = anon_client.get(f"{self.url}{servicio_aprobado.pk}/")
+
+        perfil = respuesta.data["profesional_publico"]
+        assert perfil["nombre_completo"] == "Juan Pérez"
+        assert perfil["ciudad"] == "Santiago"
+        assert perfil["bio"] == "Especialista en desarrollo web."
+        assert perfil["linkedin_url"] == "https://www.linkedin.com/in/juan-perez"
+        assert perfil["foto"] is None
+
+    def test_detalle_expone_url_de_la_foto(
+        self, anon_client, servicio_aprobado, settings, tmp_path
+    ):
+        settings.MEDIA_ROOT = tmp_path
+        profesional = servicio_aprobado.profesional
+        profesional.foto = SimpleUploadedFile(
+            "perfil.jpg", b"contenido-de-prueba", content_type="image/jpeg"
+        )
+        profesional.save()
+
+        respuesta = anon_client.get(f"{self.url}{servicio_aprobado.pk}/")
+
+        foto = respuesta.data["profesional_publico"]["foto"]
+        assert foto.startswith("http://testserver/media/profesionales/")
+        assert foto.endswith("/perfil.jpg")
+
+    def test_perfil_publico_no_expone_datos_privados(
+        self, anon_client, servicio_aprobado
+    ):
+        respuesta = anon_client.get(f"{self.url}{servicio_aprobado.pk}/")
+
+        perfil = respuesta.data["profesional_publico"]
+        assert "email" not in perfil
+        assert "telefono" not in perfil
+        assert "rut" not in perfil
+        assert "estado" not in perfil
+
+    def test_listado_no_incluye_perfil_publico(self, anon_client, servicio_aprobado):
+        respuesta = anon_client.get(self.url)
+
+        assert "profesional_publico" not in respuesta.data["results"][0]
 
 
 @pytest.mark.django_db

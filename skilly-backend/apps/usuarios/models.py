@@ -8,7 +8,7 @@ que es lo unico que Sprint 0 necesita para poder migrar y autenticar.
 """
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -328,6 +328,17 @@ class Organizacion(models.Model):
 # ===========================================================================
 # Sprint 1 — ticket 1.2
 # ===========================================================================
+def validar_tamano_foto(archivo):
+    if archivo.size > 2 * 1024 * 1024:
+        raise ValidationError("La foto no puede superar 2 MB.")
+
+
+VALIDADORES_FOTO = [
+    FileExtensionValidator(["jpg", "jpeg", "png", "webp"]),
+    validar_tamano_foto,
+]
+
+
 class Profesional(models.Model):
     """Perfil profesional. Ticket 1.2.
 
@@ -369,6 +380,14 @@ class Profesional(models.Model):
         max_length=255,
         blank=True,
         help_text="Se valida el formato de la URL, no el perfil real (decisión 3).",
+    )
+
+    foto = models.FileField(
+        upload_to="profesionales/%Y/%m/",
+        blank=True,
+        null=True,
+        max_length=255,
+        validators=VALIDADORES_FOTO,
     )
 
     estado = models.CharField(

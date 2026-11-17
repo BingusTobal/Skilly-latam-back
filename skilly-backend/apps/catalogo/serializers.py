@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.usuarios.models import Profesional
+from apps.usuarios.serializers import ProfesionalPublicoSerializer
 from .models import Categoria, Entregable, Servicio
 
 
@@ -63,9 +64,15 @@ class ServicioPublicoSerializer(serializers.ModelSerializer):
 
 class ServicioDetallePublicoSerializer(ServicioPublicoSerializer):
     sugerencias = serializers.SerializerMethodField()
+    profesional_publico = ProfesionalPublicoSerializer(
+        source="profesional", read_only=True
+    )
 
     class Meta(ServicioPublicoSerializer.Meta):
-        fields = ServicioPublicoSerializer.Meta.fields + ("sugerencias",)
+        fields = ServicioPublicoSerializer.Meta.fields + (
+            "sugerencias",
+            "profesional_publico",
+        )
 
     def get_sugerencias(self, obj):
         qs = (

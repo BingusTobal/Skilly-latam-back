@@ -68,7 +68,7 @@ class ProfesionalAdmin(admin.ModelAdmin):
     email.admin_order_field = "usuario__email"
 
     fieldsets = (
-        (None, {"fields": ("nombre_completo", "rut", "telefono", "ciudad", "bio")}),
+        (None, {"fields": ("nombre_completo", "rut", "telefono", "ciudad", "bio", "foto")}),
         ("Cuenta", {"fields": ("usuario", "estado", "linkedin_url", "disponibilidad")}),
         ("Auditoría", {"fields": ("creado_en", "fecha_estado")}),
     )

@@ -8,6 +8,7 @@ códigos de respuesta y las rutas de la respuesta de error.
 """
 import pytest
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from apps.postulaciones.models import Certificado, Postulacion
@@ -509,6 +510,74 @@ class TestPerfilProfesional:
             self.url, {"estado": "aprobado"}, format="json"
         )
         assert respuesta.data["estado"] != "aprobado"
+
+    def test_puede_subir_su_foto(
+        self, profesional_client, profesional, settings, tmp_path
+    ):
+        settings.MEDIA_ROOT = tmp_path
+        foto = SimpleUploadedFile(
+            "perfil.jpg", b"contenido-de-prueba", content_type="image/jpeg"
+        )
+
+        respuesta = profesional_client.patch(
+            self.url, {"foto": foto}, format="multipart"
+        )
+
+        assert respuesta.status_code == 200
+        assert respuesta.data["foto"].startswith("http://testserver/media/")
+        assert respuesta.data["foto"].endswith("/perfil.jpg")
+        profesional.refresh_from_db()
+        assert profesional.foto.name.endswith("perfil.jpg")
+
+    def test_puede_quitar_su_foto(
+        self, profesional_client, profesional, settings, tmp_path
+    ):
+        settings.MEDIA_ROOT = tmp_path
+        profesional.foto = SimpleUploadedFile(
+            "perfil.jpg", b"contenido-de-prueba", content_type="image/jpeg"
+        )
+        profesional.save()
+
+        respuesta = profesional_client.patch(
+            self.url, {"quitar_foto": True}, format="json"
+        )
+
+        assert respuesta.status_code == 200
+        assert respuesta.data["foto"] is None
+        profesional.refresh_from_db()
+        assert not profesional.foto
+
+    def test_rechaza_foto_con_extension_no_permitida(
+        self, profesional_client, profesional, settings, tmp_path
+    ):
+        settings.MEDIA_ROOT = tmp_path
+        foto = SimpleUploadedFile(
+            "perfil.txt", b"contenido-de-prueba", content_type="text/plain"
+        )
+
+        respuesta = profesional_client.patch(
+            self.url, {"foto": foto}, format="multipart"
+        )
+
+        assert respuesta.status_code == 400
+        assert "foto" in respuesta.data
+
+    def test_rechaza_foto_de_mas_de_dos_megas(
+        self, profesional_client, profesional, settings, tmp_path
+    ):
+        settings.MEDIA_ROOT = tmp_path
+        foto = SimpleUploadedFile(
+            "perfil.png",
+            b"x" * (2 * 1024 * 1024 + 1),
+            content_type="image/png",
+        )
+
+        respuesta = profesional_client.patch(
+            self.url, {"foto": foto}, format="multipart"
+        )
+
+        assert respuesta.status_code == 400
+        assert "foto" in respuesta.data
 
 
 # ===========================================================================

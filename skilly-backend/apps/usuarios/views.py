@@ -268,14 +268,21 @@ class MiPerfilProfesionalView(APIView):
         profesional = getattr(request.user, "profesional", None)
         if profesional is None:
             raise NotFound("Tu cuenta no tiene perfil profesional.")
-        return Response(MiPerfilProfesionalSerializer(profesional).data)
+        return Response(
+            MiPerfilProfesionalSerializer(
+                profesional, context={"request": request}
+            ).data
+        )
 
     def patch(self, request):
         profesional = getattr(request.user, "profesional", None)
         if profesional is None:
             raise NotFound("Tu cuenta no tiene perfil profesional.")
         serializer = MiPerfilProfesionalSerializer(
-            profesional, data=request.data, partial=True
+            profesional,
+            data=request.data,
+            partial=True,
+            context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
