@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skilly Latam · Contrata talento independiente experto, solo lo que necesitas</title>
+  <meta name="description" content="Marketplace de servicios con precio fijo publicados por profesionales verificados. Reserva en minutos y tu pago queda protegido hasta que confirmes la entrega.">
+  <meta name="theme-color" content="#0D2240">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3.5 29.5 27h-27z' fill='none' stroke='%232B64F0' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M16 12.5 22 23H10z' fill='%2319B394'/%3E%3C/svg%3E">
+
+  <!-- Tipografía: en el proyecto React usar @fontsource/plus-jakarta-sans (autoalojada) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <script src="main.js" defer></script>
+</head>
+<body>
+
+<!-- ============ Sprite de íconos (stroke, 24×24) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></symbol>
+  <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/><path d="M9 21V9"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.500 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.500-1.200 6.200-2.700a1.200 1.200 0 0 1 1.500 0C14.500 3.800 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-user-check" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+</svg>
+
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<!-- ============ Header ============ -->
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="brand" href="index.html" aria-label="Skilly Latam, ir al inicio">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2B64F0"/><stop offset="1" stop-color="#19B394"/>
+          </linearGradient>
+        </defs>
+        <path d="M16 3.500 29.500 27h-27z" fill="none" stroke="url(#bm)" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M16 12.500 22 23H10z" fill="url(#bm)"/>
+      </svg>
+      <span class="brand-name">Skilly<span>latam</span></span>
+    </a>
+
+    <div class="nav-panel" id="menu">
+      <nav class="main-nav" aria-label="Principal">
+        <a href="catalogo.html">Servicios</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#profesionales">Para profesionales</a>
+        <a href="ayuda.html">Ayuda</a>
+      </nav>
+      <div class="header-actions">
+        <a class="link-quiet" href="login.html">Iniciar sesión</a>
+        <a class="btn btn-primary btn-sm" href="catalogo.html">Explorar servicios</a>
+      </div>
+    </div>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg>
+      <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <!-- ============ Hero ============ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <span class="tri tri-1"></span><span class="tri tri-2"></span><span class="tri tri-3"></span>
+    </div>
+
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="slash">/</span>marketplace de talento independiente</p>
+        <h1 id="hero-title">Contrata <span class="grad">talento experto</span> solo cuando lo necesitas</h1>
+        <p class="lead">Servicios de precio fijo publicados por profesionales verificados. Reserva en minutos y paga con tranquilidad: tu dinero queda protegido hasta que confirmes la entrega.</p>
+
+        <!-- Funciona sin JS: GET a catalogo.html?q=...&categoria=... -->
+        <form class="search" role="search" action="catalogo.html" method="get">
+          <label class="search-field">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="sr-only">¿Qué servicio necesitas?</span>
+            <input type="search" name="q" placeholder="Ej: sitio web, diseño UX, auditoría…" autocomplete="off">
+          </label>
+          <label class="search-select">
+            <span class="sr-only">Categoría</span>
+            <select name="categoria">
+              <option value="">Todas las categorías</option>
+              <option value="desarrollo-software">Desarrollo software</option>
+              <option value="diseno-grafico">Diseño gráfico</option>
+              <option value="finanzas">Finanzas</option>
+              <option value="marketing">Marketing</option>
+              <option value="salud-bienestar">Salud y Bienestar</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </form>
+
+        <div class="popular">
+          <span class="popular-label">Populares</span>
+          <ul class="chips">
+            <li><a href="catalogo.html?q=desarrollo+web">Desarrollo web</a></li>
+            <li><a href="catalogo.html?q=diseño+UX">Diseño UX/UI</a></li>
+            <li><a href="catalogo.html?q=marketing+digital">Marketing digital</a></li>
+            <li><a href="catalogo.html?q=auditoría">Auditoría financiera</a></li>
+            <li><a href="catalogo.html?q=bienestar">Bienestar laboral</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Vista previa decorativa del producto -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="vglow"></div>
+
+        <div class="vcard vcard-main">
+          <div class="vcover" style="--c1:#2B64F0;--c2:#7C4DFF">
+            <svg class="icon vicon"><use href="#i-code"/></svg>
+            <span class="vtag">Desarrollo software</span>
+          </div>
+          <div class="vbody">
+            <p class="vtitle">Sitio web corporativo en 15 días</p>
+            <p class="vpro"><span class="avatar" style="--c1:#2B64F0;--c2:#7C4DFF">JP</span>Juan Pérez<svg class="icon verified"><use href="#i-check-circle"/></svg></p>
+            <div class="vmeta">
+              <span><svg class="icon"><use href="#i-monitor"/></svg>Remoto</span>
+              <span><svg class="icon"><use href="#i-clock"/></svg>15 días</span>
+            </div>
+            <div class="vfoot">
+              <div><span class="vprice">$700.000</span><span class="vunit">precio fijo</span></div>
+              <span class="vbtn">Reservar</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="vchip vchip-pay">
+          <span class="vchip-ic mint"><svg class="icon"><use href="#i-lock"/></svg></span>
+          <span><strong>Pago autorizado</strong><small>Aún no se cobra</small></span>
+        </div>
+
+        <div class="vchip vchip-ok">
+          <span class="vchip-ic blue"><svg class="icon"><use href="#i-user-check"/></svg></span>
+          <span><strong>Profesional verificado</strong><small>LinkedIn y certificados</small></span>
+        </div>
+
+        <div class="vcard vcard-cal">
+          <p class="vcal-title"><svg class="icon"><use href="#i-calendar"/></svg>Elige fecha y hora</p>
+          <div class="vslots"><span>9:00</span><span class="on">9:30</span><span>10:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <ul class="trust">
+        <li>
+          <span class="trust-ic mint"><svg class="icon"><use href="#i-shield"/></svg></span>
+          <div><strong>Pago protegido</strong><span>Se retiene hasta que confirmas la entrega.</span></div>
+        </li>
+        <li>
+          <span class="trust-ic blue"><svg class="icon"><use href="#i-user-check"/></svg></span>
+          <div><strong>Profesionales verificados</strong><span>LinkedIn y certificados revisados por Skilly.</span></div>
+        </li>
+        <li>
+          <span class="trust-ic violet"><svg class="icon"><use href="#i-calendar"/></svg></span>
+          <div><strong>Reserva sin cuenta</strong><span>Agenda en minutos, sin registrarte.</span></div>
+        </li>
+        <li>
+          <span class="trust-ic coral"><svg class="icon"><use href="#i-file"/></svg></span>
+          <div><strong>Factura incluida</strong><span>Boleta de honorarios y factura automáticas.</span></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Categorías ============ -->
+  <section class="section" id="categorias" aria-labelledby="cat-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="slash">/</span>categorías</p>
+        <h2 id="cat-title">Explora por categoría</h2>
+        <p class="section-lead">Cinco áreas para que tu equipo avance sin sumar contratos fijos.</p>
+      </header>
+
+      <ul class="cat-grid" data-stagger>
+        <li class="reveal">
+          <a class="cat-card" style="--tint:#E7EEFF;--hue:#2B64F0" href="catalogo.html?categoria=desarrollo-software">
+            <span class="cat-icon"><svg class="icon"><use href="#i-code"/></svg></span>
+            <h3>Desarrollo software</h3>
+            <p>Sitios web, apps y soporte técnico.</p>
+            <span class="cat-count" data-sample="66">66 servicios <svg class="icon"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+        <li class="reveal">
+          <a class="cat-card" style="--tint:#F0EAFF;--hue:#7C4DFF" href="catalogo.html?categoria=diseno-grafico">
+            <span class="cat-icon"><svg class="icon"><use href="#i-layout"/></svg></span>
+            <h3>Diseño gráfico</h3>
+            <p>Identidad visual, UX/UI y piezas gráficas.</p>
+            <span class="cat-count" data-sample="47">47 servicios <svg class="icon"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+        <li class="reveal">
+          <a class="cat-card" style="--tint:#DDF6EF;--hue:#0B7A63" href="catalogo.html?categoria=finanzas">
+            <span class="cat-icon"><svg class="icon"><use href="#i-chart"/></svg></span>
+            <h3>Finanzas</h3>
+            <p>Auditoría, contabilidad y análisis para PYMEs.</p>
+            <span class="cat-count" data-sample="29">29 servicios <svg class="icon"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+        <li class="reveal">
+          <a class="cat-card" style="--tint:#FFEBE4;--hue:#D9481F" href="catalogo.html?categoria=marketing">
+            <span class="cat-icon"><svg class="icon"><use href="#i-megaphone"/></svg></span>
+            <h3>Marketing</h3>
+            <p>Estrategia digital, contenidos y campañas.</p>
+            <span class="cat-count" data-sample="42">42 servicios <svg class="icon"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+        <li class="reveal">
+          <a class="cat-card" style="--tint:#FFE8F1;--hue:#C2255C" href="catalogo.html?categoria=salud-bienestar">
+            <span class="cat-icon"><svg class="icon"><use href="#i-heart"/></svg></span>
+            <h3>Salud y Bienestar</h3>
+            <p>Talleres, evaluaciones y apoyo para tu equipo.</p>
+            <span class="cat-count" data-sample="112">112 servicios <svg class="icon"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Servicios destacados ============ -->
+  <section class="section section-soft" id="servicios" aria-labelledby="svc-title">
+    <div class="container">
+      <header class="section-head section-head-row reveal">
+        <div>
+          <p class="eyebrow"><span class="slash">/</span>destacados</p>
+          <h2 id="svc-title">Servicios más solicitados</h2>
+          <p class="section-lead">Precio fijo, alcance claro y un profesional con nombre y apellido.</p>
+        </div>
+        <a class="link-arrow" href="catalogo.html">Ver todo el catálogo <svg class="icon"><use href="#i-arrow"/></svg></a>
+      </header>
+
+      <div class="svc-grid" data-stagger>
+
+        <article class="svc-card reveal" style="--c1:#2B64F0;--c2:#7C4DFF">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Desarrollo software</span>
+            <svg class="icon svc-icon"><use href="#i-code"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Sitio web corporativo en 15 días</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">JP</span>Juan Pérez<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg>Remoto</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>15 días</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$700.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="svc-card reveal" style="--c1:#7C4DFF;--c2:#D08BFF">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Diseño gráfico</span>
+            <svg class="icon svc-icon"><use href="#i-layout"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Rediseño UX/UI de landing</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">MD</span>María José Delgado<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg>Remoto</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>2–3 semanas</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$650.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="svc-card reveal" style="--c1:#0E9F7E;--c2:#5ED9B5">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Finanzas</span>
+            <svg class="icon svc-icon"><use href="#i-chart"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Auditoría financiera PYME</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">AM</span>Andrés Muñoz<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>Semipresencial</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>1 semana</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$400.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="svc-card reveal" style="--c1:#F0603A;--c2:#FFB347">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Marketing</span>
+            <svg class="icon svc-icon"><use href="#i-megaphone"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Estrategia de marketing digital</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">CR</span>Camila Rojas<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg>Remoto</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>2 semanas</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$350.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="svc-card reveal" style="--c1:#E8579A;--c2:#FF9A8B">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Salud y Bienestar</span>
+            <svg class="icon svc-icon"><use href="#i-heart"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Taller de bienestar laboral</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">TI</span>Tomás Iturra<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>Presencial</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>1 hora</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$150.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="svc-card reveal" style="--c1:#E8579A;--c2:#B07CFF">
+          <a class="svc-cover" href="detalle-servicio.html" tabindex="-1" aria-hidden="true">
+            <span class="svc-tag">Salud y Bienestar</span>
+            <svg class="icon svc-icon"><use href="#i-user-check"/></svg>
+          </a>
+          <div class="svc-body">
+            <h3><a href="detalle-servicio.html">Evaluación psicolaboral</a></h3>
+            <p class="svc-pro"><span class="avatar" aria-hidden="true">TI</span>Tomás Iturra<svg class="icon verified" role="img" aria-label="Profesional verificado"><use href="#i-check-circle"/></svg></p>
+            <ul class="svc-meta">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>Presencial</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>45 min</li>
+            </ul>
+            <div class="svc-foot">
+              <p class="price"><span class="amount">$80.000</span><span class="unit">CLP · precio fijo</span></p>
+              <a class="btn btn-soft btn-sm" href="detalle-servicio.html">Ver servicio</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Cómo funciona + pago protegido ============ -->
+  <section class="section" id="como-funciona" aria-labelledby="how-title">
+    <div class="container how-grid">
+      <div class="how-copy">
+        <header class="section-head reveal">
+          <p class="eyebrow"><span class="slash">/</span>cómo funciona</p>
+          <h2 id="how-title">De la idea a la entrega, en cuatro pasos</h2>
+          <p class="section-lead">Sin licitaciones ni contratos largos. Tú decides qué contratar y cuándo.</p>
+        </header>
+
+        <ol class="steps" data-stagger>
+          <li class="reveal">
+            <span class="step-n">1</span>
+            <div><h3>Elige un servicio</h3><p>Compara precio, duración y modalidad. El precio es fijo: sin sorpresas.</p></div>
+          </li>
+          <li class="reveal">
+            <span class="step-n">2</span>
+            <div><h3>Reserva y autoriza el pago</h3><p>Escoge fecha y hora. Tu tarjeta solo se autoriza, todavía no se cobra. Puedes reservar sin crear cuenta.</p></div>
+          </li>
+          <li class="reveal">
+            <span class="step-n">3</span>
+            <div><h3>El profesional acepta</h3><p>Recién cuando acepta, el pago queda retenido por Skilly. Si no acepta, no pagas nada.</p></div>
+          </li>
+          <li class="reveal">
+            <span class="step-n">4</span>
+            <div><h3>Confirma la entrega</h3><p>Revisa el trabajo y confirma. Ahí se libera el pago al profesional y recibes tu factura.</p></div>
+          </li>
+        </ol>
+      </div>
+
+      <aside class="protect reveal" aria-labelledby="protect-title">
+        <span class="protect-badge"><svg class="icon"><use href="#i-shield"/></svg>Pago protegido</span>
+        <h3 id="protect-title">Tu dinero, cuidado en cada etapa</h3>
+
+        <ol class="timeline">
+          <li class="done">
+            <span class="dot"><svg class="icon"><use href="#i-check"/></svg></span>
+            <div><strong>Autorizado</strong><span>Se reserva el cupo de tu tarjeta. No se cobra.</span></div>
+          </li>
+          <li class="done">
+            <span class="dot"><svg class="icon"><use href="#i-check"/></svg></span>
+            <div><strong>Retenido</strong><span>El profesional aceptó. Skilly retiene el pago.</span></div>
+          </li>
+          <li>
+            <span class="dot"><svg class="icon"><use href="#i-lock"/></svg></span>
+            <div><strong>Liberado</strong><span>Confirmaste la entrega. El profesional recibe su pago.</span></div>
+          </li>
+        </ol>
+
+        <p class="protect-note">¿Algo salió mal? Reporta un problema: el pago permanece retenido mientras Skilly revisa el caso.</p>
+        <p class="protect-note protect-note-2"><svg class="icon"><use href="#i-calendar"/></svg>Cancela sin costo con 24 horas o más de anticipación.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ Para profesionales ============ -->
+  <section class="section section-pro" id="profesionales" aria-labelledby="pro-title">
+    <div class="container pro-grid">
+      <div class="pro-copy reveal">
+        <p class="eyebrow"><span class="slash">/</span>para profesionales</p>
+        <h2 id="pro-title">Publica tus servicios y trabaja a tu manera</h2>
+        <p class="section-lead">Súmate como talento independiente: tú pones el precio, el horario y las condiciones.</p>
+
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check-circle"/></svg><span><strong>Tú defines tu horario.</strong> Las organizaciones solo reservan dentro de tu disponibilidad.</span></li>
+          <li><svg class="icon"><use href="#i-check-circle"/></svg><span><strong>Siempre ves tu monto neto.</strong> Lo que recibirás, con la comisión ya descontada.</span></li>
+          <li><svg class="icon"><use href="#i-check-circle"/></svg><span><strong>Hablas directo con la organización</strong> una vez que aceptas la solicitud.</span></li>
+          <li><svg class="icon"><use href="#i-check-circle"/></svg><span><strong>Sin calificaciones por estrellas.</strong> Tu trabajo se muestra con comentarios reales.</span></li>
+        </ul>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="postular.html">Postula como profesional</a>
+          <a class="link-arrow" href="ayuda.html">Cómo se valida mi perfil <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+
+      <div class="pro-visual reveal" aria-hidden="true">
+        <div class="pcard pcard-price">
+          <p class="pcard-title">Publicar servicio</p>
+          <div class="prow"><span>Precio publicado</span><strong>$700.000</strong></div>
+          <div class="prow"><span>Comisión Skilly (10 %)</span><strong class="neg">− $70.000</strong></div>
+          <div class="prow prow-total"><span>Recibirás</span><strong>$630.000</strong></div>
+        </div>
+        <div class="pcard pcard-sched">
+          <p class="pcard-title"><svg class="icon"><use href="#i-calendar"/></svg>Mi horario de atención</p>
+          <div class="days"><span class="on">L</span><span class="on">M</span><span class="on">M</span><span class="on">J</span><span class="on">V</span><span>S</span><span>D</span></div>
+          <p class="hours"><svg class="icon"><use href="#i-clock"/></svg>9:00 – 18:00</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Comentarios ============ -->
+  <section class="section" id="comentarios" aria-labelledby="com-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="slash">/</span>comentarios</p>
+        <h2 id="com-title">Lo que dicen las organizaciones</h2>
+        <p class="section-lead">Comentarios en texto, validados por Skilly. Sin puntajes ni estrellas.</p>
+      </header>
+
+      <div class="quote-grid" data-stagger>
+        <figure class="quote reveal">
+          <svg class="icon quote-ic" aria-hidden="true"><use href="#i-message"/></svg>
+          <blockquote>“Cumplió el alcance a tiempo y la comunicación fue clara durante todo el proyecto.”</blockquote>
+          <figcaption><span class="avatar" aria-hidden="true">CA</span><span><strong>Constructora Alba</strong><small>Sitio web corporativo</small></span><span class="valid"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Comentario validado</span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <svg class="icon quote-ic" aria-hidden="true"><use href="#i-message"/></svg>
+          <blockquote>“Buen nivel técnico. Lo volveríamos a contratar para la siguiente etapa del proyecto.”</blockquote>
+          <figcaption><span class="avatar" aria-hidden="true">EN</span><span><strong>Estudio Norte</strong><small>Rediseño UX/UI</small></span><span class="valid"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Comentario validado</span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <svg class="icon quote-ic" aria-hidden="true"><use href="#i-message"/></svg>
+          <blockquote>“Reservamos sin crear cuenta y en minutos teníamos la confirmación del profesional.”</blockquote>
+          <figcaption><span class="avatar" aria-hidden="true">CR</span><span><strong>Comercial Rojas</strong><small>Evaluación psicolaboral</small></span><span class="valid"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Comentario validado</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section section-soft" id="faq" aria-labelledby="faq-title">
+    <div class="container faq-grid">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="slash">/</span>preguntas frecuentes</p>
+        <h2 id="faq-title">Lo que más nos preguntan</h2>
+        <p class="section-lead">¿Tienes otra duda? Escríbenos a <a class="inline-link" href="mailto:hola@skillylatam.com">hola@skillylatam.com</a>.</p>
+      </header>
+
+      <div class="faq reveal">
+        <details>
+          <summary>¿Necesito una cuenta para reservar? <svg class="icon chev" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <p>No. Puedes reservar con tus datos de contacto, sin crear una contraseña. Si ya tienes cuenta, inicia sesión y tus datos se completan solos.</p>
+        </details>
+        <details>
+          <summary>¿Cuándo se me cobra? <svg class="icon chev" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <p>Al reservar, tu tarjeta solo se autoriza. El cobro ocurre cuando el profesional acepta tu solicitud. Si la rechaza o no responde a tiempo, no se cobra nada.</p>
+        </details>
+        <details>
+          <summary>¿Puedo cancelar una reserva? <svg class="icon chev" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <p>Sí. Con 24 horas o más de anticipación te devolvemos el 100 %; con menos, el 90 %. Una vez iniciado el servicio ya no hay cancelación, pero puedes reportar un problema.</p>
+        </details>
+        <details>
+          <summary>¿Qué pasa si el trabajo no cumple lo acordado? <svg class="icon chev" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <p>Antes de confirmar la entrega, usa “Reportar un problema”. El pago permanece retenido mientras Skilly revisa el caso.</p>
+        </details>
+        <details>
+          <summary>¿Cómo me convierto en profesional? <svg class="icon chev" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <p>Postulas desde la plataforma. Un administrador revisa tu perfil y tus certificados; tu LinkedIn se valida automáticamente. Una vez aprobado, puedes publicar tus servicios.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA final ============ -->
+  <section class="cta-final" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta-card reveal">
+        <span class="tri tri-a" aria-hidden="true"></span><span class="tri tri-b" aria-hidden="true"></span>
+        <p class="eyebrow eyebrow-light"><span class="slash">/</span>empecemos</p>
+        <h2 id="cta-title">Contrata solo lo que necesitas.</h2>
+        <p>Encuentra al profesional indicado y reserva hoy mismo, con tu pago protegido.</p>
+        <div class="cta-row cta-row-center">
+          <a class="btn btn-light" href="catalogo.html">Explorar servicios</a>
+          <a class="btn btn-outline-light" href="postular.html">Soy profesional</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand-light" href="index.html" aria-label="Skilly Latam, ir al inicio">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3.500 29.500 27h-27z" fill="none" stroke="#7FA2FF" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M16 12.500 22 23H10z" fill="#19B394"/>
+        </svg>
+        <span class="brand-name">Skilly<span>latam</span></span>
+      </a>
+      <p>Marketplace de talento independiente para PYMEs, startups y organizaciones.</p>
+    </div>
+
+    <nav aria-label="Plataforma">
+      <h3>Plataforma</h3>
+      <ul>
+        <li><a href="catalogo.html">Servicios</a></li>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#profesionales">Para profesionales</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-label="Ayuda y legal">
+      <h3>Ayuda</h3>
+      <ul>
+        <li><a href="ayuda.html">Centro de ayuda</a></li>
+        <li><a href="terminos.html">Términos y condiciones</a></li>
+        <li><a href="terminos.html#cancelacion">Política de cancelación</a></li>
+        <li><a href="terminos.html#privacidad">Privacidad</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h3>Contacto</h3>
+      <ul>
+        <li><a class="mail" href="mailto:hola@skillylatam.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>hola@skillylatam.com</a></li>
+        <li class="muted">Santiago, Chile</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© <span data-year>2026</span> Skilly Latam. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+</body>
+</html>
