@@ -1,0 +1,15 @@
+# Skilly Latam — Dependencias de QA / desarrollo
+# No reemplaza a requirements.txt (producción). Instalar con:
+#   .venv/bin/pip install -r requirements-dev.txt
+-r requirements.txt
+
+# Analisis estatico y auditoria de dependencias
+bandit==1.9.4
+pip-audit==2.10.1
+
+# Pruebas de carga y estres
+locust==2.47.0
+
+# Generacion del informe con capturas incrustadas
+python-docx==1.2.0
+Pillow==13.0.0

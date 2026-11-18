@@ -1,0 +1,50 @@
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "GET /api/servicios/ HTTP/1.1" 500 302881
+[17/Nov/2026 16:49:40] "GET /api/servicios/ HTTP/1.1" 500 302881
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "GET /api/servicios/ HTTP/1.1" 500 302881
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "POST /api/auth/token/ HTTP/1.1" 500 307657
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "POST /api/auth/token/ HTTP/1.1" 500 307657
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "POST /api/auth/token/ HTTP/1.1" 500 307657
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:40] "GET /api/servicios/ HTTP/1.1" 500 302881
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+MySQLdb.OperationalError: (1040, 'Too many connections')
+django.db.utils.OperationalError: (1040, 'Too many connections')
+[17/Nov/2026 16:49:41] "GET /api/servicios/ HTTP/1.1" 500 303765
+[17/Nov/2026 16:49:41] "GET /api/servicios/ HTTP/1.1" 500 303765
+[17/Nov/2026 16:49:41] "GET /api/servicios/ HTTP/1.1" 500 303765

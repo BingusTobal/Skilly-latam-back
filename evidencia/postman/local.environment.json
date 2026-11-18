@@ -1,0 +1,25 @@
+{
+  "name": "skilly-local-qa",
+  "values": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000/api", "enabled": true},
+    {"key": "fecha", "value": "", "enabled": true},
+    {"key": "servicio_id", "value": "", "enabled": true},
+    {"key": "hora_inicio", "value": "", "enabled": true},
+    {"key": "hora_solapada", "value": "", "enabled": true},
+    {"key": "hora_autenticada", "value": "", "enabled": true},
+    {"key": "reserva_id", "value": "", "enabled": true},
+    {"key": "reserva_token", "value": "", "enabled": true},
+    {"key": "reserva_auth_id", "value": "", "enabled": true},
+    {"key": "access", "value": "", "enabled": true},
+    {"key": "access_prof", "value": "", "enabled": true},
+    {"key": "access_admin", "value": "", "enabled": true},
+    {"key": "referencia", "value": "", "enabled": true},
+    {"key": "token_ws", "value": "", "enabled": true},
+    {"key": "referencia_auth", "value": "", "enabled": true},
+    {"key": "token_ws_auth", "value": "", "enabled": true},
+    {"key": "access_qa", "value": "", "enabled": true},
+    {"key": "postulacion_id", "value": "", "enabled": true},
+    {"key": "qa_email", "value": "", "enabled": true},
+    {"key": "qa_rut", "value": "", "enabled": true}
+  ]
+}

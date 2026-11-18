@@ -1,0 +1,159 @@
+Fecha: 2026-11-17T15:56:17-03:00
+Comando: python -m pytest --cov=apps --cov=config --cov-report=html:evidencia/automatizacion/cobertura --cov-report=term-missing
+
+........................................................................ [ 12%]
+........................................................................ [ 25%]
+........................................................................ [ 37%]
+........................................................................ [ 50%]
+........................................................................ [ 63%]
+........................................................................ [ 75%]
+........................................................................ [ 88%]
+..................................................................       [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.14.10-final-0 _______________
+
+Name                                                                Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------------------------------
+apps/__init__.py                                                        0      0   100%
+apps/catalogo/__init__.py                                               0      0   100%
+apps/catalogo/admin.py                                                 33      0   100%
+apps/catalogo/apps.py                                                   6      0   100%
+apps/catalogo/management/__init__.py                                    0      0   100%
+apps/catalogo/management/commands/__init__.py                           0      0   100%
+apps/catalogo/management/commands/cargar_seed.py                       36      1    97%   84
+apps/catalogo/migrations/0001_initial.py                                5      0   100%
+apps/catalogo/migrations/0002_servicio_entregable.py                    6      0   100%
+apps/catalogo/migrations/0003_revisionservicio.py                       6      0   100%
+apps/catalogo/migrations/__init__.py                                    0      0   100%
+apps/catalogo/models.py                                               186     23    88%   36, 138, 155, 157, 199-221, 226, 249, 267, 294, 315, 318-320, 365
+apps/catalogo/serializers.py                                          118      3    97%   135, 139, 152
+apps/catalogo/tests/__init__.py                                         0      0   100%
+apps/catalogo/tests/test_cargar_seed.py                                53      0   100%
+apps/catalogo/tests/test_catalogo.py                                  244      0   100%
+apps/catalogo/tests/test_revision_servicio.py                          30      0   100%
+apps/catalogo/urls.py                                                   9      0   100%
+apps/catalogo/views.py                                                128     20    84%   26-30, 62-63, 93, 97, 113-114, 136, 155-156, 165-166, 175-176, 184-185
+apps/comisiones/__init__.py                                             0      0   100%
+apps/comisiones/admin.py                                                8      0   100%
+apps/comisiones/apps.py                                                 6      0   100%
+apps/comisiones/migrations/0001_initial.py                             10      0   100%
+apps/comisiones/migrations/__init__.py                                  0      0   100%
+apps/comisiones/models.py                                              31      7    77%   72-73, 76-80
+apps/comisiones/serializers.py                                         41      4    90%   44, 46, 73, 98
+apps/comisiones/services.py                                            23      3    87%   13-15
+apps/comisiones/tests/__init__.py                                       0      0   100%
+apps/comisiones/tests/test_admin_reportes.py                           66      0   100%
+apps/comisiones/tests/test_tasas.py                                    80      0   100%
+apps/comisiones/urls.py                                                 6      0   100%
+apps/comisiones/views.py                                              137     11    92%   54, 77, 131-141, 172, 287, 414
+apps/disputas/__init__.py                                               0      0   100%
+apps/disputas/admin.py                                                  0      0   100%
+apps/disputas/apps.py                                                   6      0   100%
+apps/disputas/migrations/__init__.py                                    0      0   100%
+apps/disputas/models.py                                                 0      0   100%
+apps/disputas/views.py                                                  0      0   100%
+apps/pagos/__init__.py                                                  0      0   100%
+apps/pagos/admin.py                                                    33      0   100%
+apps/pagos/apps.py                                                      6      0   100%
+apps/pagos/estados.py                                                  25      0   100%
+apps/pagos/gateway/__init__.py                                         45      1    98%   80
+apps/pagos/gateway/base.py                                             40      0   100%
+apps/pagos/gateway/fake.py                                             83      4    95%   40, 62, 153, 161
+apps/pagos/gateway/transbank.py                                        92      4    96%   42, 45-46, 188
+apps/pagos/migrations/0001_initial.py                                   7      0   100%
+apps/pagos/migrations/0002_pago_tasa_aplicada.py                        4      0   100%
+apps/pagos/migrations/__init__.py                                       0      0   100%
+apps/pagos/models.py                                                  126      7    94%   109, 118, 134, 138, 155-156, 221
+apps/pagos/seguridad.py                                                12      0   100%
+apps/pagos/services.py                                                404     64    84%   74, 169-179, 184, 235, 250, 267, 269, 274-275, 279, 292, 338, 361, 394-395, 406, 414-422, 529-538, 543, 620, 639-648, 662, 679-708, 721, 732, 744, 749, 772, 775-777, 780-786, 793
+apps/pagos/tasks.py                                                    11      0   100%
+apps/pagos/tests/__init__.py                                            0      0   100%
+apps/pagos/tests/conftest.py                                            7      0   100%
+apps/pagos/tests/test_fake_gateway.py                                  77      0   100%
+apps/pagos/tests/test_fase3.py                                        149      0   100%
+apps/pagos/tests/test_gateway_config.py                                75      0   100%
+apps/pagos/tests/test_models.py                                        78      0   100%
+apps/pagos/tests/test_sandbox_transbank.py                             18     13    28%   22-43
+apps/pagos/tests/test_seguridad.py                                      9      0   100%
+apps/pagos/tests/test_services.py                                     251      0   100%
+apps/pagos/tests/test_transbank_gateway.py                            158      0   100%
+apps/pagos/tests/test_views.py                                        150      0   100%
+apps/pagos/throttles.py                                                 7      0   100%
+apps/pagos/urls.py                                                      3      0   100%
+apps/pagos/views.py                                                   112     10    91%   50, 52, 71, 92, 154-156, 163-165
+apps/postulaciones/__init__.py                                          0      0   100%
+apps/postulaciones/admin.py                                            90      6    93%   86-87, 114-117
+apps/postulaciones/apps.py                                              6      0   100%
+apps/postulaciones/migrations/0001_initial.py                           7      0   100%
+apps/postulaciones/migrations/__init__.py                               0      0   100%
+apps/postulaciones/models.py                                          154      8    95%   17, 95-96, 110, 123, 183, 195, 293
+apps/postulaciones/serializers.py                                     146      8    95%   48, 93-94, 103, 107, 117, 381-382
+apps/postulaciones/tests/__init__.py                                    0      0   100%
+apps/postulaciones/tests/test_postulaciones.py                        273      0   100%
+apps/postulaciones/urls.py                                              7      0   100%
+apps/postulaciones/views.py                                           165     27    84%   59, 62, 154-155, 178-182, 221, 243-246, 261-264, 278-281, 306, 317-318, 333-334
+apps/reservas/__init__.py                                               0      0   100%
+apps/reservas/admin.py                                                 28      0   100%
+apps/reservas/apps.py                                                   6      0   100%
+apps/reservas/management/__init__.py                                    0      0   100%
+apps/reservas/management/commands/__init__.py                           0      0   100%
+apps/reservas/management/commands/liberar_entregas_vencidas.py          7      7     0%   2-12
+apps/reservas/management/commands/procesar_vencidas.py                  7      7     0%   2-12
+apps/reservas/migrations/0001_initial.py                                8      0   100%
+apps/reservas/migrations/0002_pendiente_pago.py                         4      0   100%
+apps/reservas/migrations/0003_disputas_resolucion.py                    6      0   100%
+apps/reservas/migrations/0004_alter_reserva_tasa_comision.py            5      0   100%
+apps/reservas/migrations/__init__.py                                    0      0   100%
+apps/reservas/models.py                                               154     11    93%   148, 159, 163, 170, 193, 197-199, 253, 326, 360
+apps/reservas/serializers.py                                          157      8    95%   38, 43, 168, 174, 191-192, 245, 330
+apps/reservas/services.py                                             462     66    86%   69, 121-126, 160-161, 168, 198, 213-229, 268, 288, 382, 389, 410, 413, 415, 425, 428, 448, 453, 466, 493, 509, 519, 530-531, 565, 567, 576-580, 594, 616, 632, 641, 646, 669, 674, 700, 723, 807, 816, 823-824, 826, 859, 861, 870-876, 881, 897
+apps/reservas/tasks.py                                                  8      8     0%   2-16
+apps/reservas/tests/__init__.py                                         0      0   100%
+apps/reservas/tests/test_api.py                                        83      0   100%
+apps/reservas/tests/test_disputas.py                                  128      0   100%
+apps/reservas/tests/test_liberacion_automatica.py                      57      0   100%
+apps/reservas/tests/test_services.py                                  161      0   100%
+apps/reservas/urls.py                                                   7      0   100%
+apps/reservas/views.py                                                283     73    74%   59, 61, 67-68, 103-111, 130, 137, 149, 188-189, 217, 226-231, 242, 247, 256-257, 262-270, 278-279, 288-289, 294-302, 306-319, 331, 378, 408-411, 421, 432-433, 472-474, 504-505
+apps/usuarios/__init__.py                                               0      0   100%
+apps/usuarios/admin.py                                                 45      1    98%   65
+apps/usuarios/apps.py                                                   6      0   100%
+apps/usuarios/backends.py                                              16      1    94%   16
+apps/usuarios/correo.py                                                79      5    94%   130-136
+apps/usuarios/management/__init__.py                                    0      0   100%
+apps/usuarios/management/commands/__init__.py                           0      0   100%
+apps/usuarios/management/commands/cargar_demo.py                       51     51     0%   16-158
+apps/usuarios/migrations/0001_initial.py                                7      0   100%
+apps/usuarios/migrations/0002_organizacion_profesional_horario.py       7      0   100%
+apps/usuarios/migrations/0003_alter_organizacion_rut.py                 5      0   100%
+apps/usuarios/migrations/0004_profesional_foto.py                       6      0   100%
+apps/usuarios/migrations/__init__.py                                    0      0   100%
+apps/usuarios/models.py                                               225     13    94%   21, 33, 65, 85, 152-153, 224, 310, 315, 321, 325, 427, 432
+apps/usuarios/permisos.py                                              86     18    79%   66-72, 83, 118-127, 134-136
+apps/usuarios/serializers.py                                          222      6    97%   236, 272, 404, 410, 448, 482
+apps/usuarios/tests/__init__.py                                         0      0   100%
+apps/usuarios/tests/test_admin_sprint1.py                             128      0   100%
+apps/usuarios/tests/test_andamiaje.py                                  57      0   100%
+apps/usuarios/tests/test_correo.py                                     98      0   100%
+apps/usuarios/tests/test_endpoints_sprint1.py                         283      0   100%
+apps/usuarios/tests/test_jwt.py                                        65      0   100%
+apps/usuarios/tests/test_modelos_sprint1.py                           183      0   100%
+apps/usuarios/tests/test_permisos.py                                   40      0   100%
+apps/usuarios/tests/test_permisos_globales.py                          86      0   100%
+apps/usuarios/tests/test_usuarios.py                                   67      0   100%
+apps/usuarios/tests/urls_test.py                                       10      0   100%
+apps/usuarios/urls.py                                                   3      0   100%
+apps/usuarios/urls_auth.py                                              4      0   100%
+apps/usuarios/views.py                                                210     17    92%   251-252, 280, 304, 313, 323-324, 349, 365-366, 373-374, 454-457, 484, 498
+config/__init__.py                                                      0      0   100%
+config/asgi.py                                                          4      4     0%   2-8
+config/celery.py                                                        6      6     0%   2-10
+config/settings.py                                                    137     28    80%   22, 29, 41, 48, 133, 209-211, 225-231, 258, 475-486
+config/settings_test.py                                                15      0   100%
+config/urls.py                                                          9      1    89%   40
+config/vistas.py                                                       17      4    76%   21-24
+config/wsgi.py                                                          4      4     0%   2-8
+-------------------------------------------------------------------------------------------------
+TOTAL                                                                7856    563    93%
+Coverage HTML written to dir /home/tobal/Proyectos/skilly_BACK/evidencia/automatizacion/cobertura
+570 passed, 1 deselected in 6.46s
