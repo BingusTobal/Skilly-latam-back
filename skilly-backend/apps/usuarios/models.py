@@ -23,36 +23,27 @@ def normalizar_rut(valor):
 
 
 def validar_rut(valor):
-    """Valida un RUT chileno (modulo 11). Tickets 1.1 y 0.13.
+    """Valida el formato de un RUT chileno. Tickets 1.1 y 0.13.
 
-    Los RUT de los mockups son invalidos (ver docs/CONTEXTO-ARQUITECTURA.docx
-    seccion 9.5), asi que este validador no es decorativo: es el que impide
-    sembrar datos basura.
+    No se calcula el digito verificador: el usuario conoce su RUT y no corresponde
+    corregirlo desde la aplicacion. Solo se exige un formato reconocible y se
+    normaliza sin puntos ni guiones.
     """
     if not valor:
         return
 
     limpio = normalizar_rut(valor)
-    if len(limpio) < 2:
-        raise ValueError("El RUT es demasiado corto.")
+    mensaje = "Formato de RUT inválido (ej: 12.345.678-5)."
+
+    if not 7 <= len(limpio) <= 9:
+        raise ValueError(mensaje)
 
     cuerpo, verificador = limpio[:-1], limpio[-1]
-    if not cuerpo.isdigit():
-        raise ValueError("El RUT debe contener solo digitos antes del verificador.")
+    if not cuerpo.isdigit() or verificador not in "0123456789K":
+        raise ValueError(mensaje)
 
-    # El cuerpo no puede empezar con 0.
     if cuerpo[0] == "0":
         raise ValueError("El RUT no puede comenzar en 0.")
-
-    pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5, 6, 7, 8, 9]
-    suma = sum(int(digito) * pesos[i] for i, digito in enumerate(cuerpo[-len(pesos):]))
-    calculado = 11 - (suma % 11)
-    esperado = {10: "K", 11: "0"}.get(calculado, str(calculado))
-
-    if str(esperado) != str(verificador):
-        raise ValueError(
-            f"RUT invalido: verificador incorrecto (se esperaba {esperado})."
-        )
 
 
 class UsuarioManager(BaseUserManager):
@@ -202,13 +193,13 @@ class Usuario(AbstractUser):
 # Se deja el validador disponible para el Sprint 1 (Organizacion y Profesional).
 validar_rut.__name__ = "validar_rut"
 VALIDADOR_RUT = RegexValidator(
-    r"^\d{7,8}-?[0-9Kk]$", "Formato de RUT inválido (ej: 12.345.678-5)."
+    r"^\d{6,8}-?[0-9Kk]$", "Formato de RUT inválido (ej: 12.345.678-5)."
 )
 
 
 @deconstructible
 class ValidadorRut:
-    """Validador de Django que envuelve validar_rut (módulo 11).
+    """Validador de Django que envuelve validar_rut (solo formato).
 
     Decisión 4 del Sprint 1: RUT se valida igual en Organizacion y Profesional.
 
@@ -217,7 +208,7 @@ class ValidadorRut:
     archivo de migración.
     """
 
-    mensaje = "RUT inválido: el dígito verificador no corresponde."
+    mensaje = "Formato de RUT inválido (ej: 12.345.678-5)."
 
     def __call__(self, valor):
         if not valor:
@@ -257,7 +248,7 @@ class Organizacion(models.Model):
     email_contacto = models.EmailField()
     telefono = models.CharField(max_length=30, blank=True)
 
-    # Decisión 4: RUT con validación de módulo 11, igual que en Profesional.
+    # Decisión 4: RUT con validación de formato, igual que en Profesional.
     # Opcional para la organización invitada (D7): una reserva sin cuenta puede
     # no traer RUT todavía. `clean()` lo exige si la organización es registrada.
     rut = models.CharField(
@@ -368,7 +359,7 @@ class Profesional(models.Model):
     telefono = models.CharField(max_length=30, blank=True)
     ciudad = models.CharField(max_length=100, blank=True)
 
-    # Decisión 4: RUT con módulo 11, igual que en Organizacion.
+    # Decisión 4: RUT con validación de formato, igual que en Organizacion.
     rut = models.CharField(
         "RUT",
         max_length=12,

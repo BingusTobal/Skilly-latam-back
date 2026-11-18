@@ -340,9 +340,7 @@ class EvidenciaDisputa(models.Model):
     disputa = models.ForeignKey(
         Disputa, on_delete=models.CASCADE, related_name="evidencias"
     )
-    archivo = models.FileField(
-        upload_to="disputas/%Y/%m/", max_length=5 * 1024 * 1024
-    )
+    archivo = models.FileField(upload_to="disputas/%Y/%m/")
     nombre = models.CharField(max_length=200, blank=True)
     subida_por = models.ForeignKey(
         settings.AUTH_USER_MODEL,

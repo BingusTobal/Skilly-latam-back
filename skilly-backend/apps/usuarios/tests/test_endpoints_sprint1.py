@@ -88,7 +88,7 @@ class TestRegistroOrganizacion:
 
     def test_rechaza_rut_invalido(self, anon_client):
         respuesta = anon_client.post(
-            self.url, self.payload(rut="76541230-4"), format="json"
+            self.url, self.payload(rut="76541230-X"), format="json"
         )
         assert respuesta.status_code == 400
         assert "rut" in respuesta.data
@@ -202,6 +202,15 @@ class TestMiPerfil:
         usuario, asi que esto tiene que leer el objeto de la relacion."""
         respuesta = organizacion_client.get(self.url)
         assert respuesta.data["organizacion_id"] == organizacion.pk
+
+    def test_expone_los_datos_de_su_organizacion(self, organizacion_client, organizacion):
+        respuesta = organizacion_client.get(self.url)
+        datos = respuesta.data["organizacion"]
+        assert datos["id"] == organizacion.pk
+        assert datos["nombre"] == organizacion.nombre
+        assert datos["nombre_contacto"] == organizacion.nombre_contacto
+        assert datos["email_contacto"] == organizacion.email_contacto
+        assert datos["rut"] == organizacion.rut
 
     def test_expone_el_id_de_su_perfil_profesional(
         self, profesional_client, profesional

@@ -231,9 +231,7 @@ class Certificado(models.Model):
 
     nombre = models.CharField(max_length=150, help_text="Ej: Título profesional.")
     # El archivo es obligatorio para documentos, no para LinkedIn.
-    archivo = models.FileField(
-        upload_to="certificados/%Y/%m/", blank=True, max_length=5 * 1024 * 1024
-    )
+    archivo = models.FileField(upload_to="certificados/%Y/%m/", blank=True)
 
     # Para LinkedIn se guarda la URL aquí en lugar de un archivo.
     enlace = models.URLField(max_length=500, blank=True)

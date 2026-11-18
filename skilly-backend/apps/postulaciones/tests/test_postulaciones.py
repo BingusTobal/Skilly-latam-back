@@ -146,7 +146,7 @@ class TestCrearPostulacion:
 
     def test_rechaza_rut_invalido(self, anon_client, payload_postulacion):
         respuesta = anon_client.post(
-            self.url, {**payload_postulacion, "rut": "76541230-4"}, format="json"
+            self.url, {**payload_postulacion, "rut": "76541230-X"}, format="json"
         )
         assert respuesta.status_code == 400
         assert "rut" in respuesta.data
@@ -577,3 +577,16 @@ class TestModeracionCertificados:
             f"{self.url_cert(certificado_sin_revisar.pk)}aprobar/"
         )
         assert respuesta.status_code == 403
+
+
+# ===========================================================================
+# Regresión H1: FileField no debe usar max_length en bytes (MariaDB error 1074)
+# ===========================================================================
+class TestRegresionH1ColumnasArchivo:
+    def test_filefields_usan_longitud_por_defecto(self):
+        from apps.reservas.models import EvidenciaDisputa
+
+        certificado = Certificado._meta.get_field("archivo").max_length
+        evidencia = EvidenciaDisputa._meta.get_field("archivo").max_length
+        assert certificado <= 255 and certificado != 5 * 1024 * 1024
+        assert evidencia <= 255 and evidencia != 5 * 1024 * 1024

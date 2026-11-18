@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
             name='EvidenciaDisputa',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('archivo', models.FileField(max_length=5242880, upload_to='disputas/%Y/%m/')),
+                ('archivo', models.FileField(upload_to='disputas/%Y/%m/')),
                 ('nombre', models.CharField(blank=True, max_length=200)),
                 ('creada_en', models.DateTimeField(auto_now_add=True)),
                 ('disputa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='evidencias', to='reservas.disputa')),

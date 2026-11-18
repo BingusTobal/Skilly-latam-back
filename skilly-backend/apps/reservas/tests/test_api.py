@@ -76,7 +76,7 @@ class TestCrearReservaAPI:
     ):
         resp = anon_client.post(
             URL_RESERVAS,
-            _cuerpo(servicio_aprobado, fecha_futura, rut="12.345.678-3"),
+            _cuerpo(servicio_aprobado, fecha_futura, rut="12.345.678-X"),
             format="json",
         )
         assert resp.status_code == 400

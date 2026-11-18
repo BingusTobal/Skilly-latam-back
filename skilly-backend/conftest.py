@@ -89,14 +89,13 @@ def tipo_profesional():
 # ===========================================================================
 # Fixtures del Sprint 1: organizaciones, profesionales y postulaciones
 # ===========================================================================
-# RUTs con dígito verificador real (módulo 11). Los de los mockups son
-# inválidos y no sirven para probar: ver docs/CONTEXTO-ARQUITECTURA.docx 9.5.
+# RUTs con formato válido; no se valida el dígito verificador.
 
 RUT_ORGANIZACION_VALIDO = "15686734-5"
 RUT_ORGANIZACION_VALIDO_2 = "18765321-5"
 RUT_PROFESIONAL_VALIDO = "23181746-0"
 RUT_PROFESIONAL_VALIDO_2 = "24918073-K"
-RUT_INVALIDO = "76541230-4"
+RUT_INVALIDO = "76541230-X"
 
 
 @pytest.fixture

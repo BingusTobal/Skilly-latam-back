@@ -36,10 +36,33 @@ def _validar_password(value, usuario=None):
     return value
 
 
+class MiOrganizacionSerializer(serializers.ModelSerializer):
+    """Datos de la organización para autocompletar formularios del frontend."""
+
+    class Meta:
+        model = Organizacion
+        fields = [
+            "id",
+            "nombre",
+            "giro",
+            "nombre_contacto",
+            "email_contacto",
+            "telefono",
+            "rut",
+        ]
+        read_only_fields = fields
+
+
 class MiPerfilSerializer(serializers.ModelSerializer):
     """Lo que el usuario ve de sí mismo."""
 
     tipo_nombre = serializers.CharField(source="get_tipo_display", read_only=True)
+
+    def get_organizacion(self, obj):
+        organizacion = getattr(obj, "organizacion", None)
+        return MiOrganizacionSerializer(organizacion).data if organizacion else None
+
+    organizacion = serializers.SerializerMethodField()
 
     def get_organizacion_id(self, obj):
         organizacion = getattr(obj, "organizacion", None)
@@ -65,6 +88,7 @@ class MiPerfilSerializer(serializers.ModelSerializer):
             "tipo",
             "tipo_nombre",
             "is_admin",
+            "organizacion",
             "organizacion_id",
             "profesional_id",
             "date_joined",

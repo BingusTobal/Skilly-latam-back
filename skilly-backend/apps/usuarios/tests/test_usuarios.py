@@ -1,8 +1,8 @@
 """
 Pruebas del validador de RUT y del usuario custom. Tickets 0.11 y 0.13.
 
-Los RUT de los mockups son invalidos (CONTEXTO-ARQUITECTURA.docx seccion 9.5).
-Estas pruebas fijan ese comportamiento para que no se repita el error en el seed.
+El validador solo revisa el formato: no corrige ni exige un digito verificador
+concreto, porque el usuario conoce su RUT.
 """
 import pytest
 from django.core.exceptions import ValidationError
@@ -20,6 +20,15 @@ class TestValidarRut:
             "61.000.000-7",
             "1.234.567-8",
             "99999999-0",
+            "76.541.230-K",
+            "77.902.114-5",
+            "78.115.887-2",
+            "76.220.556-9",
+            "77.334.902-1",
+            "12.345.678-3",
+            "12.345.678-5",
+            "61.000.000-K",
+            "123456782",
         ],
     )
     def test_ruts_validos_pasan(self, rut):
@@ -28,17 +37,10 @@ class TestValidarRut:
     @pytest.mark.parametrize(
         "rut",
         [
-            # Los 5 RUT de los mockups, todos invalidos.
-            "76.541.230-K",
-            "77.902.114-5",
-            "78.115.887-2",
-            "76.220.556-9",
-            "77.334.902-1",
-            # Otros casos invalidos.
-            "12.345.678-3",  # verificador incorrecto
-            "12.345.678-5",  # verificador de un RUT inventado en tests previos
-            "61.000.000-K",  # verificador incorrecto
-            "01.234.567-8",  # no puede empezar en 0
+            "76541230-X",
+            "01.234.567-8",
+            "123456",
+            "1234567890",
             "abc-def",
             "1",
         ],
@@ -50,8 +52,10 @@ class TestValidarRut:
     def test_rut_acepta_puntos_y_guiones(self):
         validar_rut("12.345.678-2")
         validar_rut("123456782")
-        with pytest.raises(ValueError):
-            validar_rut("12.345.678-3")
+
+    def test_no_corrige_el_verificador(self):
+        validar_rut("76.541.230-K")
+        validar_rut("12.345.678-3")
 
 
 class TestUsuarioCustom:
