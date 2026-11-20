@@ -1,5 +1,5 @@
 """
-Comando cargar_demo. Sprint 3.
+Comando cargar_demo. Iteración 3.
 
 Deja el entorno listo para probar el flujo de reservas de punta a punta:
   - un profesional aprobado (juan@test.skilly)
@@ -57,7 +57,6 @@ class Command(BaseCommand):
                 slug=slug, defaults={"nombre": nombre, "aprobada": True}
             )
 
-        # --- Profesional (la contraseña solo se fija al crear la cuenta) ---
         usuario_prof, creado_prof = Usuario.objects.get_or_create(
             email=EMAIL_PROFESIONAL,
             defaults={
@@ -84,7 +83,6 @@ class Command(BaseCommand):
             profesional.estado = Profesional.ESTADO_APROBADO
             profesional.save(update_fields=["estado"])
 
-        # --- Organización ---
         usuario_org, creado_org = Usuario.objects.get_or_create(
             email=EMAIL_ORGANIZACION,
             defaults={
@@ -110,7 +108,6 @@ class Command(BaseCommand):
             },
         )
 
-        # --- Horario del profesional (sin esto no hay slots) ---
         if not Horario.objects.filter(profesional=profesional).exists():
             for dia in DIAS_HABILES:
                 Horario.objects.create(
@@ -126,7 +123,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write("El profesional ya tiene horario.")
 
-        # --- Servicios de ejemplo ---
         if not Servicio.objects.filter(profesional=profesional).exists():
             self._crear_servicios(profesional)
         else:

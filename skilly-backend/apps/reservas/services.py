@@ -43,9 +43,7 @@ ZONA = timezone.get_current_timezone()
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
 # Utilidades de tiempo
-# ---------------------------------------------------------------------------
 def aware(fecha, hora):
     """Combina fecha y hora locales (America/Santiago) en un datetime aware."""
     return timezone.make_aware(datetime.combine(fecha, hora), ZONA)
@@ -126,14 +124,12 @@ def dias_disponibles(servicio, desde, dias=45):
     return salida
 
 
-# ---------------------------------------------------------------------------
 # Creación de la reserva (ticket 3.5)
-# ---------------------------------------------------------------------------
 def _crear_usuario_invitado(datos):
     """Crea la cuenta automática de una reserva sin registro.
 
     Nace con contraseña inutilizable: el invitado la define al activar la
-    cuenta desde el correo. Ver decisión del Sprint 3 sobre reserva de invitado.
+    cuenta desde el correo. Ver decisión de la Iteración 3 sobre reserva de invitado.
     """
     nombre = (datos.get("nombre") or "").strip()
     partes = nombre.split(" ")
@@ -346,9 +342,7 @@ def crear_reserva(*, servicio, fecha, hora_inicio, datos, organizacion=None, cre
     return reserva, token
 
 
-# ---------------------------------------------------------------------------
 # Máquina de estados (ticket 3.2)
-# ---------------------------------------------------------------------------
 def _evento(reserva, tipo, actor=None, detalle=""):
     return EventoReserva.objects.create(
         reserva=reserva, tipo=tipo, actor=actor, detalle=detalle
@@ -487,6 +481,7 @@ def rechazar(reserva, actor=None, motivo=""):
     return original
 
 
+# Entrega marcada por el profesional; queda pendiente de confirmación.
 @transaction.atomic
 def marcar_entregado(reserva, actor=None):
     if reserva.estado != Reserva.ESTADO_EN_CURSO:
@@ -536,6 +531,7 @@ def _finalizar_entrega(reserva, actor, detalle, *, actor_pago=Pago.ACTOR_USUARIO
     return reserva
 
 
+# Confirmar entrega: cierra la reserva y libera el pago retenido.
 @transaction.atomic
 def confirmar_entrega(reserva, actor=None):
     return _finalizar_entrega(
@@ -840,9 +836,7 @@ def resolver_disputa(
         )
 
 
-# ---------------------------------------------------------------------------
 # Vencimiento (R12 / ticket 3.13)
-# ---------------------------------------------------------------------------
 def expirar_vencidas(ahora=None):
     """Pasa a 'vencida' las reservas cuyo plazo de respuesta expiró."""
     ahora = ahora or timezone.now()

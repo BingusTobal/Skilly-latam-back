@@ -1,8 +1,8 @@
 """
 Modelos de la app catalogo.
 
-Ticket 0.15 (sprint actual) adelantado: se crea Categoria porque el comando
-cargar_seed lo necesita. Servicio y Entregable son del Sprint 2 (tickets 2.2
+Ticket 0.15 (iteración actual) adelantado: se crea Categoria porque el comando
+cargar_seed lo necesita. Servicio y Entregable son de la Iteración 2 (tickets 2.2
 y 2.3) y siguen pendientes.
 """
 from django.conf import settings
@@ -23,7 +23,7 @@ class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True)
     # 0.15: las 5 categorias del seed entran ya aprobadas para que el flujo de
-    # publicacion se pueda probar desde el Sprint 1.
+    # publicacion se pueda probar desde el Iteración 1.
     aprobada = models.BooleanField(default=False)
     activa = models.BooleanField(default=True)
 

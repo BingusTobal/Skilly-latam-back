@@ -86,9 +86,7 @@ def tipo_profesional():
     return UsuarioTipo.PROFESIONAL
 
 
-# ===========================================================================
-# Fixtures del Sprint 1: organizaciones, profesionales y postulaciones
-# ===========================================================================
+# Fixtures de la Iteración 1: organizaciones, profesionales y postulaciones
 # RUTs con formato válido; no se valida el dígito verificador.
 
 RUT_ORGANIZACION_VALIDO = "15686734-5"
@@ -186,9 +184,7 @@ def postulacion(db, profesional):
     )
 
 
-# ===========================================================================
 # Fixtures del catálogo: categorías y servicios
-# ===========================================================================
 
 
 @pytest.fixture
@@ -303,9 +299,7 @@ def certificado_linkedin(db, postulacion):
     )
 
 
-# ===========================================================================
-# Fixtures del Sprint 3: horarios y reservas
-# ===========================================================================
+# Fixtures de la Iteración 3: horarios y reservas
 @pytest.fixture
 def horario_semanal(db, profesional_aprobado):
     """Disponibilidad de lunes a domingo, 09:00–18:00 (para elegir cualquier día)."""

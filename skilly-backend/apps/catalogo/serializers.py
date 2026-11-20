@@ -1,4 +1,3 @@
-# Serializers para catálogo: Servicio, Entregable, Categoría
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError

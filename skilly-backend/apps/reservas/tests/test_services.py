@@ -102,7 +102,7 @@ class TestCrearReserva:
 
 @pytest.mark.django_db
 class TestCuentaInvitada:
-    """Reserva sin registro crea/enlaza una cuenta automática (Sprint 3)."""
+    """Reserva sin registro crea/enlaza una cuenta automática (Iteración 3)."""
 
     def _reservar(self, **kwargs):
         return services.crear_reserva(

@@ -1,4 +1,4 @@
-"""Celery. Se activa en el Sprint 3 (ticket 3.13) para las tareas de expiracion."""
+"""Celery. Se activa en la Iteración 3 (ticket 3.13) para las tareas de expiracion."""
 import os
 
 from celery import Celery

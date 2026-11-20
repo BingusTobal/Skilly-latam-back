@@ -1,5 +1,5 @@
 """
-Admin de postulaciones. Decisión 2 del Sprint 1: el admin Django queda usable
+Admin de postulaciones. Decisión 2 de la Iteración 1: el admin Django queda usable
 para moderar en este repo, mientras el shell React del panel admin vive en el
 frontend (otro repo).
 

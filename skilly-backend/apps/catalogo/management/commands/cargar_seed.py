@@ -54,7 +54,6 @@ class Command(BaseCommand):
     def handle(self, *args, **opciones):
         Usuario = get_user_model()
 
-        # --- Categorias ---
         creadas_categorias = 0
         for nombre, slug in CATEGORIAS_SEED:
             _, creada = Categoria.objects.get_or_create(
@@ -70,7 +69,6 @@ class Command(BaseCommand):
             )
         )
 
-        # --- Administrador ---
         if opciones["sin_admin"]:
             self.stdout.write("Administrador omitido por --sin-admin.")
             return

@@ -4,11 +4,11 @@ Modelos de la app reservas.
 La reserva es el vínculo entre una organización y un profesional: la
 organización reserva un servicio publicado, el profesional acepta, ejecuta y
 marca la entrega, y la organización confirma. Todo el intercambio de dinero
-queda simulado en el MVP (el escrow real es del Sprint 4); acá solo se modela
+queda simulado en el MVP (el escrow real es de la Iteración 4); acá solo se modela
 la relación y su máquina de estados.
 
 Tickets: 3.4 (Reserva), 3.5 (reserva sin cuenta + token mágico),
-3.6 (EventoReserva). Disputa se crea como modelo base; su flujo es del Sprint 5.
+3.6 (EventoReserva). Disputa se crea como modelo base; su flujo es de la Iteración 5.
 """
 import hashlib
 import secrets
@@ -83,7 +83,6 @@ class Reserva(models.Model):
     # reservas ya creadas.
     hora_fin = models.TimeField()
 
-    # Fotografías del momento de reservar.
     precio_acordado = models.DecimalField(max_digits=10, decimal_places=2)
     tasa_comision = models.DecimalField(
         max_digits=5,
@@ -154,6 +153,7 @@ class Reserva(models.Model):
             Decimal("0.01")
         )
 
+    # Comisión interna: diferencia entre precio acordado y monto neto.
     @property
     def monto_comision(self):
         return (self.precio_acordado - self.monto_neto).quantize(Decimal("0.01"))
@@ -171,7 +171,6 @@ class Reserva(models.Model):
             self.estado == self.ESTADO_PENDIENTE_ACEPTACION and not self.expirada
         )
 
-    # --- Token mágico (ticket 3.5) -----------------------------------------
     @staticmethod
     def hash_token(token):
         return hashlib.sha256(token.encode("utf-8")).hexdigest()

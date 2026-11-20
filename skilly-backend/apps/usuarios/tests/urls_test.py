@@ -2,7 +2,7 @@
 
 Replica el enrutado real de la API (config/urls.py) mas un endpoint minimo que
 exige autenticacion, para poder probar el permiso por defecto sin depender de
-los endpoints que cada sprint agrega.
+los endpoints que cada iteración agrega.
 """
 from django.urls import include, path
 from rest_framework.decorators import api_view, permission_classes

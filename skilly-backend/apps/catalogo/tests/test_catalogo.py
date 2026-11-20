@@ -32,9 +32,7 @@ def _crear_otro_profesional(email, rut=RUT_OTRO_PROFESIONAL):
     )
 
 
-# ===========================================================================
 # Modelo: slug automático
-# ===========================================================================
 @pytest.mark.django_db
 class TestSlugServicio:
     def test_genera_slug_desde_el_titulo(self, servicio_borrador):
@@ -59,9 +57,7 @@ class TestSlugServicio:
         assert segundo.slug == "servicio-repetido-2"
 
 
-# ===========================================================================
 # Modelo: validaciones de negocio
-# ===========================================================================
 @pytest.mark.django_db
 class TestValidacionesServicio:
     def test_presencial_exige_ubicacion(self, profesional_aprobado, categoria):
@@ -133,9 +129,7 @@ class TestValidacionesServicio:
             servicio.full_clean()
 
 
-# ===========================================================================
 # Modelo: máquina de estados
-# ===========================================================================
 @pytest.mark.django_db
 class TestMaquinaEstadosServicio:
     def test_publicar_pasa_a_en_revision(self, servicio_borrador):
@@ -176,9 +170,7 @@ class TestMaquinaEstadosServicio:
         assert servicio_aprobado.estado == Servicio.ESTADO_SUSPENDIDO
 
 
-# ===========================================================================
 # API pública
-# ===========================================================================
 @pytest.mark.django_db
 class TestApiPublicaServicios:
     url = "/api/servicios/"
@@ -292,9 +284,7 @@ class TestApiCategorias:
         assert len(respuesta.data) == 2
 
 
-# ===========================================================================
 # API profesional
-# ===========================================================================
 @pytest.mark.django_db
 class TestApiProfesionalServicios:
     url = "/api/profesional/servicios/"
@@ -428,9 +418,7 @@ class TestApiProfesionalServicios:
         assert respuesta.status_code == 404
 
 
-# ===========================================================================
 # API admin: cola de revisión
-# ===========================================================================
 @pytest.mark.django_db
 class TestApiAdminServicios:
     url = "/api/admin/servicios/"
@@ -484,9 +472,7 @@ class TestApiAdminServicios:
         assert servicio_aprobado.estado == Servicio.ESTADO_SUSPENDIDO
 
 
-# ===========================================================================
 # Entregables anidados
-# ===========================================================================
 @pytest.mark.django_db
 class TestEntregablesAnidados:
     def test_crea_con_entregables(self, profesional_aprobado, profesional_client, categoria):

@@ -54,9 +54,7 @@ def _enviar(asunto, cuerpo_texto, destinatarios, plantilla_html=None, contexto=N
         return False
 
 
-# ---------------------------------------------------------------------------
 # 1.6 Alta de organización
-# ---------------------------------------------------------------------------
 def enviar_bienvenida_organizacion(organizacion):
     from django.template.loader import render_to_string
 
@@ -73,9 +71,7 @@ def enviar_bienvenida_organizacion(organizacion):
     )
 
 
-# ---------------------------------------------------------------------------
 # 1.10 Recuperación de contraseña
-# ---------------------------------------------------------------------------
 def enviar_password_reset(usuario, enlace):
     from django.template.loader import render_to_string
 
@@ -94,9 +90,7 @@ def enviar_password_reset(usuario, enlace):
     )
 
 
-# ---------------------------------------------------------------------------
-# Sprint 3 — cuenta automática de la reserva de invitado
-# ---------------------------------------------------------------------------
+# Iteración 3 — cuenta automática de la reserva de invitado
 def enviar_cuenta_creada(usuario, organizacion, reserva, enlace):
     """Correo con el enlace para activar la cuenta creada al reservar.
 
@@ -142,9 +136,7 @@ def enviar_reserva_registrada(usuario, reserva):
     )
 
 
-# ---------------------------------------------------------------------------
 # Postulaciones. Todas se disparan desde el panel admin (1.11 y 1.12).
-# ---------------------------------------------------------------------------
 def _destinatario_postulacion(postulacion):
     """Email del profesional de la postulación, o None si no tiene usuario."""
     usuario = postulacion.profesional.usuario

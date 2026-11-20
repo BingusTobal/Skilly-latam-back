@@ -1,4 +1,4 @@
-"""Configuración versionada de la tasa de comisión (Sprint 5, ticket 5.4).
+"""Configuración versionada de la tasa de comisión (Iteración 5, ticket 5.4).
 
 RF-30: se configura la tasa. R17: cambiarla no altera pagos ya liberados ni
 reservas ya creadas, porque ambos guardan un snapshot.

@@ -1,5 +1,5 @@
 """
-Modelos del módulo de pagos (Sprint 4).
+Modelos del módulo de pagos (Iteración 4).
 
 `Pago` es el intento de cobro de una reserva; `PagoEvento` es su bitácora
 inmutable. Los montos se calculan una sola vez, en CLP enteros, y cumplen
@@ -58,7 +58,6 @@ class Pago(models.Model):
         max_length=20, choices=PASARELA_CHOICES, default=PASARELA_FAKE
     )
 
-    # Montos inmutables del intento, en CLP enteros.
     monto_total = models.PositiveIntegerField()
     monto_comision = models.PositiveIntegerField()
     monto_neto = models.PositiveIntegerField()
@@ -121,6 +120,7 @@ class Pago(models.Model):
     def token_corto(self):
         return token_corto(self.token)
 
+    # Cálculo de montos: total, comisión y neto con un solo redondeo.
     @classmethod
     def calcular_montos(cls, reserva):
         """Calcula los tres montos una sola vez, con redondeo comercial."""

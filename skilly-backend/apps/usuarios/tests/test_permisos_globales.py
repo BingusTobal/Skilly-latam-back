@@ -1,5 +1,5 @@
 """
-Tests de los permisos globales. Tickets 0.8 y Sprint 1.
+Tests de los permisos globales. Tickets 0.8 y Iteración 1.
 
 Estos permisos son la frontera de seguridad de toda la API, así que se prueban
 como unidad: quién puede ver qué, y qué pasa cuando alguien no tiene permiso.
@@ -40,9 +40,7 @@ def profe_sin_postulacion(db, django_user_model):
     return usuario
 
 
-# ===========================================================================
 # EsOrganizacion / EsProfesional
-# ===========================================================================
 @pytest.mark.django_db
 class TestRoles:
     def test_es_organizacion_acepta_a_una_organizacion(self, usuario_organizacion):
@@ -70,9 +68,7 @@ class TestRoles:
         assert not EsAdmin().has_permission(peticion(AnonymousUser()), None)
 
 
-# ===========================================================================
 # EsPostulante / EsPostulanteOAdmin
-# ===========================================================================
 @pytest.mark.django_db
 class TestPostulante:
     def test_acepta_a_un_profesional(self, usuario_profesional):
@@ -114,9 +110,7 @@ class TestPostulante:
         )
 
 
-# ===========================================================================
 # EsAdmin
-# ===========================================================================
 @pytest.mark.django_db
 class TestAdmin:
     def test_acepta_a_un_superusuario(self, usuario_admin):
@@ -129,7 +123,7 @@ class TestAdmin:
         assert not EsAdmin().has_permission(peticion(usuario_organizacion), None)
 
     def test_un_usuario_con_is_admin_sin_es_superusuario_pasa(self, django_user_model):
-        """`is_admin` es el flag de plataforma del Sprint 0; `is_staff` es el de
+        """`is_admin` es el flag de plataforma de la Iteración 0; `is_staff` es el de
         Django. Se usan los dos por separado a propósito."""
         usuario = django_user_model.objects.create_user(
             email="staff@test.skilly",
@@ -140,9 +134,7 @@ class TestAdmin:
         assert EsAdmin().has_permission(peticion(usuario), None)
 
 
-# ===========================================================================
 # exception_handler
-# ===========================================================================
 @pytest.mark.django_db
 class TestExceptionHandler:
     def test_un_404_django_se_normaliza(self):

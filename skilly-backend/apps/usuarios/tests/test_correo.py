@@ -36,9 +36,7 @@ def ses_caido(monkeypatch):
     monkeypatch.setattr(EmailMultiAlternatives, "send", explota)
 
 
-# ===========================================================================
 # Los dos formatos
-# ===========================================================================
 @pytest.mark.django_db
 class TestFormatos:
     def test_envia_texto_y_html(self, organizacion):
@@ -65,9 +63,7 @@ class TestFormatos:
         assert mail.outbox[0].from_email
 
 
-# ===========================================================================
 # Un fallo de correo no rompe nada
-# ===========================================================================
 @pytest.mark.django_db
 class TestFalloDeCorreo:
     def test_devuelve_false_no_levanta(self, organizacion, ses_caido):
@@ -121,9 +117,7 @@ class TestFalloDeCorreo:
         ).exists()
 
 
-# ===========================================================================
 # Contenido de cada correo
-# ===========================================================================
 @pytest.mark.django_db
 class TestContenido:
     def test_bienvenida_saluda_con_el_nombre_del_contacto(self, organizacion):

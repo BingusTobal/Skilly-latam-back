@@ -96,7 +96,7 @@ class TestUsuarioCustom:
 
 
 class TestTokenMagico:
-    """Base para el Sprint 3, ticket 3.5."""
+    """Base para el Iteración 3, ticket 3.5."""
 
     def test_guarda_solo_el_hash(self, usuario_organizacion):
         token = usuario_organizacion.generar_token_magico()

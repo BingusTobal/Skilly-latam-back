@@ -3,7 +3,7 @@ Serializers de postulaciones. Tickets 1.8, 1.11, 1.13.
 
 Puntos delicados:
 
-  - La postulación es UN SOLO PASO (decisión 1 del Sprint 1):
+  - La postulación es UN SOLO PASO (decisión 1 de la Iteración 1):
     `POST /api/postulaciones/` es público y crea Usuario + Profesional +
     Postulacion. No hay "registro de profesional" separado. Los documentos se
     suben después, por `POST /api/postulaciones/{id}/certificados/`, porque un
@@ -50,9 +50,7 @@ def es_url_linkedin(url):
     return url.lower().startswith(PREFIJOS_LINKEDIN)
 
 
-# ===========================================================================
 # Certificados
-# ===========================================================================
 class CertificadoSerializer(serializers.ModelSerializer):
     estado_nombre = serializers.CharField(source="get_estado_display", read_only=True)
     archivo_url = serializers.SerializerMethodField()
@@ -151,9 +149,7 @@ class CertificadoSerializer(serializers.ModelSerializer):
         return certificado
 
 
-# ===========================================================================
 # Postulaciones
-# ===========================================================================
 class CertificadoAdminSerializer(CertificadoSerializer):
     """Cola de certificados del panel (ticket 5.9).
 
@@ -260,10 +256,8 @@ class CrearPostulacionSerializer(serializers.Serializer):
     a mitad de camino no queda nada: la transacción revierte.
     """
 
-    # Datos de la cuenta
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
-    # Datos del profesional
     nombre_completo = serializers.CharField(max_length=150)
     rut = serializers.CharField(max_length=12)
     telefono = serializers.CharField(max_length=30, required=False, allow_blank=True)
@@ -274,7 +268,6 @@ class CrearPostulacionSerializer(serializers.Serializer):
         required=False,
         default="inmediata",
     )
-    # Contenido de la postulación
     especialidad = serializers.CharField(max_length=150, required=False, allow_blank=True)
     experiencia = serializers.CharField(required=False, allow_blank=True)
 

@@ -1,4 +1,4 @@
-"""Disputas E2E (Sprint 5, tickets 5.1–5.3).
+"""Disputas E2E (Iteración 5, tickets 5.1–5.3).
 
 Cubre apertura por organización o profesional, evidencia sin depender de S3,
 permisos de las partes y resolución del admin con efecto sobre el pago.

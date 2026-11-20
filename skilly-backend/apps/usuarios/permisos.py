@@ -41,7 +41,7 @@ class EsOrganizacion(BasePermission):
 class EsProfesional(BasePermission):
     """La cuenta tiene perfil profesional.
 
-    Nota: hasta el Sprint 1 no existe el modelo Profesional, asi que se acepta
+    Nota: hasta el Iteración 1 no existe el modelo Profesional, asi que se acepta
     cualquier cuenta marcada como profesional. El ticket 1.2 agrega la
     comprobacion de estado (postulando / aprobado / rechazado / suspendido).
     """
@@ -58,7 +58,7 @@ class EsProfesional(BasePermission):
 
 
 class EsProfesionalAprobado(BasePermission):
-    """El profesional tiene estado 'aprobado'. Se activa en el Sprint 1 (1.2)."""
+    """El profesional tiene estado 'aprobado'. Se activa en la Iteración 1 (1.2)."""
 
     message = "Tu perfil aun no esta aprobado para publicar."
 
@@ -144,9 +144,7 @@ class UsuarioTipo:
     ADMIN = "admin"
 
 
-# ---------------------------------------------------------------------------
 # Manejo de errores uniforme (referenciado desde REST_FRAMEWORK)
-# ---------------------------------------------------------------------------
 class ErrorValidacion(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = "La solicitud no es valida."
@@ -169,7 +167,7 @@ def exception_handler(exc, context):
     `{"detail": ...}`, así que la misma API respondía con dos claves según de
     dónde saliera el fallo. El frontend tenía que probar las dos. Acá se
     normaliza todo a `detail`, que es además lo que ya emiten `simplejwt` y
-    las vistas del Sprint 1.
+    las vistas de la Iteración 1.
 
     Lo que NO se hace es atrapar excepciones desconocidas: se devuelve None y
     DRF las vuelve a lanzar, para que un error de programación reviente en los

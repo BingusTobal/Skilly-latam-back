@@ -36,9 +36,7 @@ def web_client(client, admin_web):
     return client
 
 
-# ===========================================================================
 # Registro en el admin
-# ===========================================================================
 @pytest.mark.django_db
 class TestAdminRegistro:
     def test_modelos_estan_registrados(self):
@@ -68,9 +66,7 @@ class TestAdminRegistro:
         assert "hora_inicio" not in admin_horario.search_fields
 
 
-# ===========================================================================
 # PostulacionAdmin
-# ===========================================================================
 @pytest.mark.django_db
 class TestPostulacionAdmin:
     def test_acciones_registradas(self):
@@ -175,9 +171,7 @@ class TestPostulacionAdmin:
         assert respuesta.status_code == 200
 
 
-# ===========================================================================
 # CertificadoAdmin — la cola separada (R9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestCertificadoAdmin:
     def test_acciones_registradas(self):
@@ -266,9 +260,7 @@ class TestCertificadoAdmin:
         assert "estado" not in admin_cert.get_readonly_fields(None, certificado_sin_revisar)
 
 
-# ===========================================================================
 # UsuariosAdmin
-# ===========================================================================
 @pytest.mark.django_db
 class TestUsuariosAdmin:
     def test_el_password_no_aparece_en_la_ficha(self, web_client, organizacion):

@@ -4,13 +4,13 @@ Django + DRF sobre MariaDB. Este repositorio es **solo backend**: el frontend
 vive en otro repositorio (decision D4 de `docs/CONTEXTO-ARQUITECTURA.docx`).
 
 Reglas de negocio y decisiones: `../docs/CONTEXTO-ARQUITECTURA.docx`
-Plan de trabajo por sprint: `../docs/PLAN-ITERACIONES.docx`
+Plan de trabajo por iteración: `../docs/PLAN-ITERACIONES.docx`
 Fuente de verdad del stack: `../AGENTS.md`
 
 ## Estado
 
-**Sprint 0 (Iteracion 0) — Andamiaje: completo.** 17 tickets.
-Sprint 1 (Identidad y Curacion) es el siguiente.
+**Iteración 0 (Iteracion 0) — Andamiaje: completo.** 17 tickets.
+Iteración 1 (Identidad y Curacion) es el siguiente.
 
 ## Requisitos
 
@@ -18,7 +18,7 @@ Sprint 1 (Identidad y Curacion) es el siguiente.
 |---|---|
 | Python | 3.14+ |
 | MariaDB | 11.4 (o la que sea local) |
-| Redis | 7 (solo desde el Sprint 3) |
+| Redis | 7 (solo desde el Iteración 3) |
 | Docker | para `docker compose up -d` |
 
 ## Puesta en marcha
@@ -88,16 +88,16 @@ skilly-backend/
 │   ├── settings_test.py      # ajustes de test (SQLite en memoria)
 │   ├── urls.py               # enrutado raiz
 │   ├── vistas.py             # health check
-│   ├── celery.py             # Celery, activo en el Sprint 3
+│   ├── celery.py             # Celery, activo en la Iteración 3
 │   ├── wsgi.py / asgi.py
 └── apps/
     ├── usuarios/             # Usuario (AUTH_USER_MODEL), permisos, JWT
     ├── catalogo/             # Categoria + comando cargar_seed
-    ├── postulaciones/        # Sprint 1
-    ├── reservas/             # Sprint 3
-    ├── pagos/                # Sprint 4
-    ├── disputas/             # Sprint 3 (modelo) / 5 (endpoints)
-    └── comisiones/           # Sprint 4 (modelo) / 5 (reportes)
+    ├── postulaciones/        # Iteración 1
+    ├── reservas/             # Iteración 3
+    ├── pagos/                # Iteración 4
+    ├── disputas/             # Iteración 3 (modelo) / 5 (endpoints)
+    └── comisiones/           # Iteración 4 (modelo) / 5 (reportes)
 ```
 
 ## Convenciones
@@ -130,4 +130,4 @@ skilly-backend/
   (ver `CONTEXTO-ARQUITECTURA.docx` seccion 9.5), por eso el validador no es
   decorativo.
 - El token magico (reserva sin cuenta) guarda **solo el hash SHA-256** en la
-  base de datos. La implementacion completa llega en el Sprint 3.
+  base de datos. La implementacion completa llega en la Iteración 3.

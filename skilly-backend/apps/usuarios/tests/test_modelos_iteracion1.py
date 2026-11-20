@@ -1,5 +1,5 @@
 """
-Tests de modelos del Sprint 1: Organizacion, Profesional, Horario, Postulacion
+Tests de modelos de la Iteración 1: Organizacion, Profesional, Horario, Postulacion
 y Certificado.
 
 Estos tests fijan reglas de NEGOCIO, no la forma de la API. Si mañana se
@@ -18,9 +18,7 @@ from conftest import (
 )
 
 
-# ===========================================================================
 # Organizacion
-# ===========================================================================
 @pytest.mark.django_db
 class TestOrganizacion:
     def test_crea_con_rut_valido(self):
@@ -85,9 +83,7 @@ class TestOrganizacion:
         assert "." not in org.rut
 
 
-# ===========================================================================
 # Profesional
-# ===========================================================================
 @pytest.mark.django_db
 class TestProfesional:
     def test_estado_inicial_es_postulando(self, profesional):
@@ -116,9 +112,7 @@ class TestProfesional:
         assert profesional.usuario.email == "profesional@test.skilly"
 
 
-# ===========================================================================
 # Horario
-# ===========================================================================
 @pytest.mark.django_db
 class TestHorario:
     def test_hora_fin_debe_ser_posterior_a_inicio(self, profesional):
@@ -224,9 +218,7 @@ class TestHorario:
         assert str(horario) == "Jueves: 09:00–17:30"
 
 
-# ===========================================================================
 # Postulacion
-# ===========================================================================
 @pytest.mark.django_db
 class TestPostulacion:
     def test_estado_inicial_es_pendiente(self, postulacion):
@@ -303,9 +295,7 @@ class TestPostulacion:
         assert postulacion.comentarios_admin == "Completa la experiencia."
 
 
-# ===========================================================================
 # Certificado
-# ===========================================================================
 @pytest.mark.django_db
 class TestCertificado:
     def test_linkedin_exige_enlace(self, postulacion):
@@ -355,9 +345,7 @@ class TestCertificado:
         assert certificado_linkedin.requiere_moderacion is False
 
 
-# ===========================================================================
 # R9: moderación separada
-# ===========================================================================
 @pytest.mark.django_db
 class TestModeracionSeparada:
     def test_aprobar_postulacion_no_aprueba_certificados(

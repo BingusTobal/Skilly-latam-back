@@ -124,7 +124,6 @@ class ReservaViewSet(viewsets.GenericViewSet):
     )
     permission_classes = [AllowAny]
 
-    # ------------------------------------------------------------------ util
     def _exigir_sesion(self):
         if not self.request.user.is_authenticated:
             raise NotAuthenticated("Necesitas iniciar sesión.")
@@ -246,7 +245,6 @@ class ReservaViewSet(viewsets.GenericViewSet):
             return self.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
-    # --------------------------------------------------------------- acciones
     @action(detail=True, methods=["post"])
     def aceptar(self, request, pk=None):
         self._exigir_sesion()
@@ -437,9 +435,7 @@ class DisputaViewSet(viewsets.GenericViewSet):
         )
 
 
-# ===========================================================================
 # Panel de administración: cola de disputas
-# ===========================================================================
 class AdminDisputasView(APIView):
     """GET /api/admin/disputas/ — bandeja de disputas del panel admin.
 

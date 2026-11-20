@@ -71,7 +71,7 @@ def obtener_postulacion_ajena(request, pk):
 class CrearPostulacionView(APIView):
     """POST /api/postulaciones/
 
-    Público y en un solo paso (decisión 1 del Sprint 1): crea Usuario +
+    Público y en un solo paso (decisión 1 de la Iteración 1): crea Usuario +
     Profesional + Postulacion. No exige sesión ni token mágico.
     """
 
@@ -170,9 +170,7 @@ class CertificadosPostulacionView(APIView):
         )
 
 
-# ===========================================================================
 # Panel de administración
-# ===========================================================================
 def _traducir_validacion(exc, status_http=status.HTTP_400_BAD_REQUEST):
     """Convierte una ValidationError de Django en una respuesta DRF."""
     if isinstance(exc, DjangoValidationError):

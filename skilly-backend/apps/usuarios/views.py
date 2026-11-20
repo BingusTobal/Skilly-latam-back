@@ -374,9 +374,7 @@ class HorarioDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# ===========================================================================
 # Panel de administración (ticket 1.14)
-# ===========================================================================
 class AdminListarOrganizacionesView(APIView):
     """GET /api/auth/admin/organizaciones/ — ticket 1.14.
 

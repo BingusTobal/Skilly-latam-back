@@ -2,7 +2,7 @@
 Rutas de autenticacion y perfil. Tickets 0.17, 1.6 a 1.10, 1.14.
 
 Se mantienen los endpoints de simplejwt (`token/`, `token/refresh/`) porque
-son los que usan los tests del Sprint 0, y se agregan los de Sprint 1.
+son los que usan los tests de la Iteración 0, y se agregan los de Iteración 1.
 """
 from django.urls import path
 from rest_framework_simplejwt.views import (
@@ -26,10 +26,8 @@ from .views import (
 )
 
 urlpatterns = [
-    # --- Sprint 0 ---
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    # --- Sprint 1 ---
     path(
         "registro-organizacion/",
         RegistroOrganizacionView.as_view(),
@@ -57,7 +55,6 @@ urlpatterns = [
         HorarioDetailView.as_view(),
         name="mis_horarios_detail",
     ),
-    # --- Panel admin (1.14) ---
     path(
         "admin/organizaciones/",
         AdminListarOrganizacionesView.as_view(),

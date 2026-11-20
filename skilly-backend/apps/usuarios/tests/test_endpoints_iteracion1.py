@@ -1,5 +1,5 @@
 """
-Tests de API del Sprint 1: registro, login, perfil, password reset, horarios
+Tests de API de la Iteración 1: registro, login, perfil, password reset, horarios
 y la cola de administración.
 
 Cada test usa el cliente HTTP real (`APIClient`), no llamadas a las vistas: lo
@@ -18,9 +18,7 @@ RUT_ORG_NUEVO = "18765321-5"
 RUT_PROF_NUEVO = "24918073-K"
 
 
-# ===========================================================================
 # Registro de organización (1.6)
-# ===========================================================================
 @pytest.mark.django_db
 class TestRegistroOrganizacion:
     url = "/api/auth/registro-organizacion/"
@@ -118,9 +116,7 @@ class TestRegistroOrganizacion:
         assert Organizacion.objects.filter(nombre="Constructora Nueva SpA").exists()
 
 
-# ===========================================================================
 # Login (1.7)
-# ===========================================================================
 @pytest.mark.django_db
 class TestLogin:
     url = "/api/auth/login/"
@@ -177,9 +173,7 @@ class TestLogin:
         assert "inactiva" in str(respuesta.data).lower()
 
 
-# ===========================================================================
 # Perfil (1.7, 1.9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestMiPerfil:
     url = "/api/auth/me/"
@@ -236,9 +230,7 @@ class TestMiPerfil:
         assert respuesta.data["tipo"] != "admin"
 
 
-# ===========================================================================
 # Cambio de contraseña (1.9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestCambiarPassword:
     url = "/api/auth/cambiar-password/"
@@ -304,9 +296,7 @@ class TestCambiarPassword:
         assert respuesta.status_code == 400
 
 
-# ===========================================================================
 # Recuperación de contraseña (1.10)
-# ===========================================================================
 @pytest.mark.django_db
 class TestPasswordReset:
     url = "/api/auth/password-reset/"
@@ -385,9 +375,7 @@ class TestPasswordReset:
         assert respuesta.status_code == 400
 
 
-# ===========================================================================
 # Horarios personalizados (1.9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestHorarios:
     url = "/api/auth/mis-horarios/"
@@ -482,9 +470,7 @@ class TestHorarios:
         assert respuesta.status_code == 400
 
 
-# ===========================================================================
 # Perfil profesional (1.9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestPerfilProfesional:
     url = "/api/auth/mi-perfil-profesional/"
@@ -589,9 +575,7 @@ class TestPerfilProfesional:
         assert "foto" in respuesta.data
 
 
-# ===========================================================================
 # Panel admin: organizaciones y profesionales (1.14)
-# ===========================================================================
 @pytest.mark.django_db
 class TestPanelAdminListados:
     url_orgs = "/api/auth/admin/organizaciones/"

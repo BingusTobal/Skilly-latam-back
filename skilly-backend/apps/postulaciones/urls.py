@@ -22,9 +22,7 @@ router.register(r"admin/postulaciones", AdminPostulacionViewSet, basename="admin
 router.register(r"admin/certificados", AdminCertificadoViewSet, basename="admin-certificado")
 
 urlpatterns = [
-    # --- Público ---
     path("", CrearPostulacionView.as_view(), name="crear_postulacion"),
-    # --- Profesional ---
     path("mias/", MiPostulacionView.as_view(), name="mi_postulacion"),
     path(
         "<int:pk>/reenviar/",
@@ -36,6 +34,5 @@ urlpatterns = [
         CertificadosPostulacionView.as_view(),
         name="certificados_postulacion",
     ),
-    # --- Panel admin ---
     path("", include(router.urls)),
 ]

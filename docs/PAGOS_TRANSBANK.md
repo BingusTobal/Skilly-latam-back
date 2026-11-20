@@ -1,4 +1,4 @@
-# Especificación del módulo de pagos — Transbank Webpay Plus (Sprint 4)
+# Especificación del módulo de pagos — Transbank Webpay Plus (Iteración 4)
 
 > **Para el agente (opencode):** lee primero `AGENTS.md` y luego este documento completo.
 > Para todo lo relacionado con pagos, **este documento prevalece** sobre cualquier otro.
@@ -9,7 +9,7 @@
 
 ## 1. Alcance
 
-**Entra en este sprint**
+**Entra en esta iteración**
 - Modelo `Pago` con máquina de estados y bitácora inmutable (`PagoEvento`).
 - Pasarela detrás de una interfaz (puerto): `FakeGateway` y `TransbankGateway`.
 - Flujo con **Webpay Plus Captura Diferida** (autorizar al reservar, capturar al aceptar el profesional).
@@ -304,9 +304,8 @@ Las tarjetas de prueba salen de la documentación oficial.
 
 ## 9. Fuera de alcance, pero con su gancho
 
-- **Pago al profesional.** `liberado` solo significa que el neto le corresponde. No automatices transferencias en este
-  sprint: crea el estado de liquidación (`pendiente` | `pagada`) y una acción de administrador auditada para marcarla.
-- **Boleta de honorarios y factura:** se generan a partir de los montos guardados en `Pago`, en un sprint posterior.
+- **Pago al profesional.** `liberado` solo significa que el neto le corresponde. No automatices transferencias en esta iteración: crea el estado de liquidación (`pendiente` | `pagada`) y una acción de administrador auditada para marcarla.
+- **Boleta de honorarios y factura:** se generan a partir de los montos guardados en `Pago`, en una iteración posterior.
 - **Operación con dinero real:** antes de ello, el equipo debe consultar a Transbank y a un asesor legal sobre el rol de
   intermediario que retiene fondos de terceros.
 

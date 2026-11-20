@@ -1,6 +1,6 @@
 """
 URLs raiz de Skilly Latam.
-Ticket 0.14 expone GET /health; el resto de endpoints se agrega por sprint.
+Ticket 0.14 expone GET /health; el resto de endpoints se agrega por iteración.
 """
 from django.conf import settings
 from django.conf.urls.static import static
@@ -21,18 +21,17 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    # Autenticacion JWT (0.17) y perfil/registro (Sprint 1)
+    # Autenticacion JWT (0.17) y perfil/registro (Iteración 1)
     path("api/auth/", include("apps.usuarios.urls_auth")),
-    # Postulaciones y certificados (Sprint 1)
+    # Postulaciones y certificados (Iteración 1)
     path("api/postulaciones/", include("apps.postulaciones.urls")),
-    # Resumen y comisiones del panel admin (Sprint 5)
+    # Resumen y comisiones del panel admin (Iteración 5)
     path("api/", include("apps.comisiones.urls")),
     path("api/", include("apps.catalogo.urls")),
-    # Pagos (Sprint 4): debe ir antes del router de reservas por la ruta anidada.
+    # Pagos (Iteración 4): debe ir antes del router de reservas por la ruta anidada.
     path("api/", include("apps.pagos.urls")),
-    # Reservas y disponibilidad (Sprint 3)
+    # Reservas y disponibilidad (Iteración 3)
     path("api/", include("apps.reservas.urls")),
-    # API por app (se va poblando sprint a sprint)
     path("api/", include("apps.usuarios.urls")),
 ]
 

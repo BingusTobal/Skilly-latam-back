@@ -10,7 +10,6 @@ Se usa desde pytest.ini:
 """
 from .settings import *  # noqa: F401,F403
 
-# Base de datos en memoria para cada test.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

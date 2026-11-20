@@ -59,7 +59,6 @@ class Postulacion(models.Model):
         blank=True, help_text="Se muestra al profesional al devolver o rechazar."
     )
 
-    # Qué pidió el profesional en su postulación.
     experiencia = models.TextField(blank=True)
     especialidad = models.CharField(max_length=150, blank=True)
 
@@ -113,7 +112,6 @@ class Postulacion(models.Model):
                     "El profesional ya tiene una postulación pendiente."
                 )
 
-    # --- Transiciones ------------------------------------------------------
     def _puede_transicionar_a(self, nuevo):
         permitidos = self.TRANSICIONES.get(self.estado, set())
         return nuevo in permitidos
@@ -201,7 +199,7 @@ class Certificado(models.Model):
     Cuatro estados (R9):
       - verificado_automatico: el perfil de LinkedIn. OJO: lo que se valida es
         el FORMATO de la URL, porque LinkedIn no ofrece API pública para
-        validar un perfil. Decisión 3 del Sprint 1.
+        validar un perfil. Decisión 3 de la Iteración 1.
       - sin_reviewer: cualquier otro documento, esperando moderación manual.
       - aprobado / rechazado: decisión del admin sobre ese documento.
     """
@@ -268,7 +266,6 @@ class Certificado(models.Model):
                     {"archivo": "Un documento requiere un archivo adjunto."}
                 )
 
-    # --- Transiciones de moderación (independientes de la postulación) -----
     def aprobar(self, admin_usuario=None):
         if self.estado == self.ESTADO_VERIFICADO_AUTOMATICO:
             raise ValidationError("El perfil de LinkedIn no requiere moderación.")

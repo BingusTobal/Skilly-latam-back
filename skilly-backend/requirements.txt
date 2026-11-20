@@ -23,11 +23,11 @@ django-anymail==15.2
 # --- Documentacion de API ---
 drf-spectacular==0.30.0
 
-# --- Tareas en segundo plano (Celery, Sprint 3 ticket 3.13) ---
+# --- Tareas en segundo plano (Celery, Iteración 3 ticket 3.13) ---
 celery==5.6.3
 redis==8.1.0
 
-# --- Pagos Transbank Webpay Plus (Sprint 4) ---
+# --- Pagos Transbank Webpay Plus (Iteración 4) ---
 # marshmallow llega como dependencia transitiva (ver requirements.lock.txt).
 transbank-sdk==6.1.0
 

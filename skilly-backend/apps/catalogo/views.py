@@ -1,4 +1,3 @@
-# Vistas de catálogo: público, profesional, admin
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q

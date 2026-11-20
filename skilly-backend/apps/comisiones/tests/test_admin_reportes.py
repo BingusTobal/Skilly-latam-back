@@ -1,5 +1,5 @@
 """
-Tests de los endpoints del panel admin (Sprint 5, tickets 5.7 y 5.8).
+Tests de los endpoints del panel admin (Iteración 5, tickets 5.7 y 5.8).
 
 Cubren las vistas que cruzan apps: resumen, comisiones, disputas, listados de
 profesionales/organizaciones y la ficha de una organización. Lo importante es

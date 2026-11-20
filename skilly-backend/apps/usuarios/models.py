@@ -3,8 +3,8 @@ Modelos de la app usuarios.
 Tickets cubiertos: 0.11 (AUTH_USER_MODEL), 1.1 (Organizacion), 1.2 (Profesional),
 1.3 (Horario).
 
-Organizacion y Profesional se crean en el Sprint 1; aqui solo el usuario base,
-que es lo unico que Sprint 0 necesita para poder migrar y autenticar.
+Organizacion y Profesional se crean en la Iteración 1; aqui solo el usuario base,
+que es lo único que la Iteración 0 necesita para poder migrar y autenticar.
 """
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.exceptions import ValidationError
@@ -88,7 +88,6 @@ class Usuario(AbstractUser):
     username = None
     email = models.EmailField("email", unique=True)
 
-    # El administrador del panel (RF de administracion).
     is_admin = models.BooleanField(
         "es administrador",
         default=False,
@@ -96,7 +95,7 @@ class Usuario(AbstractUser):
     )
 
     # Rol de la cuenta. La pertenencia a una organizacion o a un perfil
-    # profesional se resuelve en sus propios modelos (Sprint 1).
+    # profesional se resuelve en sus propios modelos (Iteración 1).
     TIPO_ORGANIZACION = "organizacion"
     TIPO_PROFESIONAL = "profesional"
     TIPO_ADMIN = "admin"
@@ -113,7 +112,7 @@ class Usuario(AbstractUser):
     )
 
     # Token magico de la reserva sin cuenta (D7). Se guarda el hash, nunca
-    # el token en claro. Se implementa en el Sprint 3, ticket 3.5.
+    # el token en claro. Se implementa en la Iteración 3, ticket 3.5.
     token_magico_hash = models.CharField(max_length=64, blank=True, null=True, unique=True)
     token_magico_expira = models.DateTimeField(blank=True, null=True)
 
@@ -147,12 +146,10 @@ class Usuario(AbstractUser):
         self.email = self.__class__.objects.normalize_email(self.email)
         super().save(*args, **kwargs)
 
-    # --- Token magico (Sprint 3) -------------------------------------------
     def generar_token_magico(self, horas_validez=None):
         """Genera un token de un solo uso y guarda solo su hash SHA-256.
 
-        Se deja el metodo aqui para que la app de reservas lo use en el
-        Sprint 3 (ticket 3.5). Nunca se persiste el token en claro.
+        Se deja el metodo aqui para que la app de reservas lo use en la Iteración 3 (ticket 3.5). Nunca se persiste el token en claro.
         """
         import hashlib
         import secrets
@@ -190,7 +187,7 @@ class Usuario(AbstractUser):
         self.save(update_fields=["token_magico_hash", "token_magico_expira"])
 
 
-# Se deja el validador disponible para el Sprint 1 (Organizacion y Profesional).
+# Se deja el validador disponible para el Iteración 1 (Organizacion y Profesional).
 validar_rut.__name__ = "validar_rut"
 VALIDADOR_RUT = RegexValidator(
     r"^\d{6,8}-?[0-9Kk]$", "Formato de RUT inválido (ej: 12.345.678-5)."
@@ -201,7 +198,7 @@ VALIDADOR_RUT = RegexValidator(
 class ValidadorRut:
     """Validador de Django que envuelve validar_rut (solo formato).
 
-    Decisión 4 del Sprint 1: RUT se valida igual en Organizacion y Profesional.
+    Decisión 4 de la Iteración 1: RUT se valida igual en Organizacion y Profesional.
 
     Es `@deconstructible` porque Django tiene que poder serializar el validador
     dentro de una migración; una clase normal no se puede escribir en un
@@ -222,9 +219,7 @@ class ValidadorRut:
 VALIDADOR_RUT_MODULO11 = ValidadorRut()
 
 
-# ===========================================================================
-# Sprint 1 — ticket 1.1
-# ===========================================================================
+# Iteración 1 — ticket 1.1
 class Organizacion(models.Model):
     """Organización que contrata servicios. Ticket 1.1.
 
@@ -289,7 +284,7 @@ class Organizacion(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
-        # Normaliza el RUT: sin puntos ni guiones, siempre.
+        # RUT: se normaliza antes de guardarse.
         if self.rut:
             self.rut = normalizar_rut(self.rut)
         super().save(*args, **kwargs)
@@ -316,9 +311,7 @@ class Organizacion(models.Model):
         return self.rut
 
 
-# ===========================================================================
-# Sprint 1 — ticket 1.2
-# ===========================================================================
+# Iteración 1 — ticket 1.2
 def validar_tamano_foto(archivo):
     if archivo.size > 2 * 1024 * 1024:
         raise ValidationError("La foto no puede superar 2 MB.")
@@ -423,14 +416,12 @@ class Profesional(models.Model):
         return self.esta_aprobado
 
 
-# ===========================================================================
-# Sprint 1 — ticket 1.3
-# ===========================================================================
+# Iteración 1 — ticket 1.3
 class Horario(models.Model):
     """Horario semanal del profesional. Ticket 1.3.
 
     Vive en la app usuarios (decisión D9): es un atributo del profesional, no
-    del catálogo. El cálculo de slots del Sprint 3 (3.1) lo usa junto con las
+    del catálogo. El cálculo de slots de la Iteración 3 (3.1) lo usa junto con las
     reservas vigentes.
     """
 

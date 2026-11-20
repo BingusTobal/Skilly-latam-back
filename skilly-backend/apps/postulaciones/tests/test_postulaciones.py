@@ -31,9 +31,7 @@ def payload_postulacion():
     }
 
 
-# ===========================================================================
 # Postulación pública (1.8)
-# ===========================================================================
 @pytest.mark.django_db
 class TestCrearPostulacion:
     url = "/api/postulaciones/"
@@ -210,9 +208,7 @@ class TestCrearPostulacion:
         ).exists()
 
 
-# ===========================================================================
 # El profesional ve su trámite
-# ===========================================================================
 @pytest.mark.django_db
 class TestMiPostulacion:
     url = "/api/postulaciones/mias/"
@@ -253,9 +249,7 @@ class TestMiPostulacion:
         assert respuesta.data["comentarios_admin"] == "No cubrimos tu especialidad."
 
 
-# ===========================================================================
 # Reenvío (1.10)
-# ===========================================================================
 @pytest.mark.django_db
 class TestReenviarPostulacion:
     def url(self, pk):
@@ -295,9 +289,7 @@ class TestReenviarPostulacion:
         assert respuesta.status_code == 404
 
 
-# ===========================================================================
 # Certificados del profesional (1.9)
-# ===========================================================================
 @pytest.mark.django_db
 class TestCertificadosPostulacion:
     def url(self, pk):
@@ -379,9 +371,7 @@ class TestCertificadosPostulacion:
         assert respuesta.status_code == 404
 
 
-# ===========================================================================
 # Moderación de postulaciones (1.11, 1.12)
-# ===========================================================================
 @pytest.mark.django_db
 class TestModeracionAdmin:
     def url(self, pk):
@@ -497,9 +487,7 @@ class TestModeracionAdmin:
         assert respuesta.status_code == 405
 
 
-# ===========================================================================
 # Moderación de certificados (R9) — cola separada
-# ===========================================================================
 @pytest.mark.django_db
 class TestModeracionCertificados:
     def url_cert(self, pk):
@@ -579,9 +567,7 @@ class TestModeracionCertificados:
         assert respuesta.status_code == 403
 
 
-# ===========================================================================
 # Regresión H1: FileField no debe usar max_length en bytes (MariaDB error 1074)
-# ===========================================================================
 class TestRegresionH1ColumnasArchivo:
     def test_filefields_usan_longitud_por_defecto(self):
         from apps.reservas.models import EvidenciaDisputa

@@ -30,9 +30,7 @@ def env_list(nombre, por_defecto=""):
     return [item.strip() for item in valor.split(",") if item.strip()]
 
 
-# ---------------------------------------------------------------------------
 # 0.2 Seguridad basica
-# ---------------------------------------------------------------------------
 # En produccion DJANGO_SECRET_KEY es obligatoria: sin ella no se arranca.
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = env_bool("DEBUG", False)
@@ -50,9 +48,7 @@ if not SECRET_KEY:
 # 0.6 Hosts permitidos
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 
-# ---------------------------------------------------------------------------
 # 0.10 Estructura de aplicaciones
-# ---------------------------------------------------------------------------
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -117,9 +113,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# ---------------------------------------------------------------------------
 # 0.3 Base de datos MariaDB
-# ---------------------------------------------------------------------------
 DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.mysql").strip()
 
 if DB_ENGINE == "django.db.backends.sqlite3":
@@ -164,9 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ---------------------------------------------------------------------------
 # 0.5 Internacionalizacion y zona horaria
-# ---------------------------------------------------------------------------
 # CRITICO: el calculo de slots (ticket 3.1) depende de USE_TZ=True y de que la
 # hora local de negocio sea America/Santiago. No cambiar sin revisar reservas.
 LANGUAGE_CODE = "es-cl"
@@ -174,9 +166,7 @@ TIME_ZONE = "America/Santiago"
 USE_I18N = True
 USE_TZ = True
 
-# ---------------------------------------------------------------------------
 # Archivos estaticos y medios
-# ---------------------------------------------------------------------------
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
@@ -187,9 +177,7 @@ STORAGES = {
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# ---------------------------------------------------------------------------
 # 0.7 Almacenamiento S3
-# ---------------------------------------------------------------------------
 # En produccion Amazon S3; en desarrollo backend local. El codigo de la app
 # es el mismo en ambos casos.
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
@@ -210,9 +198,7 @@ if os.environ.get("USAR_S3", "").strip().lower() in ("1", "true", "yes", "si", "
         raise RuntimeError("USAR_S3=1 requiere definir AWS_STORAGE_BUCKET_NAME en .env")
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
-# ---------------------------------------------------------------------------
 # 0.8 Correo transaccional
-# ---------------------------------------------------------------------------
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
@@ -236,9 +222,7 @@ EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))
 # correos (restablecer contraseña, confirmar token mágico de la reserva D7).
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
-# ---------------------------------------------------------------------------
 # 0.6 CORS
-# ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
@@ -260,9 +244,7 @@ if CORS_ALLOW_CREDENTIALS and "*" in CORS_ALLOWED_ORIGINS:
         "CORS_ALLOW_CREDENTIALS esta activo."
     )
 
-# ---------------------------------------------------------------------------
 # REST Framework (0.13 RBAC se resuelve en apps/usuarios/permisos.py)
-# ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -298,9 +280,7 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-# ---------------------------------------------------------------------------
 # 0.17 JWT
-# ---------------------------------------------------------------------------
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": __import__("datetime").timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": __import__("datetime").timedelta(days=7),
@@ -320,14 +300,12 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-# ---------------------------------------------------------------------------
 # 0.9 Constantes de negocio
-# ---------------------------------------------------------------------------
 # Vienen del .env para poder ajustarlas sin redeploy. Los valores por defecto
 # son los aprobados en CONTEXTO-ARQUITECTURA.docx (seccion 12.1).
 
 # R12: plazo de respuesta del profesional antes de que la reserva venza.
-# Decision Sprint 4: 12 h, con tope para no cruzar el inicio del servicio.
+# Decision Iteración 4: 12 h, con tope para no cruzar el inicio del servicio.
 PLAZO_RESPUESTA_PROFESIONAL_HORAS = int(
     os.environ.get("PLAZO_RESPUESTA_PROFESIONAL_HORAS", "12")
 )
@@ -356,7 +334,6 @@ DIAS_VENTANA_AUTORIZACION_WEBPAY = int(
     os.environ.get("DIAS_VENTANA_AUTORIZACION_WEBPAY", "7")
 )
 
-# --- Pasarela de pago (Sprint 4, docs/PAGOS_TRANSBANK.md) ---
 # fake permite desarrollar sin credenciales. En produccion el gateway falso
 # debe habilitarse explicitamente.
 PAYMENT_GATEWAY = os.environ.get("PAYMENT_GATEWAY", "fake").strip().lower()
@@ -414,9 +391,7 @@ SLOT_MINUTOS = int(os.environ.get("SLOT_MINUTOS", "30"))
 # R5: unicos formatos de ejecucion permitidos.
 FORMATOS_EJECUCION = ("remoto", "presencial", "hibrido")
 
-# ---------------------------------------------------------------------------
-# Celery (Sprint 3, ticket 3.13) - se declara en Sprint 0 para tener Redis pronto
-# ---------------------------------------------------------------------------
+# Celery (Iteración 3, ticket 3.13) - se declara en Iteración 0 para tener Redis pronto
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
 CELERY_TIMEZONE = TIME_ZONE
@@ -450,9 +425,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# ---------------------------------------------------------------------------
 # Logging
-# ---------------------------------------------------------------------------
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -468,9 +441,7 @@ LOGGING = {
     },
 }
 
-# ---------------------------------------------------------------------------
 # 0.6 Endurecimiento de cookies y transporte en produccion
-# ---------------------------------------------------------------------------
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
